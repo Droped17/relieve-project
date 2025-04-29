@@ -1,11 +1,9 @@
-import { ApolloClient, HttpLink, InMemoryCache } from "@apollo/client";
+// lib/apollo-client.ts
+import { ApolloClient, InMemoryCache } from '@apollo/client';
 
- const client = new ApolloClient({
-    link: new HttpLink({
-        uri: process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT,
-        credentials: 'include'
-    }),
-    cache: new InMemoryCache()
- })
+const client = new ApolloClient({
+  uri: process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT, 
+  cache: new InMemoryCache(),
+});
 
- export default client
+export default client;

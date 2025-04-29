@@ -1,9 +1,14 @@
-const HomePage = () => {
-    return (
-        <div>
-            <p>HomePage</p>
-        </div>
-    )
-}
+'use client';
 
-export default HomePage
+export default function UsersPage() {
+
+  return (
+    <div>
+      <h1> TEst Users</h1>
+      <p>test</p>
+      <p>sadasd</p>
+      <p>test</p>
+      <p>asdas</p>
+    </div>
+  );
+}

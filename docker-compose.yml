@@ -1,17 +1,28 @@
 version: '3.8'
 
 services:
+# [TODO]: open when need to deploy
+# NEXT
+  # app:
+  #   build: .
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - MONGODB_URI=mongodb://mongo:27017/relieve_project
+  #   depends_on:
+  #     - mongo
+  #   volumes:
+  #     - .:/app
+# MONGO
   mongo:
     image: mongo
-    restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
     ports:
       - "27017:27017"
+    environment:
+      - MONGODB_URI=mongodb://mongo:27017/relieve_project
     volumes:
       - mongo-data:/data/db
 
 volumes:
-  mongo-data:
-    driver: local
+    mongo-data: 
+
