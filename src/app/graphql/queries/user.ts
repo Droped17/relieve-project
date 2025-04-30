@@ -1,11 +1,14 @@
-// graphql/schema.ts
 import { gql } from 'graphql-tag';
 
 export const typeDefs = gql`
   type User {
     id: ID!
-    name: String!
+    firstName: String!
+    lastName: String!
     email: String!
+    password: String!
+    phone: String!  
+    role: String!
   }
 
   type Query {
@@ -13,6 +16,6 @@ export const typeDefs = gql`
   }
 
   type Mutation {
-    createUser(name: String!, email: String!): User!
+    createUser(firstName: String!, lastName: String!, email: String!, password: String!, phone: String!): User!
   }
 `;

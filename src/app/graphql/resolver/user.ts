@@ -1,20 +1,24 @@
-// graphql/resolvers.ts
-import dbConnect from '@/src/lib/mongoose';
 import { User } from '@/src/models/User';
+
+interface User {
+  firstName: string
+  lastName: string
+  email: string
+  password: string
+  phone: string
+  role: string
+}
 
 export const resolvers = {
   Query: {
     users: async () => {
-      await dbConnect();
       return await User.find();
     },
   },
   Mutation: {
-    createUser: async (_: any, { name, email }: { name: string; email: string }) => {
-      // await dbConnect();
-      const newUser = User.create({
-        email,
-        name
+    createUser: async (_: never, args: User) => {
+      const newUser = await User.create({
+        ...args,
       })
       return newUser
     },
