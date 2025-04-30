@@ -1,13 +1,4 @@
-import { User } from '@/src/models/User';
-
-interface User {
-  firstName: string
-  lastName: string
-  email: string
-  password: string
-  phone: string
-  role: string
-}
+import { IUser, User } from '@/src/models/User';
 
 export const resolvers = {
   Query: {
@@ -16,7 +7,7 @@ export const resolvers = {
     },
   },
   Mutation: {
-    createUser: async (_: never, args: User) => {
+    createUser: async (_: never, args: IUser) => {
       const newUser = await User.create({
         ...args,
       })
