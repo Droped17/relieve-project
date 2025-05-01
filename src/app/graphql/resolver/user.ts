@@ -1,11 +1,9 @@
-import dbConnect from '@/src/lib/mongoose';
 import { IUser, User } from '@/src/models/User';
 import * as bcrypt from 'bcrypt'
 
 export const resolvers = {
   Query: {
     users: async () => {
-      await dbConnect();
       return await User.find();
     },
   },

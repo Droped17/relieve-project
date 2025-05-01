@@ -2,6 +2,8 @@ import { NextIntlClientProvider, hasLocale } from 'next-intl';
 import { notFound } from 'next/navigation';
 import { routing } from '@/src/app/i18n/routing';
 import SessionProvider from '@/src/providers/SessionProvider';
+import ApolloProviders from '@/src/providers/ApolloProvider';
+import '@/src/app/style/globals.css'
 
 export default async function LocaleLayout({
   children,
@@ -19,13 +21,16 @@ export default async function LocaleLayout({
   return (
     <html lang={locale}>
       <body>
+        {/* Apollo */}
+        <ApolloProviders>
         {/* Localization */}
-        <NextIntlClientProvider>
+          <NextIntlClientProvider>
         {/* Next Auth */}
-          <SessionProvider>
-            {children}
-          </SessionProvider>
-        </NextIntlClientProvider>
+            <SessionProvider>
+              {children}
+            </SessionProvider>
+          </NextIntlClientProvider>
+        </ApolloProviders>
       </body>
     </html>
   );

@@ -1,6 +1,8 @@
 'use client';
 
 import { signOut, useSession } from "next-auth/react";
+import { Link } from "../../i18n/routing";
+
 
 const HomePage = () => {
   const {data, status} = useSession()
@@ -17,6 +19,10 @@ const HomePage = () => {
       </div> : 
       <div>
         <p>Not Login</p>
+        <div className="flex flex-col">
+        <Link href={`/login`}>Login</Link>
+        <Link href={`/register`}>Register</Link>
+        </div>
       </div>}
     </div>
   );
