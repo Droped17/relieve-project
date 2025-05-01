@@ -5,6 +5,15 @@ import SessionProvider from '@/src/providers/SessionProvider';
 import ApolloProviders from '@/src/providers/ApolloProvider';
 import '@/src/app/style/globals.css'
 import Header from '@/src/components/organisms/Header';
+import { Kanit } from 'next/font/google'
+
+const kanit = Kanit({
+  subsets: ['latin', 'thai'],
+  weight: ['300', '400', '500', '700'],
+  variable: '--font-kanit',
+  display: 'swap',
+})
+
 
 export default async function LocaleLayout({
   children,
@@ -14,13 +23,15 @@ export default async function LocaleLayout({
   params: Promise<{ locale: string }>;
 }) {
   // Ensure that the incoming `locale` is valid
+
+
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) {
     notFound();
   }
 
   return (
-    <html lang={locale}>
+    <html lang={locale} className={kanit.variable}>
       <body>
         {/* Apollo */}
         <ApolloProviders>

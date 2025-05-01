@@ -5,9 +5,9 @@ interface HeaderTextProps {
 
 const HeaderText = ({title,className}: HeaderTextProps) => {
     return (
-        <h1 className={`font-bold text-2xl ${className}`}>
+        <p className={`${className}`}>
             {title}
-        </h1>
+        </p>
     )
 }
 
