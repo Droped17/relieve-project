@@ -6,6 +6,7 @@ import { signOut, useSession } from "next-auth/react";
 import { useState } from "react";
 import clsx from "clsx";
 import Image from "next/image";
+import { useParams, useRouter } from "next/navigation";
 
 /* [TODO]: fetch real data */
 const room = [
@@ -118,6 +119,8 @@ const HomePage = () => {
 
   const [floor, setFloor] = useState<boolean>(true)
 
+  const router = useRouter()
+  const params = useParams()
   const { data } = useSession()
 
   const nowLocal = new Date().toLocaleDateString();
@@ -148,6 +151,7 @@ const HomePage = () => {
                 <button
                   key={item.id}
                   disabled={item.status === 'full' || item.status === 'empty' && true}
+                  onClick={() => router.push(`/${params.locale}/room/${item.id}`)}
                   className={clsx(
                     'border border-gray-300 p-4 w-28 flex justify-center',
                     {
@@ -170,6 +174,7 @@ const HomePage = () => {
                 <button
                   key={item.id}
                   disabled={item.status === 'full' || item.status === 'empty' && true}
+                  onClick={() => router.push(`/${params.locale}/room/${item.id}`)}
                   className={clsx(
                     'border border-gray-300 p-4 w-28 flex justify-center',
                     {
@@ -192,6 +197,7 @@ const HomePage = () => {
               <button
               key={item.id}
               disabled={item.status === 'full' || item.status === 'empty' && true}
+              onClick={() => router.push(`/${params.locale}/room/${item.id}`)}
               className={clsx(
                 'border border-gray-300 p-4 w-28 flex justify-center',
                 {
@@ -214,6 +220,7 @@ const HomePage = () => {
               <button
               key={item.id}
               disabled={item.status === 'full' || item.status === 'empty' && true}
+              onClick={() => router.push(`/${params.locale}/room/${item.id}`)}
               className={clsx(
                 'border border-gray-300 p-4 w-28 flex justify-center',
                 {
