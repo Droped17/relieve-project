@@ -4,6 +4,7 @@ import { routing } from '@/src/app/i18n/routing';
 import SessionProvider from '@/src/providers/SessionProvider';
 import ApolloProviders from '@/src/providers/ApolloProvider';
 import '@/src/app/style/globals.css'
+import Header from '@/src/components/organisms/Header';
 
 export default async function LocaleLayout({
   children,
@@ -23,11 +24,15 @@ export default async function LocaleLayout({
       <body>
         {/* Apollo */}
         <ApolloProviders>
-        {/* Localization */}
+          {/* Localization */}
           <NextIntlClientProvider>
-        {/* Next Auth */}
+            {/* Next Auth */}
             <SessionProvider>
-              {children}
+              {/* Header Component */}
+              <Header />
+                <main>
+                  {children}
+                </main>
             </SessionProvider>
           </NextIntlClientProvider>
         </ApolloProviders>

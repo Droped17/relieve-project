@@ -2,6 +2,8 @@
 
 // import { REGISTER_USER } from "@/src/app/graphql/mutations/user.mutation";
 import { gql, useMutation } from "@apollo/client";
+import { signIn } from "next-auth/react";
+import { useParams } from "next/navigation";
 import React, { FormEvent, useState } from "react"
 
 const CREATE_USER = gql`
@@ -43,6 +45,8 @@ const RegisterForm = () => {
         phone: ""
     })
 
+    const param = useParams()
+
     /* Handle Loading, Error */
     // if (loading) return <LoadingTable />
     // if (isError(error)) return <Error />
@@ -50,7 +54,15 @@ const RegisterForm = () => {
 
     const [createUser] = useMutation(CREATE_USER, {
         onCompleted: (data) => {
-            console.log(data)
+            // Auto Login with NextAuth
+            if (data) {
+                signIn("credentials", {
+                    redirect: true,
+                    callbackUrl: `/${param.locale}/homepage`,
+                    email: formData.email,
+                    password: formData.password
+                })
+            }
         },
         onError: (error) => {
             console.log(error)
@@ -65,13 +77,11 @@ const RegisterForm = () => {
         }))
     }
 
-    const handleSubmit = async(e: FormEvent) => {
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault()
         try {
-            console.log(formData)
-            // await dbConnect();
-            await createUser({variables: formData})
-            
+            await createUser({ variables: formData })
+
         } catch (error) {
             console.error(error)
         }
