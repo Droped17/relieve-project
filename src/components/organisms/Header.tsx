@@ -7,7 +7,7 @@ const Header = async () => {
     console.log(session);
 
     return (
-        <header className="flex items-center border-y border-gray-300 px-8 py-4 justify-between h-16">
+        <header className="flex items-center border-b border-gray-300 bg-[#ACD3A8] px-8 py-4 justify-between h-16">
             <div>
                 <Link href={`/en/homepage`}>Web Name</Link>
             </div>

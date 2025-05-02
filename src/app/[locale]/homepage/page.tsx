@@ -7,6 +7,7 @@ import { useState } from "react";
 import clsx from "clsx";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 /* [TODO]: fetch real data */
 const room = [
@@ -121,6 +122,7 @@ const HomePage = () => {
 
   const router = useRouter()
   const params = useParams()
+  const t = useTranslations()
   const { data } = useSession()
 
   const nowLocal = new Date().toLocaleDateString();
@@ -135,7 +137,7 @@ const HomePage = () => {
 
   return (
     <div className="mx-8">
-      <HeaderText title="Relieve" className="text-center text-3xl mt-6 font-semibold" />
+      <HeaderText title={t('home_page.relieve')} className="text-center text-3xl mt-6 font-semibold" />
       <div className="flex flex-col gap-6">
         <div>
           {data?.user && <button onClick={() => signOut({ callbackUrl: "/th/homepage" })} className="p-2 bg-red-400 cursor-pointer">logout</button>}
@@ -246,11 +248,11 @@ const HomePage = () => {
         {/* Divider */}
         <Divider />
         {/* Relieve Details */}
-        <div className="flex justify-center">
+        <div className="flex flex-col items-center justify-center gap-6">
+          <HeaderText title="About us" className="text-2xl font-semibold"/>
           <Image alt="home_img" width={600} height={600} src={`https://images.unsplash.com/photo-1742898958003-63577fe8776e?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D`} />
-
         </div>
-        <p className="pb-4">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Facere voluptate accusantium facilis iste voluptatum praesentium inventore sit, enim ab, est harum soluta nobis id dolores. Ipsum quisquam ab, deleniti minus, vero numquam distinctio recusandae nisi, reprehenderit repudiandae nobis molestiae sequi! Odio numquam dignissimos repellat asperiores. Asperiores vitae, mollitia vero consectetur obcaecati animi repellendus ut vel laborum nulla cumque inventore similique quae, dolor quibusdam eligendi, veritatis rem at error perferendis. A nisi quisquam consectetur placeat odit eveniet, tempora, sit nemo impedit enim quibusdam? Doloremque suscipit repellendus rem est. Vero officia non nisi laboriosam sapiente aut corrupti odio suscipit, expedita hic quaerat?</p>
+        <p className="pb-4">{t('home_page.title')}</p>
       </div>
     </div>
   );
