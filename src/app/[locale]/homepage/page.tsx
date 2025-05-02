@@ -136,7 +136,7 @@ const HomePage = () => {
   }
 
   return (
-    <div className="mx-8">
+    <div className="mx-auto max-w-[1024px]">
       <HeaderText title={t('home_page.relieve')} className="text-center text-3xl mt-6 font-semibold" />
       <div className="flex flex-col gap-6">
         <div>
