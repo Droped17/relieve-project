@@ -29,7 +29,7 @@ const Booking = () => {
     return (
         <div>
                         <div className="flex gap-4">
-                <Link href={`/${params.locale}/homepage`} className="cursor-pointer px-2">{`<`}</Link>
+                <Link href={`/${params.locale}/room/${params.id}`} className="cursor-pointer px-2">{`<`}</Link>
                 {/* [TODO]: change this to real room number */}
                 <HeaderText title={`Room ${params.id}`} className="font-semibold text-xl" />
             </div>

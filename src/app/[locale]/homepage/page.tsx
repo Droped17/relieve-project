@@ -2,7 +2,6 @@
 
 import HeaderText from "@/src/components/atoms/HeaderText";
 import Divider from "@/src/components/atoms/Divider";
-import { signOut, useSession } from "next-auth/react";
 import { useState } from "react";
 import clsx from "clsx";
 import Image from "next/image";
@@ -123,7 +122,6 @@ const HomePage = () => {
   const router = useRouter()
   const params = useParams()
   const t = useTranslations()
-  const { data } = useSession()
 
   const nowLocal = new Date().toLocaleDateString();
 
@@ -139,9 +137,6 @@ const HomePage = () => {
     <div className="mx-auto max-w-[1024px]">
       <HeaderText title={t('home_page.relieve')} className="text-center text-3xl mt-6 font-semibold" />
       <div className="flex flex-col gap-6">
-        <div>
-          {data?.user && <button onClick={() => signOut({ callbackUrl: "/th/homepage" })} className="p-2 bg-red-400 cursor-pointer">logout</button>}
-        </div>
         {/* Date Picker */}
 
         {/* Room Status */}
