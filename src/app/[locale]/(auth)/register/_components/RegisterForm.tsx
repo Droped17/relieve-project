@@ -1,5 +1,7 @@
 "use client"
 
+import Button from "@/src/components/atoms/Button";
+import Input from "@/src/components/atoms/Input";
 // import { REGISTER_USER } from "@/src/app/graphql/mutations/user.mutation";
 import { gql, useMutation } from "@apollo/client";
 import { signIn } from "next-auth/react";
@@ -47,11 +49,6 @@ const RegisterForm = () => {
 
     const param = useParams()
 
-    /* Handle Loading, Error */
-    // if (loading) return <LoadingTable />
-    // if (isError(error)) return <Error />
-
-
     const [createUser] = useMutation(CREATE_USER, {
         onCompleted: (data) => {
             // Auto Login with NextAuth
@@ -88,45 +85,13 @@ const RegisterForm = () => {
     }
 
     return (
-        <form onSubmit={handleSubmit} className="flex flex-col gap-2">
-            <label>Firstname</label>
-            <input type="text"
-                className="border p-2 border-gray-200 rounded-sm"
-                value={formData.firstName}
-                id="firstName"
-                name="firstName"
-                onChange={handleOnChange} />
-            <label>Lastname</label>
-            <input type="text"
-                className="border p-2 border-gray-200 rounded-sm"
-                value={formData.lastName}
-                id="lastName"
-                name="lastName"
-                onChange={handleOnChange} />
-
-            <label>Email</label>
-            <input type="text"
-                className="border p-2 border-gray-200 rounded-sm"
-                value={formData.email}
-                id="email"
-                name="email"
-                onChange={handleOnChange} />
-
-            <label>Password</label>
-            <input type="password"
-                className="border p-2 border-gray-200 rounded-sm"
-                value={formData.password}
-                id="password"
-                name="password"
-                onChange={handleOnChange} />
-            <label>Phone</label>
-            <input type="text"
-                className="border p-2 border-gray-200 rounded-sm"
-                value={formData.phone}
-                id="phone"
-                name="phone"
-                onChange={handleOnChange} />
-            <button type="submit" className="p-2 bg-green-300 hover:bg-green-400 transition cursor-pointer rounded-md text-white font-bold">Register</button>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-2 p-12 rounded-2xl shadow-lg bg-white">
+            <Input id="firstName" name="firstName" type="text" value={formData.firstName} onChange={handleOnChange} label="Firstname" />
+            <Input id="lastName" name="lastName" type="text" value={formData.lastName} onChange={handleOnChange} label="Lastname" />
+            <Input id="email" name="email" type="email" value={formData.email} onChange={handleOnChange} label="Email" />
+            <Input id="password" name="password" type="password" value={formData.password} onChange={handleOnChange} label="Password" />
+            <Input id="phone" name="phone" type="text" value={formData.phone} onChange={handleOnChange} label="Phone" />
+            <Button type="submit" title="Register" />
         </form>
     )
 }

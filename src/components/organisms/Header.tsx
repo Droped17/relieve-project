@@ -35,6 +35,12 @@ const Header = () => {
                     <Link href={`/en/register`}>Register</Link></div>}
             </div>
 
+<div>
+<Link href={`/en/login`}>Login</Link>
+<Link href={`/en/register`}>Register</Link>
+
+</div>
+
         </header>
     )
 }
