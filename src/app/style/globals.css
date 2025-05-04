@@ -1,2 +1,19 @@
 @import "tailwindcss";
 
+@theme {
+    /* Breakpoint */
+    --breakpoint-*: initial;
+    --breakpoint-tablet: 40rem;   /* 640px */
+    --breakpoint-laptop: 64rem;   /* 1024px */
+    --breakpoint-desktop: 80rem;  /* 1280px */
+    --breakpoint-widescreen: 96rem; /* 1536px */
+    --breakpoint-4k: 120rem; /* 1920px */
+
+    /* Colors */
+    --color-primary: #8AB2A6;
+    --color-secondary: #ACD3A8;
+    --color-tertiary: #3E3F5B;
+    --color-error: #ED1C24;
+    --color-warning: #FFB051;
+
+}

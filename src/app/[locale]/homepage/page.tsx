@@ -138,7 +138,6 @@ const HomePage = () => {
       <HeaderText title={t('home_page.relieve')} className="text-center text-3xl mt-6 font-semibold" />
       <div className="flex flex-col gap-6">
         {/* Date Picker */}
-
         {/* Room Status */}
 
         {/* FLOOR 1 */}
