@@ -7,6 +7,7 @@ import { gql, useMutation } from "@apollo/client";
 import { signIn } from "next-auth/react";
 import { useParams } from "next/navigation";
 import React, { FormEvent, useState } from "react"
+import { RegisterSchema } from "../registerSchema";
 
 const CREATE_USER = gql`
   mutation CreateUser(
@@ -46,8 +47,10 @@ const RegisterForm = () => {
         password: "",
         phone: ""
     })
+    const [error, setError] = useState<Record<string, string[]>>({});
 
     const param = useParams()
+    const schema = RegisterSchema()
 
     const [createUser] = useMutation(CREATE_USER, {
         onCompleted: (data) => {
@@ -77,7 +80,13 @@ const RegisterForm = () => {
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault()
         try {
-            await createUser({ variables: formData })
+            const validatedFormData = schema.safeParse(formData)
+            if (validatedFormData.success) {
+                await createUser({ variables: formData })
+            } else {
+                console.log(validatedFormData.error.format());
+                setError(validatedFormData.error.flatten().fieldErrors)
+            }
 
         } catch (error) {
             console.error(error)
@@ -86,12 +95,12 @@ const RegisterForm = () => {
 
     return (
         <form onSubmit={handleSubmit} className="flex flex-col gap-2 p-12 rounded-2xl shadow-lg bg-white">
-            <Input id="firstName" name="firstName" type="text" value={formData.firstName} onChange={handleOnChange} label="Firstname" />
-            <Input id="lastName" name="lastName" type="text" value={formData.lastName} onChange={handleOnChange} label="Lastname" />
-            <Input id="email" name="email" type="email" value={formData.email} onChange={handleOnChange} label="Email" />
-            <Input id="password" name="password" type="password" value={formData.password} onChange={handleOnChange} label="Password" />
-            <Input id="phone" name="phone" type="text" value={formData.phone} onChange={handleOnChange} label="Phone" />
-            <Button type="submit" title="Register" />
+            <Input id="firstName" name="firstName" type="text" value={formData.firstName} onChange={handleOnChange} label="Firstname" error={error.firstName}/>
+            <Input id="lastName" name="lastName" type="text" value={formData.lastName} onChange={handleOnChange} label="Lastname" error={error.lastName}/>
+            <Input id="email" name="email" type="email" value={formData.email} onChange={handleOnChange} label="Email" error={error.email}/>
+            <Input id="password" name="password" type="password" value={formData.password} onChange={handleOnChange} label="Password" error={error.password}/>
+            <Input id="phone" name="phone" type="text" value={formData.phone} onChange={handleOnChange} label="Phone" error={error.phone}/>
+            <Button type="submit" title="Register"className="mt-5" />
         </form>
     )
 }

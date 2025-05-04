@@ -7,6 +7,7 @@ const Register = () => {
             <div className="max-w-[600px] flex flex-col gap-6 p-4">
                 <div>
                 {/* ICON */}
+                <p className="text-center">LOGO HERE</p>
                 {/* [TODO]: Add Icon */}
                 {/* Header Title*/}
                 <HeaderText title="Sign up to your account" className="text-center text-2xl font-semibold" />

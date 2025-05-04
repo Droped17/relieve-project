@@ -8,6 +8,7 @@ const Login = () => {
                 <div>
                 {/* ICON */}
                 {/* [TODO]: Add Icon */}
+                <p className="text-center">LOGO HERE</p>
                 {/* Header Title*/}
                 <HeaderText title="Sign in to your account" className="text-center text-2xl font-semibold" />
                 </div>
