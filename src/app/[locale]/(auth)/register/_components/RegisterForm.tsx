@@ -60,7 +60,8 @@ const RegisterForm = () => {
                     redirect: true,
                     callbackUrl: `/${param.locale}/homepage`,
                     email: formData.email,
-                    password: formData.password
+                    password: formData.password,
+                    name: formData.firstName
                 })
             }
         },
