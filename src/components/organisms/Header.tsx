@@ -2,26 +2,18 @@
 
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
-import { useState } from "react";
 import { useParams } from "next/navigation";
 
 const Header = () => {
 
-    const [dialog, setDialog] = useState<boolean>(false)
-
     const session = useSession()
     const params = useParams()
 
-    const handleDialog = () => {
-        setDialog(!dialog)
-    }
-
-    console.log(session);
 
     return (
         <header className="flex items-center border-b border-gray-300 bg-[#ACD3A8] px-8 py-4 justify-between h-16">
             <div>
-                <Link href={`/${params.locale}/homepage`}>Web Name</Link>
+                <Link href={`/${params.locale}/homepage`} className="font-mono text-lg font-bold text-tertiary">Relieve</Link>
             </div>
 
             <div className="flex gap-4 items-center">

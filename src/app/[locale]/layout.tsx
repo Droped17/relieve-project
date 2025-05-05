@@ -30,7 +30,7 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} className={kanit.className}>
-      <body className=''>
+      <body className='text-tertiary'>
         {/* Apollo */}
         <ApolloProviders>
           {/* Localization */}

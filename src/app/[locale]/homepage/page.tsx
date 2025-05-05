@@ -7,6 +7,18 @@ import clsx from "clsx";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { gql, useQuery } from "@apollo/client";
+
+const FIND_ROOMS = gql`
+query {
+  findRoomBy(floor: 1) {
+    id
+    number
+    floor
+    status
+  }
+}
+`;
 
 /* [TODO]: fetch real data */
 const room = [
@@ -118,7 +130,8 @@ const floor2 = [
 const HomePage = () => {
 
   const [floor, setFloor] = useState<boolean>(true)
-
+  
+  const {data} = useQuery(FIND_ROOMS)
   const router = useRouter()
   const params = useParams()
   const t = useTranslations()
@@ -133,9 +146,11 @@ const HomePage = () => {
     }
   }
 
+  console.log(data?.findRoomBy);
+
   return (
-    <div className="mx-auto max-w-[1024px]">
-      <HeaderText title={t('home_page.relieve')} className="text-center text-3xl mt-6 font-semibold" />
+    <div className="mx-auto max-w-[1024px] px-4 flex flex-col gap-4">
+      <HeaderText title={t('home_page.relieve')} className="text-center text-3xl mt-6 font-semibold text-tertiary" />
       <div className="flex flex-col gap-6">
         {/* Date Picker */}
         {/* Room Status */}
@@ -143,7 +158,7 @@ const HomePage = () => {
         {/* FLOOR 1 */}
           {floor && <div className="flex justify-between">
             <div>
-              {room.slice(0, 7).map((item) => (
+              {data?.findRoomBy.slice(0, 7).map((item) => (
                 <button
                   key={item.id}
                   disabled={item.status === 'full' || item.status === 'empty' && true}
@@ -166,7 +181,7 @@ const HomePage = () => {
             </div>
             {/* RIGHT */}
             <div>
-              {room.slice(7, 14).map((item) => (
+              {data?.findRoomBy.slice(7, 14).map((item) => (
                 <button
                   key={item.id}
                   disabled={item.status === 'full' || item.status === 'empty' && true}

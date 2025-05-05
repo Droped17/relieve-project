@@ -2,7 +2,7 @@
 import { ApolloServer } from '@apollo/server';
 import { startServerAndCreateNextHandler } from '@as-integrations/next';
 import { typeDefs } from '@/src/app/graphql/queries/user';
-import { resolvers } from '../../graphql/resolver/user';
+import { resolvers } from '../../graphql/resolver/resolver';
 import dbConnect from '@/src/lib/mongoose';
 
 const server = new ApolloServer({

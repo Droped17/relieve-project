@@ -3,12 +3,12 @@ import mongoose, { Schema, Document } from 'mongoose';
 enum ERoomStatus {
     EMPTY = "empty",
     FULL = "full",
-    NULL = "null"
+    NULL = "null_value"
 }
 
 export interface IRoom extends Document {
     number: string;
-    detail: string;
+    detail: string[];
     price: number;
     floor: number;
     image: string[];
@@ -21,11 +21,11 @@ export interface IRoom extends Document {
 
 const RoomSchema: Schema = new Schema({
     number: { type: String, required: true, unique: true  },
-    detail: { type: String, required: true },
+    detail: { type: [String], required: true },
     price: { type: Number, required: true},
     floor: { type: Number, required: true },
-    image: { type: [], required: true },
-    status: { type: ERoomStatus, default: ERoomStatus.EMPTY },
+    image: { type: [String], required: true },
+    status: { type: String, enum: Object.values(ERoomStatus), default: ERoomStatus.NULL, required: true },
 },
     {
         timestamps: true
