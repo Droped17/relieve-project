@@ -7,6 +7,8 @@ import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { gql, useLazyQuery, useQuery } from "@apollo/client";
+import { useEffect, useState } from "react";
+import Input from "@/src/components/atoms/Input";
 
 // [TODO]: Add Skeletom when loading
 
@@ -22,6 +24,19 @@ const FIND_ROOMS_BY_FLOOR = gql`
 `;
 
 const HomePage = () => {
+
+  const [formData,setFormData] = useState({
+    date: '',
+    nights: '1',
+    person: '1'
+  })
+
+  useEffect(() => {
+    const { date, nights, person } = formData;
+    if (date.trim() !== "" && nights.trim() !== "" && person.trim() !== "") {
+      handleAllFieldsSelected();
+    }
+  }, [formData]);
 
   const { data, loading, error } = useQuery(FIND_ROOMS_BY_FLOOR, {
     variables: { floor: 1 },
@@ -43,30 +58,56 @@ const HomePage = () => {
     fetchFloor({ variables: { floor } });
   };
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+    // This function will run when all fields are filled
+    const handleAllFieldsSelected = () => {
+      console.log('Fetch Room:', formData);
+    };
+  
   return (
     <div className="mx-auto max-w-[1024px] px-4 flex flex-col gap-4">
       <HeaderText title={t('home_page.relieve')} className="text-center text-3xl mt-6 font-semibold text-tertiary" />
       <div className="flex flex-col gap-6">
         {/* Date Picker */}
         <div className="flex justify-center">
-          <form>
-            <label>วันที่</label>
-            <input type="date" name="" id="" className="border" />
-            <label>จำนวนคืน</label>
-            <select name="day" id="day" className="border">
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-            </select>
-            <label>จำนวนคน</label>
-            <select name="persons" id="persons" className="border">
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-            </select>
-          </form>
+        <form className="">
+      
+      <div>
+       <Input type="date" id="date" name="date" value={formData.date} onChange={handleChange} label="วันที่"/>
+
+
+      </div>
+
+      <label>จำนวนคืน</label>
+      <select
+        name="nights"
+        className="border"
+        value={formData.nights}
+        onChange={handleChange}
+      >
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+      </select>
+
+      <label>จำนวนคน</label>
+      <select
+        name="persons"
+        className="border"
+        value={formData.person}
+        onChange={handleChange}
+      >
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+      </select>
+    </form>
         </div>
 
         {/* Room Status */}

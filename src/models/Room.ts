@@ -12,6 +12,7 @@ export interface IRoom extends Document {
     price: number;
     floor: number;
     image: string[];
+    personPerRoom: number;
     status: ERoomStatus;
     createdAt: Date;
     updatedAt: Date;
@@ -23,6 +24,7 @@ const RoomSchema: Schema = new Schema({
     price: { type: Number, required: true},
     floor: { type: Number, required: true },
     image: { type: [String], required: true },
+    personPerRoom: {type: Number, required: true},
     status: { type: String, enum: Object.values(ERoomStatus), default: ERoomStatus.NULL, required: true },
 },
     {
