@@ -2,263 +2,152 @@
 
 import HeaderText from "@/src/components/atoms/HeaderText";
 import Divider from "@/src/components/atoms/Divider";
-import { useState } from "react";
 import clsx from "clsx";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { gql, useQuery } from "@apollo/client";
+import { gql, useLazyQuery, useQuery } from "@apollo/client";
 
-const FIND_ROOMS = gql`
-query {
-  findRoomBy(floor: 1) {
-    id
-    number
-    floor
-    status
+// [TODO]: Add Skeletom when loading
+
+const FIND_ROOMS_BY_FLOOR = gql`
+  query FindRoomBy($floor: Int!) {
+    findRoomBy(floor: $floor) {
+      id
+      number
+      floor
+      status
+    }
   }
-}
 `;
-
-/* [TODO]: fetch real data */
-const room = [
-  {
-    id: "1",
-    number: 1,
-    status: "empty"
-  },
-  {
-    id: "2",
-    number: 2,
-    status: "full"
-  },
-  {
-    id: "3",
-    number: 3,
-    status: "null"
-  },
-  {
-    id: "4",
-    number: 4,
-    status: "empty"
-  },
-  {
-    id: "5",
-    number: 5,
-    status: "empty"
-  },
-  {
-    id: "6",
-    number: 6,
-    status: "full"
-  },
-  {
-    id: "7",
-    number: 7,
-    status: "null"
-  },
-  {
-    id: "8",
-    number: 8,
-    status: "empty"
-  },
-  {
-    id: "9",
-    number: 9,
-    status: "empty"
-  },
-  {
-    id: "10",
-    number: 10,
-    status: "full"
-  },
-  {
-    id: "11",
-    number: 11,
-    status: "null"
-  },
-  {
-    id: "12",
-    number: 12,
-    status: "empty"
-  },
-  {
-    id: "13",
-    number: 13,
-    status: "empty"
-  },
-  {
-    id: "14",
-    number: 14,
-    status: "empty"
-  },
-]
-
-const floor2 = [
-  {
-    id: "15",
-    number: 15,
-    status: "empty"
-  },
-  {
-    id: "16",
-    number: 16,
-    status: "full"
-  },
-  {
-    id: "17",
-    number: 17,
-    status: "null"
-  },
-  {
-    id: "18",
-    number: 18,
-    status: "empty"
-  },
-  {
-    id: "19",
-    number: 19,
-    status: "empty"
-  },
-  {
-    id: "20",
-    number: 20,
-    status: "full"
-  },
-]
 
 const HomePage = () => {
 
-  const [floor, setFloor] = useState<boolean>(true)
-  
-  const {data} = useQuery(FIND_ROOMS)
+  const { data, loading, error } = useQuery(FIND_ROOMS_BY_FLOOR, {
+    variables: { floor: 1 },
+  });
+  const [fetchFloor, { data: floorData, loading: floorLoading }] = useLazyQuery(FIND_ROOMS_BY_FLOOR);
+
+  const rooms = floorData?.findRoomBy || data?.findRoomBy || [];
+
   const router = useRouter()
   const params = useParams()
   const t = useTranslations()
 
   const nowLocal = new Date().toLocaleDateString();
 
-  const handleSelectFloor = () => {
-    try {
-      setFloor(!floor)
-    } catch (error) {
-      console.error(error)
-    }
-  }
+  if (loading || floorLoading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error.message}</p>;
 
-  console.log(data?.findRoomBy);
+  const handleFloorChange = (floor: number) => {
+    fetchFloor({ variables: { floor } });
+  };
 
   return (
     <div className="mx-auto max-w-[1024px] px-4 flex flex-col gap-4">
       <HeaderText title={t('home_page.relieve')} className="text-center text-3xl mt-6 font-semibold text-tertiary" />
       <div className="flex flex-col gap-6">
         {/* Date Picker */}
-        {/* Room Status */}
+        <div className="flex justify-center">
+          <form>
+            <label>วันที่</label>
+            <input type="date" name="" id="" className="border" />
+            <label>จำนวนคืน</label>
+            <select name="day" id="day" className="border">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+            </select>
+            <label>จำนวนคน</label>
+            <select name="persons" id="persons" className="border">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+            </select>
+          </form>
+        </div>
 
-        {/* FLOOR 1 */}
-          {floor && <div className="flex justify-between">
-            <div>
-              {data?.findRoomBy.slice(0, 7).map((item) => (
-                <button
-                  key={item.id}
-                  disabled={item.status === 'full' || item.status === 'empty' && true}
-                  onClick={() => router.push(`/${params.locale}/room/${item.id}`)}
-                  className={clsx(
-                    'border border-gray-300 p-4 w-28 flex justify-center',
-                    {
-                      'bg-gray-200 hover:bg-gray-300 transition': item.status === 'empty',
-                      'bg-red-300': item.status === 'full',
-                      'bg-green-300 hover:bg-green-400 transition cursor-pointer': item.status === 'null',
-                    },
-                  )}
-                >
-                  {item.number}
-                </button>
-              ))}
-            </div>
-            <div className="flex items-center justify-center w-full border border-gray-200">
-              <p>FREE SPACE</p>
-            </div>
-            {/* RIGHT */}
-            <div>
-              {data?.findRoomBy.slice(7, 14).map((item) => (
-                <button
-                  key={item.id}
-                  disabled={item.status === 'full' || item.status === 'empty' && true}
-                  onClick={() => router.push(`/${params.locale}/room/${item.id}`)}
-                  className={clsx(
-                    'border border-gray-300 p-4 w-28 flex justify-center',
-                    {
-                      'bg-gray-200 hover:bg-gray-300 transition': item.status === 'empty',
-                      'bg-red-300': item.status === 'full',
-                      'bg-green-300 hover:bg-green-400 transition cursor-pointer': item.status === 'null',
-                    },
-                  )}
-                >
-                  {item.number}
-                </button>
-              ))}
-            </div>
-          </div>}
-      
-        {/* FLOOR 2 */}
-          {!floor &&           <div className="flex justify-between">
+        {/* Room Status */}
+        <div className="flex gap-2">
+          <div className="flex items-center gap-2">
+            <div className="h-2.5 w-2.5 bg-secondary rounded-full"></div>
+            <p>ว่าง</p>
+          </div>
+          <div className="flex items-center gap-2">  
+          <div className="h-2.5 w-2.5 bg-error rounded-full"></div>
+            <p>เต็ม</p>
+          </div>
+          <div className="flex items-center gap-2">  
+          <div className="h-2.5 w-2.5 bg-gray-300 rounded-full"></div>
+            <p>ไม่พร้อมบริการ</p>
+          </div>
+        </div>
+
+        {/* Rooms */}
+        <div className="flex justify-between shadow-lg">
           <div>
-            {floor2.slice(0,7).map((item) => (
+            {rooms.slice(0, 7).map((item) => (
               <button
-              key={item.id}
-              disabled={item.status === 'full' || item.status === 'empty' && true}
-              onClick={() => router.push(`/${params.locale}/room/${item.id}`)}
-              className={clsx(
-                'border border-gray-300 p-4 w-28 flex justify-center',
-                {
-                  'bg-gray-200 hover:bg-gray-300 transition': item.status === 'empty',
-                  'bg-red-300': item.status === 'full',
-                  'bg-green-300 hover:bg-green-400 transition cursor-pointer': item.status === 'null',
-                },
-              )}
-            >
-              {item.number}
-            </button>
+                key={item.id}
+                disabled={item.status === 'full' || item.status === 'empty' && true}
+                onClick={() => router.push(`/${params.locale}/room/${item.id}`)}
+                className={clsx(
+                  'border  border-gray-200 p-4 w-28 flex justify-center',
+                  {
+                    'bg-gray-200 hover:bg-gray-300 transition': item.status === 'empty',
+                    'bg-red-300': item.status === 'full',
+                    'bg-green-300 hover:bg-green-400 transition cursor-pointer': item.status === 'null_value',
+                  },
+                )}
+              >
+                {item.number}
+              </button>
             ))}
           </div>
-          <div className="flex items-center justify-center w-full border border-gray-200">
+          <div className="flex items-center justify-center w-full border border-gray-200 bg-warm">
             <p>FREE SPACE</p>
           </div>
           {/* RIGHT */}
           <div>
-            {floor2.slice(7,14).map((item) => (
+            {rooms.slice(7, 14).map((item) => (
               <button
-              key={item.id}
-              disabled={item.status === 'full' || item.status === 'empty' && true}
-              onClick={() => router.push(`/${params.locale}/room/${item.id}`)}
-              className={clsx(
-                'border border-gray-300 p-4 w-28 flex justify-center',
-                {
-                  'bg-gray-200 hover:bg-gray-300 transition': item.status === 'empty',
-                  'bg-red-300': item.status === 'full',
-                  'bg-green-300 hover:bg-green-400 transition cursor-pointer': item.status === 'null',
-                },
-              )}
-            >
-              {item.number}
-            </button>
+                key={item.id}
+                disabled={item.status === 'full' || item.status === 'empty' && true}
+                onClick={() => router.push(`/${params.locale}/room/${item.id}`)}
+                className={clsx(
+                  'border border-gray-300 p-4 w-28 flex justify-center',
+                  {
+                    'bg-gray-200 hover:bg-gray-300 transition': item.status === 'empty',
+                    'bg-red-300': item.status === 'full',
+                    'bg-green-300 hover:bg-green-400 transition cursor-pointer': item.status === 'null_value',
+                  },
+                )}
+              >
+                {item.number}
+              </button>
             ))}
           </div>
 
-          </div>}
-  
+        </div>
+
+
+        {/* Select Floor */}
         <div className="flex justify-between">
           {/* [TODO]: Change this time */}
           <p className="font-semibold text-lg">{nowLocal}</p>
-          <button onClick={handleSelectFloor} className="bg-blue-500 rounded-md p-2 text-white cursor-pointer">Floor {floor === true ? '1' : '2'}</button>
+          {/* <button onClick={handleSelectFloor} className="bg-blue-500 rounded-md p-2 text-white cursor-pointer">Floor {floor === true ? '1' : '2'}</button> */}
+          <div className="flex gap-2">
+            <button onClick={() => handleFloorChange(1)} className="p-2 hover:bg-primary hover:text-white cursor-pointer transition rounded-md ">Floor 1</button>
+            <button onClick={() => handleFloorChange(2)} className="p-2 hover:bg-primary hover:text-white cursor-pointer transition rounded-md ">Floor 2</button>
+          </div>
         </div>
 
-        {/* Divider */}
-        <Divider />
         {/* Relieve Details */}
+        <Divider />
         <div className="flex flex-col items-center justify-center gap-6">
-          <HeaderText title="About us" className="text-2xl font-semibold"/>
+          <HeaderText title="About us" className="text-2xl font-semibold" />
           <Image alt="home_img" width={600} height={600} src={`https://images.unsplash.com/photo-1742898958003-63577fe8776e?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D`} />
         </div>
         <p className="pb-4">{t('home_page.title')}</p>

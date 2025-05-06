@@ -14,6 +14,9 @@ export interface IBooking extends Document {
     //Reference Model
     user: Types.ObjectId[]
     transaction: Types.ObjectId[]
+    room: Types.ObjectId;            
+    dateEnd: Date;                   
+    numberOfPeople: number; 
 }
 
 const BookingSchema: Schema = new Schema({

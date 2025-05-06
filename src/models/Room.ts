@@ -15,8 +15,6 @@ export interface IRoom extends Document {
     status: ERoomStatus;
     createdAt: Date;
     updatedAt: Date;
-
-    // USER
 }
 
 const RoomSchema: Schema = new Schema({
