@@ -9,6 +9,7 @@ import { useTranslations } from "next-intl";
 import { gql, useLazyQuery, useQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
 import Input from "@/src/components/atoms/Input";
+import Dropdown from "@/src/components/atoms/Dropdown";
 
 // [TODO]: Add Skeletom when loading
 
@@ -25,7 +26,7 @@ const FIND_ROOMS_BY_FLOOR = gql`
 
 const HomePage = () => {
 
-  const [formData,setFormData] = useState({
+  const [formData, setFormData] = useState({
     date: '',
     nights: '1',
     person: '1'
@@ -63,65 +64,40 @@ const HomePage = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-    // This function will run when all fields are filled
-    const handleAllFieldsSelected = () => {
-      console.log('Fetch Room:', formData);
-    };
-  
+  // This function will run when all fields are filled
+  const handleAllFieldsSelected = () => {
+    console.log('Fetch Room:', formData);
+  };
+
   return (
     <div className="mx-auto max-w-[1024px] px-4 flex flex-col gap-4">
       <HeaderText title={t('home_page.relieve')} className="text-center text-3xl mt-6 font-semibold text-tertiary" />
       <div className="flex flex-col gap-6">
         {/* Date Picker */}
         <div className="flex justify-center">
-        <form className="">
-      
-      <div>
-       <Input type="date" id="date" name="date" value={formData.date} onChange={handleChange} label="วันที่"/>
+          <form className="">
+            <div className="flex items-center gap-2" >
+              <Input type="date" id="date" name="date" value={formData.date} onChange={handleChange} label="วันที่" />
+              <label>จำนวนคืน</label>
+              <Dropdown name="nights" value={formData.nights} onChange={handleChange} className="border border-gray-200 p-2 rounded-sm" option={['1', '2', '3', '4']} />
+              <label>จำนวนคน</label>
+              <Dropdown name="person" value={formData.person} onChange={handleChange} className="border border-gray-200 p-2 rounded-sm" option={['1', '2', '3', '4']} />
+            </div>
 
-
-      </div>
-
-      <label>จำนวนคืน</label>
-      <select
-        name="nights"
-        className="border"
-        value={formData.nights}
-        onChange={handleChange}
-      >
-        <option value="1">1</option>
-        <option value="2">2</option>
-        <option value="3">3</option>
-        <option value="4">4</option>
-      </select>
-
-      <label>จำนวนคน</label>
-      <select
-        name="persons"
-        className="border"
-        value={formData.person}
-        onChange={handleChange}
-      >
-        <option value="1">1</option>
-        <option value="2">2</option>
-        <option value="3">3</option>
-        <option value="4">4</option>
-      </select>
-    </form>
+          </form>
         </div>
-
         {/* Room Status */}
         <div className="flex gap-2">
           <div className="flex items-center gap-2">
             <div className="h-2.5 w-2.5 bg-secondary rounded-full"></div>
             <p>ว่าง</p>
           </div>
-          <div className="flex items-center gap-2">  
-          <div className="h-2.5 w-2.5 bg-error rounded-full"></div>
+          <div className="flex items-center gap-2">
+            <div className="h-2.5 w-2.5 bg-error rounded-full"></div>
             <p>เต็ม</p>
           </div>
-          <div className="flex items-center gap-2">  
-          <div className="h-2.5 w-2.5 bg-gray-300 rounded-full"></div>
+          <div className="flex items-center gap-2">
+            <div className="h-2.5 w-2.5 bg-gray-300 rounded-full"></div>
             <p>ไม่พร้อมบริการ</p>
           </div>
         </div>

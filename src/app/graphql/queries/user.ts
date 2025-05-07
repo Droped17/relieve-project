@@ -24,13 +24,14 @@ type Room {
   price: Float!
   floor: Int!
   image: [String!]!
+  personPerRoom: Int!
   status: ERoomStatus!
 }
 
   type Query {
     users: [User!]!
     rooms: [Room!]!
-    findRoomBy(floor: Int, status: ERoomStatus): [Room!]!
+    findRoomBy(id: ID, floor: Int, status: ERoomStatus): [Room!]!
   }
 
 
@@ -39,7 +40,7 @@ type Room {
   }
 
   type Mutation {
-    createRoom(number: String!, detail: [String!]!, price: Float!, floor: Int!, image: [String]!, status: ERoomStatus!): Room!
+    createRoom(number: String!, detail: [String!]!, price: Float!, floor: Int!, image: [String]!, status: ERoomStatus!, personPerRoom: Int!): Room!
   }
 
 `;

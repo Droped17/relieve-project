@@ -1,7 +1,7 @@
 import { IRoom, Room } from '@/src/models/Room';
 import { IUser, User } from '@/src/models/User';
 import * as bcrypt from 'bcrypt'
-import { ObjectId } from 'mongoose';
+import { Types } from 'mongoose';
 
 export const resolvers = {
   Query: {
@@ -11,9 +11,10 @@ export const resolvers = {
     rooms: async () => {
       return await Room.find();
     },
-    findRoomBy: async(_: unknown, args: {floor?: number, status?: string}) => {
+    findRoomBy: async(_: unknown, args: {id?: string, floor?: number, status?: string}) => {
       console.log(args);
       const filter: any = {};
+      if (args.id !== undefined) filter._id = new Types.ObjectId(args.id)
       if (args.floor !== undefined) filter.floor = args.floor 
       if (args.status !== undefined) filter.status = args.status
       
