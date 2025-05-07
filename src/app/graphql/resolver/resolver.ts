@@ -12,7 +12,6 @@ export const resolvers = {
       return await Room.find();
     },
     findRoomBy: async(_: unknown, args: {id?: string, floor?: number, status?: string}) => {
-      console.log(args);
       const filter: any = {};
       if (args.id !== undefined) filter._id = new Types.ObjectId(args.id)
       if (args.floor !== undefined) filter.floor = args.floor 
