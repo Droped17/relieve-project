@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import clsx from "clsx";
-import Button from "../atoms/Button";
 
 interface DialogProps {
   className?: string;
@@ -48,7 +47,12 @@ const Dialog: React.FC<DialogProps> = ({ className, title, children, onClose }) 
         )}
       >
         {onClose && (
-            <Button onClick={handleClose} className="absolute top-2 right-3 text-white hover:text-gray-700" title="x" type="button"/>
+          <button
+            onClick={handleClose}
+            className="absolute top-2 right-3 text-white hover:text-gray-700"
+          >
+            ✕
+          </button>
         )}
         {title && (
           <h2 className="text-xl font-semibold mb-4 border-b pb-2">{title}</h2>

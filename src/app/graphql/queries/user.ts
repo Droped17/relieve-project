@@ -28,11 +28,18 @@ type Room {
   status: ERoomStatus!
 }
 
-  type Query {
-    users: [User!]!
-    rooms: [Room!]!
-    findRoomBy(id: ID, floor: Int, status: ERoomStatus): [Room!]!
-  }
+type Query {
+  users: [User!]!
+  rooms: [Room!]!
+  findRoomBy(
+    id: ID
+    floor: Int
+    status: ERoomStatus
+    dateStart: String
+    nights: Int
+    personPerRoom: Int
+  ): [Room!]!
+}
 
 
   type Mutation {

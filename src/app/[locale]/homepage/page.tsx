@@ -77,7 +77,8 @@ const HomePage = () => {
         <div className="flex justify-center">
           <form className="">
             <div className="flex items-center gap-2" >
-              <Input type="date" id="date" name="date" value={formData.date} onChange={handleChange} label="วันที่" />
+              <label>วันที่</label>
+              <Input type="date" id="date" name="date" value={formData.date} onChange={handleChange} />
               <label>จำนวนคืน</label>
               <Dropdown name="nights" value={formData.nights} onChange={handleChange} className="border border-gray-200 p-2 rounded-sm" option={['1', '2', '3', '4']} />
               <label>จำนวนคน</label>
@@ -154,10 +155,22 @@ const HomePage = () => {
         <div className="flex justify-between">
           {/* [TODO]: Change this time */}
           <p className="font-semibold text-lg">{nowLocal}</p>
-          {/* <button onClick={handleSelectFloor} className="bg-blue-500 rounded-md p-2 text-white cursor-pointer">Floor {floor === true ? '1' : '2'}</button> */}
           <div className="flex gap-2">
-            <button onClick={() => handleFloorChange(1)} className="p-2 hover:bg-primary hover:text-white cursor-pointer transition rounded-md ">Floor 1</button>
-            <button onClick={() => handleFloorChange(2)} className="p-2 hover:bg-primary hover:text-white cursor-pointer transition rounded-md ">Floor 2</button>
+          <button
+              onClick={() => handleFloorChange(1)}
+              className={`${rooms[0].floor === 1 ? 'bg-tertiary text-white' : ''
+                } p-2 border border-transparent hover:border-gray-400 cursor-pointer transition-all rounded-md`}
+            >
+              Floor 2
+            </button>
+            <button
+              onClick={() => handleFloorChange(2)}
+              className={`${rooms[0].floor === 2 ? 'bg-tertiary text-white' : ''
+                } p-2 border border-transparent hover:border-gray-400 cursor-pointer transition-all duration-300 rounded-md`}
+            >
+              Floor 2
+            </button>
+
           </div>
         </div>
 

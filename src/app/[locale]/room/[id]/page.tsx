@@ -2,6 +2,7 @@
 
 import HeaderText from "@/src/components/atoms/HeaderText"
 import Dialog from "@/src/components/molecules/Dialog"
+import PageTitle from "@/src/components/molecules/PageTitle"
 import { gql, useQuery } from "@apollo/client"
 import Image from "next/image"
 import Link from "next/link"
@@ -40,12 +41,7 @@ const RoomPage = () => {
 
     return (
         <div className="p-6 flex flex-col gap-8 max-w-[1024px] mx-auto">
-            <div className="flex">
-                <Link href={`/${params.locale}/homepage`} className="cursor-pointer px-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="28px" viewBox="0 -960 960 960" width="24px" fill="#000000"><path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z" /></svg>
-                </Link>
-                <HeaderText title={`Room ${data?.findRoomBy[0].number}`} className="font-semibold text-xl" />
-            </div>
+            <PageTitle callBackUrl={`/${params.locale}/homepage`} title={`Room ${data?.findRoomBy[0].number}`} />
 
             <div className="flex justify-between">
                 <div className="flex-2/3">
