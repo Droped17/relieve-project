@@ -19,7 +19,7 @@ export interface ITransaction extends Document {
 }
 
 const TransactionSchema: Schema = new Schema({
-    status: { type: ETransactionStatus, default: ETransactionStatus.PENDING },
+    status: {type: String, enum: Object.values(ETransactionStatus), default: ETransactionStatus.PENDING, required: true },
     user: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
 },
     {

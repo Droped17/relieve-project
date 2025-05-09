@@ -8,6 +8,7 @@ import { signIn } from "next-auth/react";
 import { useParams } from "next/navigation";
 import React, { FormEvent, useState } from "react"
 import { RegisterSchema } from "../registerSchema";
+import HeaderText from "@/src/components/atoms/HeaderText";
 
 const CREATE_USER = gql`
   mutation CreateUser(
@@ -95,7 +96,8 @@ const RegisterForm = () => {
     }
 
     return (
-        <form onSubmit={handleSubmit} className="flex flex-col gap-2 p-12 rounded-2xl shadow-lg bg-white">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-2 p-6 rounded-2xl shadow-lg bg-white w-[450px]">
+            <HeaderText title="Register" className="text-center text-2xl font-semibold" />
             <Input id="firstName" name="firstName" type="text" value={formData.firstName} onChange={handleOnChange} label="Firstname" error={error.firstName}/>
             <Input id="lastName" name="lastName" type="text" value={formData.lastName} onChange={handleOnChange} label="Lastname" error={error.lastName}/>
             <Input id="email" name="email" type="email" value={formData.email} onChange={handleOnChange} label="Email" error={error.email}/>

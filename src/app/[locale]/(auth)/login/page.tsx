@@ -1,16 +1,13 @@
-import HeaderText from "@/src/components/atoms/HeaderText"
+import Image from "next/image"
 import LoginForm from "./_components/LoginForm"
 
 const Login = () => {
     return (
         <div className="flex flex-col items-center justify-center h-[calc(100vh-64px)] bg-fade-gray">
-            <div className="max-w-[600px] flex flex-col gap-6 p-4">
-                <div>
+            <div className="max-w-[600px] flex flex-col gap-1 p-4">
+                <div className="flex flex-col items-center">
                 {/* ICON */}
-                {/* [TODO]: Add Icon */}
-                <p className="text-center">LOGO HERE</p>
-                {/* Header Title*/}
-                <HeaderText title="Sign in to your account" className="text-center text-2xl font-semibold" />
+                <Image alt="" src="/images/onsen-color.png" width={180} height={150}/>
                 </div>
                 {/* Login Form*/}
                 <LoginForm />

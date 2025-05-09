@@ -16,7 +16,7 @@ import Dropdown from "@/src/components/atoms/Dropdown";
 const FIND_ROOMS_BY_FLOOR = gql`
   query FindRoomBy($floor: Int!) {
     findRoomBy(floor: $floor) {
-      id
+      _id
       number
       floor
       status
@@ -68,6 +68,8 @@ const HomePage = () => {
   const handleAllFieldsSelected = () => {
     console.log('Fetch Room:', formData);
   };
+
+  console.log(data);
 
   return (
     <div className="mx-auto max-w-[1024px] px-4 flex flex-col gap-4">
@@ -158,14 +160,14 @@ const HomePage = () => {
           <div className="flex gap-2">
           <button
               onClick={() => handleFloorChange(1)}
-              className={`${rooms[0].floor === 1 ? 'bg-tertiary text-white' : ''
+              className={`${rooms[0]?.floor === 1 ? 'bg-tertiary text-white' : ''
                 } p-2 border border-transparent hover:border-gray-400 cursor-pointer transition-all rounded-md`}
             >
               Floor 2
             </button>
             <button
               onClick={() => handleFloorChange(2)}
-              className={`${rooms[0].floor === 2 ? 'bg-tertiary text-white' : ''
+              className={`${rooms[0]?.floor === 2 ? 'bg-tertiary text-white' : ''
                 } p-2 border border-transparent hover:border-gray-400 cursor-pointer transition-all duration-300 rounded-md`}
             >
               Floor 2

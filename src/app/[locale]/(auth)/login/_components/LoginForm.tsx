@@ -7,6 +7,7 @@ import { LoginSchema } from "../loginSchema"
 import { signIn } from "next-auth/react"
 import { useParams } from "next/navigation"
 import { FormEvent, useState } from "react"
+import HeaderText from "@/src/components/atoms/HeaderText"
 
 interface IFormData {
     email: string
@@ -55,9 +56,11 @@ const LoginForm = () => {
     return (
         <form
             onSubmit={handleSubmit}
-            className="p-12 rounded-2xl shadow-lg bg-white"
+            className="p-6 rounded-2xl shadow-lg bg-white w-[350px]"
         >
             <div className="flex flex-col gap-4">
+                 {/* Header Title*/}
+                <HeaderText title="Login" className="text-center text-2xl font-semibold" />
                 <Input id="email" type="email" name="email" value={formData.email} onChange={handleOnChange} label="Email Address" error={error.email} />
                 <Input id="password" type="password" name="password" value={formData.password} onChange={handleOnChange} label="Password" error={error.password} />
                 <Button title="Sign In" type="submit" />

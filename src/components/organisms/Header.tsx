@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
+import Image from "next/image";
 
 const Header = () => {
 
@@ -12,8 +13,10 @@ const Header = () => {
 
     return (
         <header className="flex items-center border-b border-gray-300 bg-secondary px-8 py-4 justify-between h-16">
-            <div>
-                <Link href={`/${params.locale}/homepage`} className="font-mono text-lg font-bold text-tertiary">Relieve</Link>
+            <div className="flex items-center">
+            <Link href={`/${params.locale}/homepage`} className="font-mono text-lg font-bold text-tertiary">
+                Relieve
+            </Link>
             </div>
 
             <div className="flex gap-4 items-center">
