@@ -13,8 +13,33 @@ export const typeDefs = gql`
     NOT_PAID 
 }
 
+type Guest {
+  firstName: String!
+  lastName: String!
+  email: String
+}
 
-  enum EBookingStatus {
+input GuestInput {
+  firstName: String!
+  lastName: String!
+  email: String
+  phone: String
+}
+
+input CreateBookingInput {
+  roomId: ID!
+  date: String!
+  nights: Int!
+  numberOfPeople: Int!
+  request: String
+  guest: GuestInput
+}
+
+type CreateBookingResponse {
+  bookingId: ID!
+}
+
+enum EBookingStatus {
   PENDING
   CONFIRMED
   CANCELLED
@@ -54,14 +79,17 @@ type Room {
 
 type Booking {
   _id: ID!
-  status: EBookingStatus!
+  status: EBookingStatus
   createdAt: String!
   updatedAt: String!
   user: [User!]!
   transaction: [Transaction!]!
   room: Room!
-  dateEnd: String!
+  date: String!
+  nights: Int!
   numberOfPeople: Int!
+  guest: Guest! 
+  request: String!
 }
 
 type Transaction {
@@ -86,9 +114,9 @@ type Query {
     id: ID
     floor: Int
     status: ERoomStatus
-    dateStart: String
+    date: String
     nights: Int
-    personPerRoom: Int
+    numberOfPeople: Int
   ): [Room!]!
   booking: [Booking!]!
 }
@@ -105,5 +133,9 @@ type Query {
   type Mutation {
     createTransaction(totalPrice: Int!): Transaction!
   }
+
+extend type Mutation {
+  createBooking(input: CreateBookingInput!): Booking!
+}
 
 `;

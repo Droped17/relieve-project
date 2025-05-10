@@ -3,7 +3,7 @@ import { ChangeEvent } from "react";
 interface IDropdownProps {
     name: string;
     value: any;
-    option: string[];
+    option: number[] | string[];
     onChange: (event: ChangeEvent<HTMLSelectElement>) =>  void
     className?: string;
 }

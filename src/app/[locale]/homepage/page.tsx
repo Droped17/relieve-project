@@ -28,13 +28,13 @@ const HomePage = () => {
 
   const [formData, setFormData] = useState({
     date: '',
-    nights: '1',
-    person: '1'
+    nights: 1,
+    numberOfPeople: 1
   })
 
   useEffect(() => {
-    const { date, nights, person } = formData;
-    if (date.trim() !== "" && nights.trim() !== "" && person.trim() !== "") {
+    const { date, nights, numberOfPeople } = formData;
+    if (date.trim() !== "" && nights && numberOfPeople) {
       handleAllFieldsSelected();
     }
   }, [formData]);
@@ -42,6 +42,7 @@ const HomePage = () => {
   const { data, loading, error } = useQuery(FIND_ROOMS_BY_FLOOR, {
     variables: { floor: 1 },
   });
+
   const [fetchFloor, { data: floorData, loading: floorLoading }] = useLazyQuery(FIND_ROOMS_BY_FLOOR);
 
   const rooms = floorData?.findRoomBy || data?.findRoomBy || [];
@@ -63,10 +64,17 @@ const HomePage = () => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
+  
 
   // This function will run when all fields are filled
-  const handleAllFieldsSelected = () => {
-    console.log('Fetch Room:', formData);
+  const handleAllFieldsSelected = async() => {
+    await fetchRooms({
+      variables: {
+        date: formData.date,
+        nights: formData.nights,
+        numberOfPeople: formData.numberOfPeople
+      }
+    })
   };
 
   console.log(data);
@@ -82,9 +90,9 @@ const HomePage = () => {
               <label>วันที่</label>
               <Input type="date" id="date" name="date" value={formData.date} onChange={handleChange} />
               <label>จำนวนคืน</label>
-              <Dropdown name="nights" value={formData.nights} onChange={handleChange} className="border border-gray-200 p-2 rounded-sm" option={['1', '2', '3', '4']} />
+              <Dropdown name="nights" value={formData.nights} onChange={handleChange} className="border border-gray-200 p-2 rounded-sm" option={[1, 2, 3, 4]} />
               <label>จำนวนคน</label>
-              <Dropdown name="person" value={formData.person} onChange={handleChange} className="border border-gray-200 p-2 rounded-sm" option={['1', '2', '3', '4']} />
+              <Dropdown name="person" value={formData.numberOfPeople} onChange={handleChange} className="border border-gray-200 p-2 rounded-sm" option={[1, 2, 3, 4]} />
             </div>
 
           </form>
@@ -108,17 +116,17 @@ const HomePage = () => {
         {/* Rooms */}
         <div className="flex justify-between shadow-lg">
           <div>
-            {rooms.slice(0, 7).map((item) => (
+            {rooms.slice(0, 7).map((item,index) => (
               <button
-                key={item.id}
-                disabled={item.status === 'full' || item.status === 'empty' && true}
-                onClick={() => router.push(`/${params.locale}/room/${item.id}`)}
+                key={`${item.id}+${index}`}
+                disabled={item.status === 'full' || item.status === 'null_value' && true}
+                onClick={() => router.push(`/${params.locale}/room/${item._id}`)}
                 className={clsx(
                   'border  border-gray-200 p-4 w-28 flex justify-center',
                   {
-                    'bg-gray-200 hover:bg-gray-300 transition': item.status === 'empty',
+                    'bg-gray-200 hover:bg-gray-300 transition': item.status === 'null_value',
                     'bg-red-300': item.status === 'full',
-                    'bg-green-300 hover:bg-green-400 transition cursor-pointer': item.status === 'null_value',
+                    'bg-green-300 hover:bg-green-400 transition cursor-pointer': item.status === 'empty',
                   },
                 )}
               >
@@ -131,10 +139,10 @@ const HomePage = () => {
           </div>
           {/* RIGHT */}
           <div>
-            {rooms.slice(7, 14).map((item) => (
+            {rooms.slice(7, 14).map((item,index) => (
               <button
-                key={item.id}
-                disabled={item.status === 'full' || item.status === 'empty' && true}
+                key={`${item.id}+${index}`}
+                disabled={item.status === 'full' || item.status === 'null_value' && true}
                 onClick={() => router.push(`/${params.locale}/room/${item.id}`)}
                 className={clsx(
                   'border border-gray-300 p-4 w-28 flex justify-center',

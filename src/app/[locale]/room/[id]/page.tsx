@@ -1,6 +1,5 @@
 "use client"
 
-import HeaderText from "@/src/components/atoms/HeaderText"
 import Dialog from "@/src/components/molecules/Dialog"
 import PageTitle from "@/src/components/molecules/PageTitle"
 import { gql, useQuery } from "@apollo/client"
@@ -32,11 +31,16 @@ const RoomPage = () => {
     })
 
     if (loading) return <p>Loading..</p>
+    if (error) {
+        console.error(error);
+    }
 
     const handleSelectImage = (image: string) => {
         setSelectedImage(image);
         setDialog(true);
     };
+
+    console.log(data);
 
 
     return (

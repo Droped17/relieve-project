@@ -19,11 +19,12 @@ export interface ITransaction extends Document {
 }
 
 const TransactionSchema: Schema = new Schema({
-    status: {type: String, enum: Object.values(ETransactionStatus), default: ETransactionStatus.PENDING, required: true },
-    user: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
-},
-    {
-        timestamps: true
-    });
-
+    totalPrice: { type: Number, required: true },
+    request: { type: String },
+    image: { type: String },
+    status: { type: String, enum: Object.values(ETransactionStatus), default: ETransactionStatus.PENDING, required: true },
+    user: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+}, {
+    timestamps: true
+});
 export const Transaction = mongoose.models.Transaction || mongoose.model<ITransaction>('Transaction', TransactionSchema);
