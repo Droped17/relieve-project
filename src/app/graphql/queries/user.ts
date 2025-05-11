@@ -2,9 +2,9 @@ import { gql } from 'graphql-tag';
 
 export const typeDefs = gql`
   enum ERoomStatus {
-    empty
-    full
-    null_value
+    EMPTY
+    FULL
+    NULL_VALUE
   }
 
   enum ETransactionStatus {
@@ -28,7 +28,7 @@ input GuestInput {
 
 input CreateBookingInput {
   roomId: ID!
-  date: String!
+  dateStart: String!
   nights: Int!
   numberOfPeople: Int!
   request: String
@@ -44,13 +44,6 @@ enum EBookingStatus {
   CONFIRMED
   CANCELLED
   COMPLETED
-}
-
-  enum RoomAvailabilityStatus {
-  full
-  empty
-  unavailable
-  null_value
 }
 
   type User {
@@ -72,9 +65,9 @@ type Room {
   image: [String!]!
   personPerRoom: Int!
   status: ERoomStatus!
+  availabilityStatus: String
   createdAt: String!
   updatedAt: String!
-  availabilityStatus: RoomAvailabilityStatus
 }
 
 type Booking {
@@ -85,7 +78,8 @@ type Booking {
   user: [User!]!
   transaction: [Transaction!]!
   room: Room!
-  date: String!
+  dateStart: String!
+  dateEnd: String
   nights: Int!
   numberOfPeople: Int!
   guest: Guest! 
@@ -127,7 +121,7 @@ type Query {
   }
 
   type Mutation {
-    createRoom(number: String!, detail: [String!]!, price: Float!, floor: Int!, image: [String]!, status: ERoomStatus!, personPerRoom: Int!): Room!
+    createRoom(number: String!, detail: [String!]!, price: Float!, floor: Int!, image: [String]!, personPerRoom: Int!): Room!
   }
 
   type Mutation {

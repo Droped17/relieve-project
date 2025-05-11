@@ -1,9 +1,9 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 enum ERoomStatus {
-    EMPTY = "empty",
-    FULL = "full",
-    NULL = "null_value"
+    EMPTY = "EMPTY",
+    FULL = "FULL",
+    NULL_VALUE = "NULL_VALUE"
 }
 
 export interface IRoom extends Document {
@@ -13,6 +13,7 @@ export interface IRoom extends Document {
     floor: number;
     image: string[];
     personPerRoom: number;
+    availabilityStatus: string
     status: ERoomStatus;
     createdAt: Date;
     updatedAt: Date;
@@ -25,7 +26,8 @@ const RoomSchema: Schema = new Schema({
     floor: { type: Number, required: true },
     image: { type: [String], required: true },
     personPerRoom: {type: Number, required: true},
-    status: { type: String, enum: Object.values(ERoomStatus), default: ERoomStatus.NULL, required: true },
+    availabilityStatus: {type: String},
+    status: { type: String, enum: Object.values(ERoomStatus), default: ERoomStatus.EMPTY },
 },
     {
         timestamps: true

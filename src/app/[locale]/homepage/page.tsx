@@ -14,8 +14,8 @@ import Dropdown from "@/src/components/atoms/Dropdown";
 // [TODO]: Add Skeletom when loading
 
 const FIND_ROOMS_BY_FLOOR = gql`
-  query FindRoomBy($floor: Int!) {
-    findRoomBy(floor: $floor) {
+  query FindRoomBy($date: String, $nights: Int, $numberOfPeople: Int) {
+    findRoomBy(date: $date, nights: $nights, numberOfPeople: $numberOfPeople) {
       _id
       number
       floor
@@ -39,11 +39,25 @@ const HomePage = () => {
     }
   }, [formData]);
 
+  const nowLocal = new Date().toLocaleDateString();
+
   const { data, loading, error } = useQuery(FIND_ROOMS_BY_FLOOR, {
-    variables: { floor: 1 },
+    variables: {
+      date: nowLocal,
+      nights: 1,
+      numberOfPeople: 1
+     },
   });
 
   const [fetchFloor, { data: floorData, loading: floorLoading }] = useLazyQuery(FIND_ROOMS_BY_FLOOR);
+  const [fetchNewDate] = useLazyQuery(FIND_ROOMS_BY_FLOOR,{
+    onCompleted: (data) => {
+      console.log(data);
+    },
+    onError: (error) => {
+      console.error(error);
+    }
+  });
 
   const rooms = floorData?.findRoomBy || data?.findRoomBy || [];
 
@@ -51,7 +65,6 @@ const HomePage = () => {
   const params = useParams()
   const t = useTranslations()
 
-  const nowLocal = new Date().toLocaleDateString();
 
   if (loading || floorLoading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
@@ -68,16 +81,14 @@ const HomePage = () => {
 
   // This function will run when all fields are filled
   const handleAllFieldsSelected = async() => {
-    await fetchRooms({
-      variables: {
-        date: formData.date,
-        nights: formData.nights,
-        numberOfPeople: formData.numberOfPeople
-      }
+    await fetchNewDate({
+    variables: {
+      date: formData.date,
+      nights: formData.nights,
+      numberOfPeople: formData.numberOfPeople
+     },
     })
   };
-
-  console.log(data);
 
   return (
     <div className="mx-auto max-w-[1024px] px-4 flex flex-col gap-4">
@@ -124,9 +135,9 @@ const HomePage = () => {
                 className={clsx(
                   'border  border-gray-200 p-4 w-28 flex justify-center',
                   {
-                    'bg-gray-200 hover:bg-gray-300 transition': item.status === 'null_value',
-                    'bg-red-300': item.status === 'full',
-                    'bg-green-300 hover:bg-green-400 transition cursor-pointer': item.status === 'empty',
+                    'bg-gray-200 hover:bg-gray-300 transition cursor-pointer': item.status === 'NULL_VALUE',
+                    'bg-red-300': item.status === 'FULL',
+                    'bg-green-300 hover:bg-green-400 transition cursor-pointer': item.status === 'EMPTY',
                   },
                 )}
               >
@@ -145,11 +156,11 @@ const HomePage = () => {
                 disabled={item.status === 'full' || item.status === 'null_value' && true}
                 onClick={() => router.push(`/${params.locale}/room/${item.id}`)}
                 className={clsx(
-                  'border border-gray-300 p-4 w-28 flex justify-center',
+                  'border  border-gray-200 p-4 w-28 flex justify-center',
                   {
-                    'bg-gray-200 hover:bg-gray-300 transition': item.status === 'empty',
-                    'bg-red-300': item.status === 'full',
-                    'bg-green-300 hover:bg-green-400 transition cursor-pointer': item.status === 'null_value',
+                    'bg-gray-200 hover:bg-gray-300 transition cursor-pointer': item.status === 'NULL_VALUE',
+                    'bg-red-300': item.status === 'FULL',
+                    'bg-green-300 hover:bg-green-400 transition cursor-pointer': item.status === 'EMPTY',
                   },
                 )}
               >

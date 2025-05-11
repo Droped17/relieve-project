@@ -17,7 +17,8 @@ export interface IBooking extends Document {
     user: Types.ObjectId
     transaction: Types.ObjectId
     room: Types.ObjectId;
-    date: string;
+    dateStart: string;
+    dateEnd: string;
     nights: number;
     numberOfPeople: number;
     guest?: {
@@ -30,7 +31,8 @@ export interface IBooking extends Document {
 
 const BookingSchema: Schema = new Schema({
     room: { type: mongoose.Schema.Types.ObjectId, ref: 'Room', required: true },
-    date: { type: String, required: true },
+    dateStart: { type: String, required: true },
+    dateEnd: {type: String},
     nights: {type: Number, required: true},
     numberOfPeople: { type: Number, required: true },
     request: { type: String },

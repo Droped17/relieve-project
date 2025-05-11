@@ -1,4 +1,4 @@
-import { Booking, EBookingStatus, IBooking } from '@/src/models/Booking';
+import { Booking } from '@/src/models/Booking';
 import { IRoom, Room } from '@/src/models/Room';
 import { ITransaction, Transaction } from '@/src/models/Transaction';
 import { IUser, User } from '@/src/models/User';
@@ -21,7 +21,7 @@ export const resolvers = {
     // ) => {
     //   const allRooms = await Room.find();
 
-    //   // Only apply availabilityStatus logic if all 3 params are provided
+    //   // Only apply status logic if all 3 params are provided
     //   if (args.date && args.nights && args.numberOfPeople) {
     //     const startDate = new Date(args.date);
     //     const endDate = new Date(startDate);
@@ -43,19 +43,19 @@ export const resolvers = {
     //     const bookedRoomSet = new Set(bookings.map((b) => b.room.toString()));
 
     //     return allRooms.map((room) => {
-    //       let availabilityStatus: 'full' | 'empty' | 'unavailable';
+    //       let status: 'full' | 'empty' | 'unavailable';
 
     //       if (room.personPerRoom < args.numberOfPeople!) {
-    //         availabilityStatus = 'unavailable';
+    //         status = 'unavailable';
     //       } else if (bookedRoomSet.has(room._id.toString())) {
-    //         availabilityStatus = 'full';
+    //         status = 'full';
     //       } else {
-    //         availabilityStatus = 'empty';
+    //         status = 'empty';
     //       }
 
     //       return {
     //         ...room.toObject(),
-    //         availabilityStatus,
+    //         status,
     //       };
     //     });
     //   }
@@ -63,7 +63,7 @@ export const resolvers = {
     //   // Return raw rooms if no filter provided
     //   return allRooms.map((room) => ({
     //     ...room.toObject(),
-    //     availabilityStatus: null,
+    //     status: null,
     //   }));
     // },
     // findRoomBy: async(_: unknown, args: {id?: string, floor?: number, status?: string}) => {
@@ -93,14 +93,11 @@ export const resolvers = {
     const endDate = new Date(startDate);
     endDate.setDate(startDate.getDate() + nights);
 
-    console.log(startDate);
-    console.log(endDate);
-
     const bookings = await Booking.find({
       status: { $ne: 'CANCELLED' },
       $or: [
         {
-          date: { $gte: startDate },
+          dateEnd: { $gte: startDate },
           createdAt: { $lte: endDate },
         },
       ],
@@ -110,28 +107,29 @@ export const resolvers = {
 
     const bookedRoomSet = new Set(bookings.map((b) => b.room.toString()));
 
+    console.log(bookedRoomSet);
+
     return allRooms.map((room) => {
-      let availabilityStatus: 'full' | 'empty' | 'unavailable';
+      let status: 'FULL' | 'EMPTY' | 'UNVAILABLE';
 
       if (room.personPerRoom < numberOfPeople) {
-        availabilityStatus = 'unavailable';
+        status = 'UNVAILABLE';
       } else if (bookedRoomSet.has(room._id.toString())) {
-        availabilityStatus = 'full';
+        status = 'FULL';
       } else {
-        availabilityStatus = 'empty';
+        status = 'EMPTY';
       }
 
       return {
         ...room.toObject(),
-        availabilityStatus,
+        status,
       };
-    });
-  }
-
+  })
+}
   // Return rooms without availability if date filters are missing
   return allRooms.map((room) => ({
     ...room.toObject(),
-    availabilityStatus: null,
+    status: null,
   }));
 },
     //   const filter: any = {};
@@ -144,6 +142,9 @@ export const resolvers = {
     booking: async () => {
       return await Booking.find();
     },
+    rooms: async () => {
+      return await Room.find()
+    }
   },
   Mutation: {
     createUser: async (_: never, args: IUser) => {
@@ -154,7 +155,6 @@ export const resolvers = {
       return newUser
     },
     createRoom: async (_: never, args: IRoom) => {
-      console.log(args);
       const newRoom = await Room.create({
         ...args,
       })
@@ -175,7 +175,7 @@ export const resolvers = {
     //   return newBooking
     // },
       createBooking: async (_: any, { input }: any, context: any) => {
-      const { roomId, nights, request, guest, date, numberOfPeople } = input;
+      const { roomId, nights, request, guest, dateStart, numberOfPeople } = input;
 
       console.log(`NIGHTS => `,nights);
 
@@ -185,12 +185,16 @@ export const resolvers = {
       
       // 2. Calculate total price (assume 1 night for now)
       const totalPrice = room.price; // You can multiply by nights later
+
+      const startDate = new Date(dateStart);
+      const dateEnd = new Date(dateStart);
+      dateEnd.setDate(startDate.getDate() + nights);
       
-      /* [TODO]: can't find night */
       // 3. Create Booking
       const booking = await Booking.create({
         room: room._id,
-        date,
+        dateStart,
+        dateEnd,
         numberOfPeople,
         nights,
         request,
@@ -199,7 +203,15 @@ export const resolvers = {
         // status: EBookingStatus.PENDING,
       });
 
-      console.log(booking);
+      if(booking) {
+        console.log(`BOOKING => `, booking);
+        const result = await Room.updateOne({
+          status: "FULL"        
+        })
+
+        console.log(result);
+
+      }
 
       return booking
     
