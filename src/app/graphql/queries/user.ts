@@ -28,6 +28,7 @@ input GuestInput {
 
 input CreateBookingInput {
   roomId: ID!
+  userId: ID!
   dateStart: String!
   nights: Int!
   numberOfPeople: Int!
@@ -75,15 +76,15 @@ type Booking {
   status: EBookingStatus
   createdAt: String!
   updatedAt: String!
-  user: [User!]!
   transaction: [Transaction!]!
-  room: Room!
   dateStart: String!
   dateEnd: String
   nights: Int!
   numberOfPeople: Int!
   guest: Guest! 
   request: String!
+  user: User!
+  room: Room!
 }
 
 type Transaction {

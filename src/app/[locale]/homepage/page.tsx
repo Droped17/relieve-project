@@ -6,14 +6,14 @@ import clsx from "clsx";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { gql, useLazyQuery, useQuery } from "@apollo/client";
+import { gql, useApolloClient, useLazyQuery, useQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
 import Input from "@/src/components/atoms/Input";
 import Dropdown from "@/src/components/atoms/Dropdown";
 
 // [TODO]: Add Skeletom when loading
 
-const FIND_ROOMS_BY_FLOOR = gql`
+const FIND_ROOMS_BY_DATE = gql`
   query FindRoomBy($date: String, $nights: Int, $numberOfPeople: Int) {
     findRoomBy(date: $date, nights: $nights, numberOfPeople: $numberOfPeople) {
       _id
@@ -24,7 +24,20 @@ const FIND_ROOMS_BY_FLOOR = gql`
   }
 `;
 
+const FIND_ROOMS_BY_FLOOR = gql`
+  query FindRoomBy($floor: Int) {
+    findRoomBy(floor: $floor) {
+      _id
+      number
+      floor
+      status
+    }
+  }
+`
+
 const HomePage = () => {
+
+  const client = useApolloClient()
 
   const [formData, setFormData] = useState({
     date: '',
@@ -41,18 +54,25 @@ const HomePage = () => {
 
   const nowLocal = new Date().toLocaleDateString();
 
-  const { data, loading, error } = useQuery(FIND_ROOMS_BY_FLOOR, {
+  const { data, loading, error } = useQuery(FIND_ROOMS_BY_DATE, {
     variables: {
       date: nowLocal,
       nights: 1,
       numberOfPeople: 1
      },
+     fetchPolicy: "network-only",
   });
 
   const [fetchFloor, { data: floorData, loading: floorLoading }] = useLazyQuery(FIND_ROOMS_BY_FLOOR);
-  const [fetchNewDate] = useLazyQuery(FIND_ROOMS_BY_FLOOR,{
+  const [fetchNewDate] = useLazyQuery(FIND_ROOMS_BY_DATE,{
+    fetchPolicy: "network-only",
     onCompleted: (data) => {
       console.log(data);
+      client.cache.evict({
+        id: 'ROOT_QUERY',
+        fieldName: 'findRoomBy'
+      })
+      client.cache.gc()
     },
     onError: (error) => {
       console.error(error);
@@ -130,7 +150,7 @@ const HomePage = () => {
             {rooms.slice(0, 7).map((item,index) => (
               <button
                 key={`${item.id}+${index}`}
-                disabled={item.status === 'full' || item.status === 'null_value' && true}
+                disabled={item.status === 'FULL' || item.status === 'NULL_VALUE' && true}
                 onClick={() => router.push(`/${params.locale}/room/${item._id}`)}
                 className={clsx(
                   'border  border-gray-200 p-4 w-28 flex justify-center',
@@ -153,7 +173,7 @@ const HomePage = () => {
             {rooms.slice(7, 14).map((item,index) => (
               <button
                 key={`${item.id}+${index}`}
-                disabled={item.status === 'full' || item.status === 'null_value' && true}
+                disabled={item.status === 'Full' || item.status === 'null_value' && true}
                 onClick={() => router.push(`/${params.locale}/room/${item.id}`)}
                 className={clsx(
                   'border  border-gray-200 p-4 w-28 flex justify-center',
@@ -182,7 +202,7 @@ const HomePage = () => {
               className={`${rooms[0]?.floor === 1 ? 'bg-tertiary text-white' : ''
                 } p-2 border border-transparent hover:border-gray-400 cursor-pointer transition-all rounded-md`}
             >
-              Floor 2
+              Floor 1
             </button>
             <button
               onClick={() => handleFloorChange(2)}
