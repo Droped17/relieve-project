@@ -113,7 +113,7 @@ type Query {
     numberOfPeople: Int
   ): [Room!]!
   booking: [Booking!]!
-  allRooms(date: String!, nights: Int!, personPerRoom: Int!): [Room!]!
+  allRooms(date: String!, nights: Int!, personPerRoom: Int!, floor: Int): [Room!]!
 }
 
 

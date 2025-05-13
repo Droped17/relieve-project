@@ -1,43 +1,21 @@
 'use client';
 
-import HeaderText from "@/src/components/atoms/HeaderText";
-import Divider from "@/src/components/atoms/Divider";
+import { useTranslations } from "next-intl";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { gql, useQuery } from "@apollo/client";
 import clsx from "clsx";
 import Image from "next/image";
-import { useParams, useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
-import { gql, useApolloClient, useLazyQuery, useQuery } from "@apollo/client";
-import { useEffect, useState } from "react";
+import HeaderText from "@/src/components/atoms/HeaderText";
+import Divider from "@/src/components/atoms/Divider";
 import Input from "@/src/components/atoms/Input";
 import Dropdown from "@/src/components/atoms/Dropdown";
 
 // [TODO]: Add Skeletom when loading
 
-const FIND_ROOMS_BY_DATE = gql`
-  query FindRoomBy($date: String, $nights: Int, $numberOfPeople: Int) {
-    findRoomBy(date: $date, nights: $nights, numberOfPeople: $numberOfPeople) {
-      _id
-      number
-      floor
-      status
-    }
-  }
-`;
-
-const FIND_ROOMS_BY_FLOOR = gql`
-  query FindRoomBy($floor: Int) {
-    findRoomBy(floor: $floor) {
-      _id
-      number
-      floor
-      status
-    }
-  }
-`
-
 const GET_ALL_ROOMS = gql`
-  query AllRooms($date: String!, $nights: Int!, $personPerRoom: Int!) {
-    allRooms(date: $date, nights: $nights, personPerRoom: $personPerRoom) {
+  query AllRooms($date: String!, $nights: Int!, $personPerRoom: Int!, $floor: Int) {
+    allRooms(date: $date, nights: $nights, personPerRoom: $personPerRoom, floor: $floor) {
       _id
       floor
       number
@@ -49,84 +27,68 @@ const GET_ALL_ROOMS = gql`
 
 const HomePage = () => {
 
-  const client = useApolloClient()
+  const today = new Date();
+  const formattedDate = today.toISOString().split('T')[0]
+
+  console.log(formattedDate);
 
   const [formData, setFormData] = useState({
-    date: '',
+    date: formattedDate,
     nights: 1,
     numberOfPeople: 1
   })
 
-  useEffect(() => {
-    const { date, nights, numberOfPeople } = formData;
-    if (date.trim() !== "" && nights && numberOfPeople) {
-      handleAllFieldsSelected();
-    }
-  }, [formData]);
+  const [floor, setFloor] = useState(1);
 
-  const nowLocal = new Date().toLocaleDateString();
-
-  const today = new Date();
-const formattedDate = today.toISOString().split('T')[0]
-
-  const { data, loading, error } = useQuery(GET_ALL_ROOMS, {
+  const { data, loading, error, refetch } = useQuery(GET_ALL_ROOMS, {
     variables: {
       date: formattedDate,
       nights: 1,
-      personPerRoom: 1
+      personPerRoom: 1,
+      floor: 1
     },
   });
-
-  console.log(data);
-
-  const [fetchFloor, { data: floorData, loading: floorLoading }] = useLazyQuery(FIND_ROOMS_BY_FLOOR);
-  const [fetchNewDate] = useLazyQuery(FIND_ROOMS_BY_DATE, {
-    fetchPolicy: "network-only",
-    onCompleted: (data) => {
-      console.log(data);
-      client.cache.evict({
-        id: 'ROOT_QUERY',
-        fieldName: 'findRoomBy'
-      })
-      client.cache.gc()
-    },
-    onError: (error) => {
-      console.error(error);
+  // Refetch when all fields are valid and change
+  useEffect(() => {
+    if (
+      formData.date.trim() !== '' &&
+      formData.nights > 0 &&
+      formData.numberOfPeople > 0
+    ) {
+      refetch({
+        date: formData.date,
+        nights: formData.nights,
+        personPerRoom: formData.numberOfPeople,
+        floor,
+      });
     }
-  });
+  }, [formData, floor, refetch]);
 
-  const rooms = floorData?.findRoomBy || data?.findRoomBy || [];
+  const nowLocal = new Date().toLocaleDateString();
+
+
+
 
   const router = useRouter()
   const params = useParams()
   const t = useTranslations()
 
 
-  if (loading || floorLoading) return <p>Loading...</p>;
+  if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
 
-  const handleFloorChange = (floor: number) => {
-    fetchFloor({ variables: { floor } });
+  const handleFloorChange = (newFloor: number) => {
+    setFloor(newFloor);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
+const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const { name, value } = e.target;
 
-
-  // This function will run when all fields are filled
-  const handleAllFieldsSelected = async () => {
-    await fetchNewDate({
-      variables: {
-        date: formData.date,
-        nights: formData.nights,
-        numberOfPeople: formData.numberOfPeople
-      },
-    })
-  };
-
-  /* [TODO]: Reset Logic for fetch rooms */
+  setFormData(prev => ({
+    ...prev,
+    [name]: name === "nights" || name === "numberOfPeople" ? Number(value) : value
+  }));
+};
 
   return (
     <div className="mx-auto max-w-[1024px] px-4 flex flex-col gap-4">
@@ -165,17 +127,17 @@ const formattedDate = today.toISOString().split('T')[0]
         {/* Rooms */}
         <div className="flex justify-between shadow-lg">
           <div>
-            {rooms.slice(0, 7).map((item, index) => (
+            {data.allRooms.slice(0, 7).map((item, index) => (
               <button
                 key={`${item.id}+${index}`}
-                disabled={item.status === 'FULL' || item.status === 'NULL_VALUE' && true}
+                disabled={item.isBooked === true}
                 onClick={() => router.push(`/${params.locale}/room/${item._id}`)}
                 className={clsx(
                   'border  border-gray-200 p-4 w-28 flex justify-center',
                   {
                     'bg-gray-200 hover:bg-gray-300 transition cursor-pointer': item.status === 'NULL_VALUE',
-                    'bg-red-300': item.status === 'FULL',
-                    'bg-green-300 hover:bg-green-400 transition cursor-pointer': item.status === 'EMPTY',
+                    'bg-red-300': item.isBooked === true,
+                    'bg-green-300 hover:bg-green-400 transition cursor-pointer': !item.isBooked,
                   },
                 )}
               >
@@ -188,7 +150,7 @@ const formattedDate = today.toISOString().split('T')[0]
           </div>
           {/* RIGHT */}
           <div>
-            {rooms.slice(7, 14).map((item, index) => (
+            {/* {rooms.slice(7, 14).map((item, index) => (
               <button
                 key={`${item.id}+${index}`}
                 disabled={item.status === 'Full' || item.status === 'null_value' && true}
@@ -204,7 +166,7 @@ const formattedDate = today.toISOString().split('T')[0]
               >
                 {item.number}
               </button>
-            ))}
+            ))} */}
           </div>
 
         </div>
@@ -217,14 +179,14 @@ const formattedDate = today.toISOString().split('T')[0]
           <div className="flex gap-2">
             <button
               onClick={() => handleFloorChange(1)}
-              className={`${rooms[0]?.floor === 1 ? 'bg-tertiary text-white' : ''
+              className={`${data.allRooms?.floor === 1 ? 'bg-tertiary text-white' : ''
                 } p-2 border border-transparent hover:border-gray-400 cursor-pointer transition-all rounded-md`}
             >
               Floor 1
             </button>
             <button
               onClick={() => handleFloorChange(2)}
-              className={`${rooms[0]?.floor === 2 ? 'bg-tertiary text-white' : ''
+              className={`${data.allRooms?.floor === 2 ? 'bg-tertiary text-white' : ''
                 } p-2 border border-transparent hover:border-gray-400 cursor-pointer transition-all duration-300 rounded-md`}
             >
               Floor 2

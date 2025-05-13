@@ -118,10 +118,29 @@ export const resolvers = {
     //       }));
     //     }
 
-    allRooms: async (_, { date, nights, personPerRoom }) => {
+    allRooms: async (_, { date, nights, personPerRoom, floor }) => {
+
       const checkIn = new Date(date);
       const checkOut = new Date(checkIn);
       checkOut.setDate(checkIn.getDate() + nights);
+
+      if (floor) {
+        const roomsByFloor = await Room.find({
+          floor
+        }).populate({
+          path: 'booking',
+          match: {
+            checkIn: { $lt: checkOut },
+            checkOut: { $gt: checkIn },
+          },
+        }).lean()
+
+        console.log(roomsByFloor);
+        return roomsByFloor.map(room => ({
+          ...room,
+          isBooked: (Array.isArray(room.booking) && room.booking.length > 0) || room.personPerRoom < personPerRoom,
+        }))
+      }
 
       // Get all rooms with related bookings that overlap with selected range
       const rooms = await Room.find().populate({
