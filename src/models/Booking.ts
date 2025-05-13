@@ -17,8 +17,8 @@ export interface IBooking extends Document {
     user: Types.ObjectId
     transaction: Types.ObjectId
     room: Types.ObjectId;
-    dateStart: string;
-    dateEnd: string;
+    checkIn: string;
+    checkOut: string;
     nights: number;
     numberOfPeople: number;
     guest?: {
@@ -30,9 +30,9 @@ export interface IBooking extends Document {
 }
 
 const BookingSchema: Schema = new Schema({
-    dateStart: { type: String, required: true },
-    dateEnd: { type: String },
-    nights: { type: Number, required: true },
+    checkIn: { type: Date, required: true },
+    checkOut: { type: Date, required: true },
+    nights: { type: Number },
     numberOfPeople: { type: Number, required: true },
     request: { type: String },
     guest: {
@@ -49,7 +49,7 @@ const BookingSchema: Schema = new Schema({
     },
 
     /* Reference Model */
-    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     room: { type: mongoose.Schema.Types.ObjectId, ref: 'Room', required: true },
 },
     {

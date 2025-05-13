@@ -90,7 +90,55 @@ export const resolvers = {
     },
     rooms: async () => {
       return await Room.find()
+    },
+    //     allRooms: async (_, { date, nights, personPerRoom }) => {
+    //       const checkIn = new Date(date);
+    //       const checkOut = new Date(checkIn);
+    //       checkOut.setDate(checkIn.getDate() + nights);
+
+    //       console.log(date);
+    //       console.log(checkIn);
+    //       console.log(checkOut);
+
+    //       // const rooms = await Room.find().populate({
+    //       //   path: "booking",
+    //       //   match: {
+    //       //     checkIn: { $lt: checkOut },
+    //       //     checkOut: { $gt: checkIn },
+    //       //   },
+    //       // }).lean();
+
+    //       const rooms = await Room.find().populate("booking").lean();
+    // console.log(rooms);
+
+
+    //       return rooms.map(room => ({
+    //         ...room,
+    //         isBooked: Array.isArray(room.booking) && room.booking.length > 0 || room.personPerRoom < personPerRoom
+    //       }));
+    //     }
+
+    allRooms: async (_, { date, nights, personPerRoom }) => {
+      const checkIn = new Date(date);
+      const checkOut = new Date(checkIn);
+      checkOut.setDate(checkIn.getDate() + nights);
+
+      // Get all rooms with related bookings that overlap with selected range
+      const rooms = await Room.find().populate({
+        path: 'booking',
+        match: {
+          checkIn: { $lt: checkOut },
+          checkOut: { $gt: checkIn },
+        },
+      }).lean();
+
+      // Add isBooked field based on booking overlap or capacity
+      return rooms.map(room => ({
+        ...room,
+        isBooked: (Array.isArray(room.booking) && room.booking.length > 0) || room.personPerRoom < personPerRoom,
+      }));
     }
+
   },
   Mutation: {
     createUser: async (_: never, args: IUser) => {
@@ -113,36 +161,62 @@ export const resolvers = {
       })
       return newRoom
     },
-    createBooking: async (_: any, { input }: any, context: any) => {
-      const { roomId, nights, request, guest, dateStart, numberOfPeople, userId } = input;
+    // createBooking: async (_: any, { input }: any, context: any) => {
+    //   const { roomId, nights, request, guest, checkIn, numberOfPeople, userId } = input;
 
-      // 1. Find the room
-      const room = await Room.findById(roomId);
-      if (!room) throw new Error("Room not found");
+    //   // 1. Find the room
+    //   const room = await Room.findById(roomId);
+    //   if (!room) throw new Error("Room not found");
 
-      // 2. Calculate total price (assume 1 night for now)
-      const totalPrice = room.price * nights  // You can multiply by nights later
+    //   // 2. Calculate total price (assume 1 night for now)
+    //   const totalPrice = room.price * nights  // You can multiply by nights later
 
-      const startDate = new Date(dateStart);
-      const dateEnd = new Date(dateStart);
+    //   const startDate = new Date(checkIn);
+    //   const checkOut = new Date(checkIn);
 
-      dateEnd.setDate(startDate.getDate() + nights);
+    //   checkOut.setDate(startDate.getDate() + nights);
 
-      // 3. Create Booking
+    //   // 3. Create Booking
+    //   const booking = await Booking.create({
+    //     checkIn,
+    //     checkOut,
+    //     numberOfPeople,
+    //     nights,
+    //     request,
+    //     guest: guest || undefined,
+    //     room: room._id,
+    //     user: userId
+    //   });
+
+    //   console.log(booking);
+    //   return booking
+
+    // },
+    createBooking: async (_, { input }) => {
+      const { roomId, checkIn, checkOut, personPerRoom } = input;
+
+      const parsedCheckIn = new Date(checkIn);
+      const parsedCheckOut = new Date(checkOut);
+
+      if (isNaN(parsedCheckIn.getTime()) || isNaN(parsedCheckOut.getTime())) {
+        throw new Error("Invalid date format. Use YYYY-MM-DD.");
+      }
+
+
       const booking = await Booking.create({
-        dateStart,
-        dateEnd,
-        numberOfPeople,
-        nights,
-        request,
-        guest: guest || undefined,
-        room: room._id,
-        user: userId
+        room: roomId,
+        checkIn: parsedCheckIn,
+        checkOut: parsedCheckOut,
+        numberOfPeople: personPerRoom,
+        // user: req.user._id  <-- if required, pass this from auth context
       });
 
-      console.log(booking);
-      return booking
+      await Room.findByIdAndUpdate(roomId, {
+        $push: { booking: booking._id }
+      });
 
-    },
+      return booking;
+    }
+
   }
 };

@@ -26,14 +26,12 @@ input GuestInput {
   phone: String
 }
 
+
 input CreateBookingInput {
   roomId: ID!
-  userId: ID!
-  dateStart: String!
-  nights: Int!
-  numberOfPeople: Int!
-  request: String
-  guest: GuestInput
+  checkIn: String!
+  checkOut: String!
+  personPerRoom: Int!
 }
 
 type CreateBookingResponse {
@@ -67,6 +65,7 @@ type Room {
   personPerRoom: Int!
   status: ERoomStatus!
   availabilityStatus: String
+  isBooked: Boolean
   createdAt: String!
   updatedAt: String!
 }
@@ -77,8 +76,8 @@ type Booking {
   createdAt: String!
   updatedAt: String!
   transaction: [Transaction!]!
-  dateStart: String!
-  dateEnd: String
+  checkIn: String!
+  checkOut: String!
   nights: Int!
   numberOfPeople: Int!
   guest: Guest! 
@@ -114,6 +113,7 @@ type Query {
     numberOfPeople: Int
   ): [Room!]!
   booking: [Booking!]!
+  allRooms(date: String!, nights: Int!, personPerRoom: Int!): [Room!]!
 }
 
 

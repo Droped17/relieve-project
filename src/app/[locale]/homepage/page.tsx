@@ -35,6 +35,18 @@ const FIND_ROOMS_BY_FLOOR = gql`
   }
 `
 
+const GET_ALL_ROOMS = gql`
+  query AllRooms($date: String!, $nights: Int!, $personPerRoom: Int!) {
+    allRooms(date: $date, nights: $nights, personPerRoom: $personPerRoom) {
+      _id
+      floor
+      number
+      status
+      isBooked
+    }
+  }
+`
+
 const HomePage = () => {
 
   const client = useApolloClient()
@@ -54,17 +66,21 @@ const HomePage = () => {
 
   const nowLocal = new Date().toLocaleDateString();
 
-  const { data, loading, error } = useQuery(FIND_ROOMS_BY_DATE, {
+  const today = new Date();
+const formattedDate = today.toISOString().split('T')[0]
+
+  const { data, loading, error } = useQuery(GET_ALL_ROOMS, {
     variables: {
-      date: nowLocal,
+      date: formattedDate,
       nights: 1,
-      numberOfPeople: 1
-     },
-     fetchPolicy: "network-only",
+      personPerRoom: 1
+    },
   });
 
+  console.log(data);
+
   const [fetchFloor, { data: floorData, loading: floorLoading }] = useLazyQuery(FIND_ROOMS_BY_FLOOR);
-  const [fetchNewDate] = useLazyQuery(FIND_ROOMS_BY_DATE,{
+  const [fetchNewDate] = useLazyQuery(FIND_ROOMS_BY_DATE, {
     fetchPolicy: "network-only",
     onCompleted: (data) => {
       console.log(data);
@@ -97,18 +113,20 @@ const HomePage = () => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
-  
+
 
   // This function will run when all fields are filled
-  const handleAllFieldsSelected = async() => {
+  const handleAllFieldsSelected = async () => {
     await fetchNewDate({
-    variables: {
-      date: formData.date,
-      nights: formData.nights,
-      numberOfPeople: formData.numberOfPeople
-     },
+      variables: {
+        date: formData.date,
+        nights: formData.nights,
+        numberOfPeople: formData.numberOfPeople
+      },
     })
   };
+
+  /* [TODO]: Reset Logic for fetch rooms */
 
   return (
     <div className="mx-auto max-w-[1024px] px-4 flex flex-col gap-4">
@@ -147,7 +165,7 @@ const HomePage = () => {
         {/* Rooms */}
         <div className="flex justify-between shadow-lg">
           <div>
-            {rooms.slice(0, 7).map((item,index) => (
+            {rooms.slice(0, 7).map((item, index) => (
               <button
                 key={`${item.id}+${index}`}
                 disabled={item.status === 'FULL' || item.status === 'NULL_VALUE' && true}
@@ -170,7 +188,7 @@ const HomePage = () => {
           </div>
           {/* RIGHT */}
           <div>
-            {rooms.slice(7, 14).map((item,index) => (
+            {rooms.slice(7, 14).map((item, index) => (
               <button
                 key={`${item.id}+${index}`}
                 disabled={item.status === 'Full' || item.status === 'null_value' && true}
@@ -197,7 +215,7 @@ const HomePage = () => {
           {/* [TODO]: Change this time */}
           <p className="font-semibold text-lg">{nowLocal}</p>
           <div className="flex gap-2">
-          <button
+            <button
               onClick={() => handleFloorChange(1)}
               className={`${rooms[0]?.floor === 1 ? 'bg-tertiary text-white' : ''
                 } p-2 border border-transparent hover:border-gray-400 cursor-pointer transition-all rounded-md`}
