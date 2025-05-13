@@ -27,10 +27,10 @@ const GET_ALL_ROOMS = gql`
 
 const HomePage = () => {
 
+  // [TODO]: use moment to handle date
+  
   const today = new Date();
   const formattedDate = today.toISOString().split('T')[0]
-
-  console.log(formattedDate);
 
   const [formData, setFormData] = useState({
     date: formattedDate,
@@ -48,6 +48,7 @@ const HomePage = () => {
       floor: 1
     },
   });
+
   // Refetch when all fields are valid and change
   useEffect(() => {
     if (
@@ -64,15 +65,9 @@ const HomePage = () => {
     }
   }, [formData, floor, refetch]);
 
-  const nowLocal = new Date().toLocaleDateString();
-
-
-
-
   const router = useRouter()
   const params = useParams()
   const t = useTranslations()
-
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
@@ -150,23 +145,23 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
           </div>
           {/* RIGHT */}
           <div>
-            {/* {rooms.slice(7, 14).map((item, index) => (
+            {data.allRooms.slice(7, 14).map((item, index) => (
               <button
                 key={`${item.id}+${index}`}
-                disabled={item.status === 'Full' || item.status === 'null_value' && true}
-                onClick={() => router.push(`/${params.locale}/room/${item.id}`)}
+                disabled={item.isBooked === true}
+                onClick={() => router.push(`/${params.locale}/room/${item._id}`)}
                 className={clsx(
                   'border  border-gray-200 p-4 w-28 flex justify-center',
                   {
                     'bg-gray-200 hover:bg-gray-300 transition cursor-pointer': item.status === 'NULL_VALUE',
-                    'bg-red-300': item.status === 'FULL',
-                    'bg-green-300 hover:bg-green-400 transition cursor-pointer': item.status === 'EMPTY',
+                    'bg-red-300': item.isBooked === true,
+                    'bg-green-300 hover:bg-green-400 transition cursor-pointer': !item.isBooked,
                   },
                 )}
               >
                 {item.number}
               </button>
-            ))} */}
+            ))}
           </div>
 
         </div>
@@ -175,18 +170,18 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
         {/* Select Floor */}
         <div className="flex justify-between">
           {/* [TODO]: Change this time */}
-          <p className="font-semibold text-lg">{nowLocal}</p>
+          <p className="font-semibold text-lg">{formattedDate}</p>
           <div className="flex gap-2">
             <button
               onClick={() => handleFloorChange(1)}
-              className={`${data.allRooms?.floor === 1 ? 'bg-tertiary text-white' : ''
+              className={`${floor === 1 ? 'bg-tertiary text-white' : ''
                 } p-2 border border-transparent hover:border-gray-400 cursor-pointer transition-all rounded-md`}
             >
               Floor 1
             </button>
             <button
               onClick={() => handleFloorChange(2)}
-              className={`${data.allRooms?.floor === 2 ? 'bg-tertiary text-white' : ''
+              className={`${floor === 2 ? 'bg-tertiary text-white' : ''
                 } p-2 border border-transparent hover:border-gray-400 cursor-pointer transition-all duration-300 rounded-md`}
             >
               Floor 2

@@ -1,8 +1,8 @@
+import * as bcrypt from 'bcrypt'
 import { Booking } from '@/src/models/Booking';
 import { IRoom, Room } from '@/src/models/Room';
 import { ITransaction, Transaction } from '@/src/models/Transaction';
 import { IUser, User } from '@/src/models/User';
-import * as bcrypt from 'bcrypt'
 import { Types } from 'mongoose';
 
 export const resolvers = {
@@ -30,7 +30,7 @@ export const resolvers = {
 
       const allRooms = await Room.find(filter);
 
-      console.log(allRooms);
+      // console.log(allRooms);
 
       const { date, nights, numberOfPeople } = args;
 
@@ -49,11 +49,11 @@ export const resolvers = {
           ],
         }).select('room');
 
-        console.log(bookings);
+        // console.log(bookings);
 
         const bookedRoomSet = new Set(bookings.map((b) => b.room.toString()));
 
-        console.log(bookedRoomSet);
+        // console.log(bookedRoomSet);
 
         return allRooms.map((room) => {
           let status: 'FULL' | 'EMPTY' | 'UNVAILABLE';
@@ -77,13 +77,6 @@ export const resolvers = {
         ...room.toObject(),
       }));
     },
-    //   const filter: any = {};
-    //   if (args.id !== undefined) filter._id = new Types.ObjectId(args.id)
-    //   if (args.floor !== undefined) filter.floor = args.floor 
-    //   if (args.status !== undefined) filter.status = args.status
-
-    //   return await Room.find(filter)
-    // },
     booking: async () => {
       // populate User and Room
       return await Booking.find().populate('user').populate('room')
@@ -91,35 +84,8 @@ export const resolvers = {
     rooms: async () => {
       return await Room.find()
     },
-    //     allRooms: async (_, { date, nights, personPerRoom }) => {
-    //       const checkIn = new Date(date);
-    //       const checkOut = new Date(checkIn);
-    //       checkOut.setDate(checkIn.getDate() + nights);
-
-    //       console.log(date);
-    //       console.log(checkIn);
-    //       console.log(checkOut);
-
-    //       // const rooms = await Room.find().populate({
-    //       //   path: "booking",
-    //       //   match: {
-    //       //     checkIn: { $lt: checkOut },
-    //       //     checkOut: { $gt: checkIn },
-    //       //   },
-    //       // }).lean();
-
-    //       const rooms = await Room.find().populate("booking").lean();
-    // console.log(rooms);
-
-
-    //       return rooms.map(room => ({
-    //         ...room,
-    //         isBooked: Array.isArray(room.booking) && room.booking.length > 0 || room.personPerRoom < personPerRoom
-    //       }));
-    //     }
-
     allRooms: async (_, { date, nights, personPerRoom, floor }) => {
-
+      /* [TODO]: use moment for handle date */
       const checkIn = new Date(date);
       const checkOut = new Date(checkIn);
       checkOut.setDate(checkIn.getDate() + nights);
@@ -135,7 +101,7 @@ export const resolvers = {
           },
         }).lean()
 
-        console.log(roomsByFloor);
+        // console.log(roomsByFloor);
         return roomsByFloor.map(room => ({
           ...room,
           isBooked: (Array.isArray(room.booking) && room.booking.length > 0) || room.personPerRoom < personPerRoom,
@@ -180,37 +146,6 @@ export const resolvers = {
       })
       return newRoom
     },
-    // createBooking: async (_: any, { input }: any, context: any) => {
-    //   const { roomId, nights, request, guest, checkIn, numberOfPeople, userId } = input;
-
-    //   // 1. Find the room
-    //   const room = await Room.findById(roomId);
-    //   if (!room) throw new Error("Room not found");
-
-    //   // 2. Calculate total price (assume 1 night for now)
-    //   const totalPrice = room.price * nights  // You can multiply by nights later
-
-    //   const startDate = new Date(checkIn);
-    //   const checkOut = new Date(checkIn);
-
-    //   checkOut.setDate(startDate.getDate() + nights);
-
-    //   // 3. Create Booking
-    //   const booking = await Booking.create({
-    //     checkIn,
-    //     checkOut,
-    //     numberOfPeople,
-    //     nights,
-    //     request,
-    //     guest: guest || undefined,
-    //     room: room._id,
-    //     user: userId
-    //   });
-
-    //   console.log(booking);
-    //   return booking
-
-    // },
     createBooking: async (_, { input }) => {
       const { roomId, checkIn, checkOut, personPerRoom } = input;
 

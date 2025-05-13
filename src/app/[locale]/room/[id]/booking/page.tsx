@@ -1,8 +1,10 @@
 "use client"
 
 import Button from "@/src/components/atoms/Button"
+import Divider from "@/src/components/atoms/Divider"
 import HeaderText from "@/src/components/atoms/HeaderText"
 import Input from "@/src/components/atoms/Input"
+import Dialog from "@/src/components/molecules/Dialog"
 import PageTitle from "@/src/components/molecules/PageTitle"
 import { gql, useQuery } from "@apollo/client"
 import clsx from "clsx"
@@ -34,16 +36,17 @@ const FIND_ROOMS_BY_ID = gql`
 
 const Booking = () => {
 
-    const [formData,setFormData] = useState<IFormData>({
+    const [formData, setFormData] = useState<IFormData>({
         firstName: '',
         lastName: '',
         email: '',
         phone: '',
         request: '',
-        date: new Date().toISOString() ,
+        date: new Date().toISOString(),
         acceptForm: false,
     })
     const [stepper, setStepper] = useState<number>(1)
+    const [dialog, setDialog] = useState<boolean>(false)
 
     const router = useRouter()
     const params = useParams()
@@ -53,9 +56,9 @@ const Booking = () => {
         }
     })
 
-    const { personPerRoom,price,number, image } = data?.findRoomBy[0] || {};
+    const { personPerRoom, price, number, image } = data?.findRoomBy[0] || {};
 
-    if(loading) return <p>Loading..</p>
+    if (loading) return <p>Loading..</p>
 
 
     const handleNextStepper = () => {
@@ -69,23 +72,24 @@ const Booking = () => {
     const handleOnChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const target = e.target;
         const { name, type, value } = target;
-      
-        const newValue =
-          type === 'checkbox'
-            ? (target as HTMLInputElement).checked
-            : value;
-      
-        setFormData((prev) => ({
-          ...prev,
-          [name]: newValue
-        }));
-      };
 
-      
+        const newValue =
+            type === 'checkbox'
+                ? (target as HTMLInputElement).checked
+                : value;
+
+        setFormData((prev) => ({
+            ...prev,
+            [name]: newValue
+        }));
+    };
+
+
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault()
         try {
             console.log(formData);
+            setDialog(true);
         } catch (error) {
             console.error(error)
         }
@@ -120,39 +124,39 @@ const Booking = () => {
             {/* Step 1 */}
             {stepper === 1 &&
                 <div className="p-4 max-w-[1024px] mx-auto">
-                    <HeaderText title="User Details" className="font-semibold text-xl"/>
+                    <HeaderText title="User Details" className="font-semibold text-xl" />
                     <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
-                        <Input  type="text" label="Firstname" name="firstName" id="firstName" value={formData.firstName}  onChange={handleOnChange} />
-                        <Input  type="text" label="Lastname" name="lastName" id="lastName" value={formData.lastName} onChange={handleOnChange} />
-                        <Input  type="email" label="Email" name="email" id="email" value={formData.email} onChange={handleOnChange} />
-                        <Input  type="text" label="Phone" name="phone" id="phone" value={formData.phone} onChange={handleOnChange} />
+                        <Input type="text" label="Firstname" name="firstName" id="firstName" value={formData.firstName} onChange={handleOnChange} />
+                        <Input type="text" label="Lastname" name="lastName" id="lastName" value={formData.lastName} onChange={handleOnChange} />
+                        <Input type="email" label="Email" name="email" id="email" value={formData.email} onChange={handleOnChange} />
+                        <Input type="text" label="Phone" name="phone" id="phone" value={formData.phone} onChange={handleOnChange} />
                         <div className="text-end">
-                        <Button type="button" onClick={handleNextStepper} title="Next" className="w-[100px]"/>
+                            <Button type="button" onClick={handleNextStepper} title="Next" className="w-[100px]" />
                         </div>
                     </form>
                 </div>}
             {/* Step 2 */}
             {stepper === 2 && <div className="p-4 max-w-[1024px] mx-auto flex flex-col gap-3">
                 <div className="flex justify-center">
-                <Image alt="home_img" width={600} height={600} src={image[0]} />
+                    <Image alt="home_img" width={600} height={600} src={image[0]} />
 
                 </div>
                 <div>
-                    <HeaderText title={`Room No. ${number}`} className="font-semibold text-xl"/>
+                    <HeaderText title={`Room No. ${number}`} className="font-semibold text-xl" />
                     <li>จำนวนผู้เข้าพัก : {personPerRoom}</li>
                     <li>ราคา : {price}</li>
                     <li>หมายเหตุ</li>
                     <textarea name="request" id="request" onChange={handleOnChange} value={formData.request} className="w-full border border-gray-200 rounded-md mt-2"></textarea>
                 </div>
                 <div className="flex justify-end gap-3">
-                    <Button type="button" onClick={handleBackStepper} title="Back" className="w-[100px] bg-test"/>
-                    <Button type="button" onClick={handleNextStepper} title="Next" className="w-[100px]"/>
+                    <Button type="button" onClick={handleBackStepper} title="Back" className="w-[100px] bg-test" />
+                    <Button type="button" onClick={handleNextStepper} title="Next" className="w-[100px]" />
                 </div>
             </div>}
             {/* Step 3 */}
             {stepper === 3 && <div className="flex gap-2 p-4 max-w-[1024px] mx-auto">
                 <div className="flex flex-col">
-                    <HeaderText title="Payment" className="font-semibold text-lg"/>
+                    <HeaderText title="Payment" className="font-semibold text-lg" />
                     <li>
                         โปรดจ่ายเงินภายใน 1 ชั่วโมง
                     </li>
@@ -164,7 +168,7 @@ const Booking = () => {
                         <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ratione voluptate tempore rerum culpa, exercitationem cum eveniet quod provident dolore repudiandae officia quas cumque quia vel facere commodi quibusdam optio facilis. Optio mollitia dolor veniam! Debitis labore, quibusdam laboriosam blanditiis consequatur amet ex, fuga vero fugit ad numquam itaque quidem! Hic atque soluta aperiam maxime harum repellat ab blanditiis odio voluptatibus? Blanditiis repudiandae, eligendi corrupti ad minima facere dolorem atque et quia tempora sit nemo recusandae distinctio aliquam, eaque maxime corporis ex. Rem totam, voluptas facilis nihil eveniet modi sapiente natus perspiciatis, reprehenderit itaque porro aliquam quis ut repellendus dignissimos excepturi, amet adipisci rerum alias et corporis accusantium! Architecto doloribus quas aperiam deserunt explicabo? Asperiores natus magni eligendi praesentium exercitationem, repellat, quos hic dolore tenetur quasi ad cum odit illo fuga vitae. Consequuntur impedit autem reprehenderit quaerat ut magnam voluptatum, quo facilis perferendis officia eos explicabo necessitatibus laborum nobis alias numquam beatae ratione tenetur nesciunt quis dolor aut? Nobis eos accusamus facere reprehenderit esse minus consectetur qui laboriosam! Numquam atque commodi autem beatae quis totam, labore perferendis. Explicabo perferendis deleniti vel necessitatibus sint dicta quaerat laboriosam quisquam reprehenderit, suscipit officia molestias quibusdam. Nihil veritatis blanditiis quisquam dignissimos laborum ipsum maxime tenetur enim, doloremque voluptatibus pariatur assumenda sit, asperiores sapiente magnam? Iusto quidem recusandae error ullam, non tenetur maiores debitis molestiae molestias fuga, harum asperiores qui, animi nesciunt voluptatem? Aliquam nulla possimus sint alias quo repellendus, temporibus vitae modi quaerat porro iste. Quos dicta neque sequi sunt facilis maxime harum optio aut architecto quaerat? Excepturi, voluptates adipisci accusamus repudiandae omnis dolore sed magnam consectetur aut, quaerat, pariatur autem expedita dolores. Suscipit quod blanditiis, fuga qui doloremque molestias aliquid deleniti incidunt non commodi, voluptatem accusamus velit vero, eligendi porro quia eos ullam vel maiores mollitia. At quae non tenetur repellendus exercitationem excepturi sapiente!</p>
                     </div>
                     <div className="flex gap-3">
-                        <input type="checkbox" name="acceptForm" id="acceptForm" checked={formData.acceptForm} onChange={handleOnChange}/>
+                        <input type="checkbox" name="acceptForm" id="acceptForm" checked={formData.acceptForm} onChange={handleOnChange} />
                         <p>ยอมรับข้อตกลง</p>
                     </div>
                     <div className="flex justify-between text-xl my-2">
@@ -173,11 +177,25 @@ const Booking = () => {
                     </div>
 
                     <div className="flex justify-end gap-3 mt-3">
-                    <Button type="button" onClick={handleBackStepper} title="Back" className="w-[100px] bg-test"/>
-                    <Button type="submit" onClick={handleSubmit} disable={!formData.acceptForm} title="Payment" className="w-[100px]"/>
+                        <Button type="button" onClick={handleBackStepper} title="Back" className="w-[100px] bg-test" />
+                        <Button type="submit" onClick={handleSubmit} disable={!formData.acceptForm} title="Payment" className="w-[100px]" />
                     </div>
                 </div>
             </div>}
+
+
+            {dialog && (
+                <Dialog className="w-full" onClose={() => setDialog(false)}>
+                    <div className="p-4 text-center flex flex-col gap-4">
+                    <strong className="text-xl">Please Check Your Email</strong>
+                    <Divider />
+                    <p>We send you QRCode in your email please check and confirm booking in 1 hour</p>
+                    <div>
+                    <Button type="submit" onClick={() => router.replace(`/${params.locale}/transaction`)} disable={!formData.acceptForm} title="Confirm" className="w-[100px]" />
+                    </div>
+                    </div>
+                </Dialog>
+            )}
 
         </div>
     )

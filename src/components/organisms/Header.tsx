@@ -14,8 +14,9 @@ const Header = () => {
     return (
         <header className="flex items-center border-b border-gray-300 bg-secondary px-8 py-4 justify-between h-16">
             <div className="flex items-center">
-            <Link href={`/${params.locale}/homepage`} className="font-mono text-lg font-bold text-tertiary">
-                Relieve
+            <Link href={`/${params.locale}/homepage`} className="flex items-center gap-2 font-mono text-lg font-bold text-tertiary">
+                 <Image alt="" src="/images/onsen.png" width={60} height={45}/>
+                 <p>Relieve</p>
             </Link>
             </div>
 

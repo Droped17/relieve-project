@@ -75,7 +75,7 @@ const RoomPage = () => {
                     </div>
 
                     <div className="flex justify-end">
-                        <p className="text-xl flex gap-2">Price: <strong className="">{data?.findRoomBy[0].price}</strong></p>
+                        <p className="text-xl flex gap-2">Price/Nights: <strong className="">{data?.findRoomBy[0].price}</strong></p>
 
                     </div>
                 </div>
