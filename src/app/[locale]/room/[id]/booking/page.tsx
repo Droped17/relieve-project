@@ -7,10 +7,12 @@ import Input from "@/src/components/atoms/Input"
 import Dialog from "@/src/components/molecules/Dialog"
 import PageTitle from "@/src/components/molecules/PageTitle"
 import { gql, useMutation, useQuery } from "@apollo/client"
+import { RootState } from "@reduxjs/toolkit/query"
 import clsx from "clsx"
 import Image from "next/image"
 import { useParams, useRouter } from "next/navigation"
 import { FormEvent, useState } from "react"
+import { useSelector } from "react-redux"
 
 interface IFormData {
     firstName: string
@@ -33,27 +35,17 @@ const FIND_ROOMS_BY_ID = gql`
   }
 `;
 
-
-
 const CREATE_BOOKING = gql`
-
-    input CreateBookingInput {
-    roomId: ID!
-    checkIn: String!
-    checkOut: String!
-    personPerRoom: Int!
-    }
-
-    mutation CreateBooking($input: CreateBookingInput!){
-        createBooking(input: $input) {
+mutation CreateBooking($input: CreateBookingInput!){
+    createBooking(input: $input) {
+        _id
+        checkIn
+        checkOut
+        room {
             _id
-            checkIn
-            checkOut
-            room {
-                _id
-            }
         }
     }
+}
 `
 
 
@@ -71,18 +63,17 @@ const Booking = () => {
     const [stepper, setStepper] = useState<number>(1)
     const [dialog, setDialog] = useState<boolean>(false)
 
+    const bookingFormData = useSelector((state: RootState) => state.booking);
+
+    console.log(bookingFormData);
+
     const router = useRouter()
     const params = useParams()
 
     const [createBooking] = useMutation(CREATE_BOOKING, {
-        variables: {
-            roomId: params.id,
-            checkIn: "", //formData in Redux
-            checkOut: "", //formData in Redux
-            personPerRoom: 2 //formData in Redux
-        },
         onCompleted: (data) => {
             console.log(data);
+            setDialog(true);
         },
         onError: (error) => {
             console.error(error)
@@ -124,18 +115,50 @@ const Booking = () => {
     };
 
 
-    const handleSubmit = (e: FormEvent) => {
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault()
         try {
-            console.log(formData);
-            setDialog(true);
+            if (!params.id || !bookingFormData.date || !formData.firstName || !formData.lastName) {
+                console.error("Missing required fields");
+                return;
+            }
+            await createBooking({
+                variables: {
+                    input: {
+                        roomId: params.id,
+                        checkIn: bookingFormData.date,
+                        nights: bookingFormData.nights,
+                        personPerRoom: bookingFormData.personPerRoom,
+                        guest: {
+                            firstName: formData.firstName,
+                            lastName: formData.lastName,
+                            email: formData.email,
+                            phone: formData.phone
+                        }
+                    }
+                },
+            })
         } catch (error) {
             console.error(error)
         }
     }
 
-    console.log(data);
+    // console.log(bookingFormData.date);
 
+    const test = {
+        roomId: params.id,
+        checkIn: bookingFormData.date,
+        nights: bookingFormData.nights,
+        personPerRoom: bookingFormData.personPerRoom,
+        guest: {
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            email: formData.email,
+            phone: formData.phone
+        }
+    }
+
+    console.log(test);
 
     return (
         <div className="p-6 max-w-[1024px] mx-auto">
@@ -166,7 +189,7 @@ const Booking = () => {
             {stepper === 1 &&
                 <div className="p-4 max-w-[1024px] mx-auto">
                     <HeaderText title="User Details" className="font-semibold text-xl" />
-                    <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
+                    <form className="flex flex-col gap-3">
                         <Input type="text" label="Firstname" name="firstName" id="firstName" value={formData.firstName} onChange={handleOnChange} />
                         <Input type="text" label="Lastname" name="lastName" id="lastName" value={formData.lastName} onChange={handleOnChange} />
                         <Input type="email" label="Email" name="email" id="email" value={formData.email} onChange={handleOnChange} />

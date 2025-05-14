@@ -14,9 +14,10 @@ export const typeDefs = gql`
 }
 
 type Guest {
-  firstName: String!
-  lastName: String!
+  firstName: String
+  lastName: String
   email: String
+  phone: String
 }
 
 input GuestInput {
@@ -30,8 +31,9 @@ input GuestInput {
 input CreateBookingInput {
   roomId: ID!
   checkIn: String!
-  checkOut: String!
+  nights: Int!
   personPerRoom: Int!
+  guest: GuestInput
 }
 
 type CreateBookingResponse {
@@ -79,7 +81,7 @@ type Booking {
   checkIn: String!
   checkOut: String!
   nights: Int!
-  numberOfPeople: Int!
+  personPerRoom: Int!
   guest: Guest! 
   request: String!
   user: User!

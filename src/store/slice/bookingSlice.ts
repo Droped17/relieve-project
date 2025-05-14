@@ -4,7 +4,7 @@ import dayjs from "dayjs"
 interface BookingState {
     date: string,
     nights: number,
-    numberOfPeople: number
+    personPerRoom: number
 }
 
 const currentDate = dayjs();
@@ -12,7 +12,7 @@ const currentDate = dayjs();
 const initialState: BookingState = {
     date: currentDate.format('YYYY-MM-DD'),
     nights: 1,
-    numberOfPeople: 1
+    personPerRoom: 1
 }
 
 export const BookingSlice = createSlice({

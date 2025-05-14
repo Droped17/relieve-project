@@ -20,7 +20,7 @@ export interface IBooking extends Document {
     checkIn: string;
     checkOut: string;
     nights: number;
-    numberOfPeople: number;
+    personPerRoom: number;
     guest?: {
         firstName: string
         lastName: string
@@ -33,7 +33,7 @@ const BookingSchema: Schema = new Schema({
     checkIn: { type: Date, required: true },
     checkOut: { type: Date, required: true },
     nights: { type: Number },
-    numberOfPeople: { type: Number, required: true },
+    personPerRoom: { type: Number, required: true },
     request: { type: String },
     guest: {
         firstName: String,

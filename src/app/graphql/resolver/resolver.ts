@@ -139,22 +139,25 @@ allRooms: async (_, { date, nights, personPerRoom, floor }) => {
       return newRoom
     },
     createBooking: async (_, { input }) => {
-      const { roomId, checkIn, checkOut, personPerRoom } = input;
+      const { roomId, checkIn, nights, personPerRoom, guest } = input;
 
-      const parsedCheckIn = dayjs(checkIn, 'DD-MM-YYYY', true);
-      const parsedCheckOut = dayjs(checkOut, 'DD-MM-YYYY', true);
+      const parsedCheckIn = dayjs(checkIn, 'YYYY-MM-DD', true);
 
-      if (!parsedCheckIn.isValid() || !parsedCheckOut.isValid()) {
-        throw new Error("Invalid date format. Use DD-MM-YYYY.");
+      if (!parsedCheckIn.isValid()) {
+        throw new Error("Invalid date format. Use YYYY-MM-DD.");
       }
 
+      const parsedCheckOut = parsedCheckIn.add(nights, 'day')
 
+      /* [TODO]: handle User and Guest */
+      /* [TODO]: handle logic for check booked */
       const booking = await Booking.create({
         room: roomId,
         checkIn: parsedCheckIn.toDate(),
         checkOut: parsedCheckOut.toDate(),
-        numberOfPeople: personPerRoom,
-        // user: req.user._id  <-- if required, pass this from auth context
+        personPerRoom,
+        // user: req.user._id  <-- if required, pass this from auth 
+        guest
       });
 
       await Room.findByIdAndUpdate(roomId, {

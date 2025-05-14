@@ -11,7 +11,7 @@ import Divider from "@/src/components/atoms/Divider";
 import Input from "@/src/components/atoms/Input";
 import Dropdown from "@/src/components/atoms/Dropdown";
 import { useDispatch, useSelector } from "react-redux";
-import { setFormData, setFormField } from "@/src/store/slice/bookingSlice";
+import { setFormField } from "@/src/store/slice/bookingSlice";
 import { AppDispatch } from "@/src/store/store";
 import { RootState } from "@reduxjs/toolkit/query";
 import dayjs from "dayjs";
@@ -32,24 +32,13 @@ const GET_ALL_ROOMS = gql`
 
 const HomePage = () => {
 
-  // [TODO]: use moment to handle date
-
   const currentDate = dayjs();
   currentDate.format('YYYY-MM-DD')
 
-  const today = new Date();
-  const formattedDate = today.toISOString().split('T')[0]
-
-  // const [formData, setFormData] = useState({
-  //   date: formattedDate,
-  //   nights: 1,
-  //   numberOfPeople: 1
-  // })
+  const [floor, setFloor] = useState(1);
 
   const formData = useSelector((state: RootState) => state.booking);
   const dispatch = useDispatch<AppDispatch>();
-
-  console.log(formData);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -62,11 +51,10 @@ const HomePage = () => {
     dispatch(setFormField({ field: name as any, value: parsedValue }));
   };
 
-  const [floor, setFloor] = useState(1);
 
   const { data, loading, error, refetch } = useQuery(GET_ALL_ROOMS, {
     variables: {
-      date: formattedDate,
+      date: formData.date,
       nights: 1,
       personPerRoom: 1,
       floor: 1
@@ -78,12 +66,12 @@ const HomePage = () => {
     if (
       formData.date.trim() !== '' &&
       formData.nights > 0 &&
-      formData.numberOfPeople > 0
+      formData.personPerRoom > 0
     ) {
       refetch({
         date: formData.date,
         nights: formData.nights,
-        personPerRoom: formData.numberOfPeople,
+        personPerRoom: formData.personPerRoom,
         floor,
       });
     }
@@ -100,16 +88,7 @@ const HomePage = () => {
     setFloor(newFloor);
   };
 
-  // const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-  //   const { name, value } = e.target;
-
-  //   setFormData(prev => ({
-  //     ...prev,
-  //     [name]: name === "nights" || name === "numberOfPeople" ? Number(value) : value
-  //   }));
-  // };
-
-
+  console.log(data);
 
   return (
     <div className="mx-auto max-w-[1024px] px-4 flex flex-col gap-4">
@@ -124,7 +103,7 @@ const HomePage = () => {
               <label>จำนวนคืน</label>
               <Dropdown name="nights" value={formData.nights} onChange={handleChange} className="border border-gray-200 p-2 rounded-sm" option={[1, 2, 3, 4]} />
               <label>จำนวนคน</label>
-              <Dropdown name="person" value={formData.numberOfPeople} onChange={handleChange} className="border border-gray-200 p-2 rounded-sm" option={[1, 2, 3, 4]} />
+              <Dropdown name="person" value={formData.personPerRoom} onChange={handleChange} className="border border-gray-200 p-2 rounded-sm" option={[1, 2, 3, 4]} />
             </div>
 
           </form>
@@ -194,9 +173,9 @@ const HomePage = () => {
 
 
         {/* Select Floor */}
-        <div className="flex justify-between">
+        <div className="flex justify-between items-center">
           {/* [TODO]: Change this time */}
-          <p className="font-semibold text-lg">{formattedDate}</p>
+          <p className="font-semibold text-lg">{currentDate.format('DD-MM-YYYY')}</p>
           <div className="flex gap-2">
             <button
               onClick={() => handleFloorChange(1)}
