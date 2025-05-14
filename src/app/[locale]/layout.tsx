@@ -6,6 +6,7 @@ import ApolloProviders from '@/src/providers/ApolloProvider';
 import '@/src/app/style/globals.css'
 import Header from '@/src/components/organisms/Header';
 import { Kanit } from 'next/font/google';
+import { StoreProvider } from '@/src/providers/StoreProvider';
 
 const kanit = Kanit({
   subsets: ['thai', 'latin'], // include 'thai' for Kanit
@@ -35,14 +36,17 @@ export default async function LocaleLayout({
         <ApolloProviders>
           {/* Localization */}
           <NextIntlClientProvider messages={messages}>
-            {/* Next Auth */}
-            <SessionProvider>
-              {/* Header Component */}
-              <Header />
+            {/* Redux */}
+            <StoreProvider>
+              <SessionProvider>
+                {/* Header Component */}
+                <Header />
                 <main>
                   {children}
                 </main>
-            </SessionProvider>
+              </SessionProvider>
+            </StoreProvider>
+            {/* Next Auth */}
           </NextIntlClientProvider>
         </ApolloProviders>
       </body>

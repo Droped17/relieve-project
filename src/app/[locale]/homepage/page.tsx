@@ -10,6 +10,11 @@ import HeaderText from "@/src/components/atoms/HeaderText";
 import Divider from "@/src/components/atoms/Divider";
 import Input from "@/src/components/atoms/Input";
 import Dropdown from "@/src/components/atoms/Dropdown";
+import { useDispatch, useSelector } from "react-redux";
+import { setFormData, setFormField } from "@/src/store/slice/bookingSlice";
+import { AppDispatch } from "@/src/store/store";
+import { RootState } from "@reduxjs/toolkit/query";
+import dayjs from "dayjs";
 
 // [TODO]: Add Skeletom when loading
 
@@ -28,15 +33,34 @@ const GET_ALL_ROOMS = gql`
 const HomePage = () => {
 
   // [TODO]: use moment to handle date
-  
+
+  const currentDate = dayjs();
+  currentDate.format('YYYY-MM-DD')
+
   const today = new Date();
   const formattedDate = today.toISOString().split('T')[0]
 
-  const [formData, setFormData] = useState({
-    date: formattedDate,
-    nights: 1,
-    numberOfPeople: 1
-  })
+  // const [formData, setFormData] = useState({
+  //   date: formattedDate,
+  //   nights: 1,
+  //   numberOfPeople: 1
+  // })
+
+  const formData = useSelector((state: RootState) => state.booking);
+  const dispatch = useDispatch<AppDispatch>();
+
+  console.log(formData);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+
+    const numericFields = ['nights', 'numberOfPeople'];
+    const parsedValue = numericFields.includes(name)
+      ? Number(value)
+      : value; // For 'date', just store as YYYY-MM-DD
+
+    dispatch(setFormField({ field: name as any, value: parsedValue }));
+  };
 
   const [floor, setFloor] = useState(1);
 
@@ -76,14 +100,16 @@ const HomePage = () => {
     setFloor(newFloor);
   };
 
-const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-  const { name, value } = e.target;
+  // const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  //   const { name, value } = e.target;
 
-  setFormData(prev => ({
-    ...prev,
-    [name]: name === "nights" || name === "numberOfPeople" ? Number(value) : value
-  }));
-};
+  //   setFormData(prev => ({
+  //     ...prev,
+  //     [name]: name === "nights" || name === "numberOfPeople" ? Number(value) : value
+  //   }));
+  // };
+
+
 
   return (
     <div className="mx-auto max-w-[1024px] px-4 flex flex-col gap-4">

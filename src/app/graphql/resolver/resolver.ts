@@ -1,9 +1,14 @@
 import * as bcrypt from 'bcrypt'
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+import { Types } from 'mongoose';
 import { Booking } from '@/src/models/Booking';
 import { IRoom, Room } from '@/src/models/Room';
 import { ITransaction, Transaction } from '@/src/models/Transaction';
 import { IUser, User } from '@/src/models/User';
-import { Types } from 'mongoose';
+
+/* For use DD-MM-YYYY format */
+dayjs.extend(customParseFormat);
 
 export const resolvers = {
   Query: {
@@ -84,45 +89,32 @@ export const resolvers = {
     rooms: async () => {
       return await Room.find()
     },
-    allRooms: async (_, { date, nights, personPerRoom, floor }) => {
-      /* [TODO]: use moment for handle date */
-      const checkIn = new Date(date);
-      const checkOut = new Date(checkIn);
-      checkOut.setDate(checkIn.getDate() + nights);
+allRooms: async (_, { date, nights, personPerRoom, floor }) => {
+  // Use dayjs to parse input date and add nights
+  const checkIn = dayjs(date, 'YYYY-MM-DD', true); // or 'DD-MM-YYYY' if needed
+  if (!checkIn.isValid()) {
+    throw new Error("Invalid date format. Use DD-MM-YYYY.");
+  }
 
-      if (floor) {
-        const roomsByFloor = await Room.find({
-          floor
-        }).populate({
-          path: 'booking',
-          match: {
-            checkIn: { $lt: checkOut },
-            checkOut: { $gt: checkIn },
-          },
-        }).lean()
+  const checkOut = checkIn.add(nights, 'day');
 
-        // console.log(roomsByFloor);
-        return roomsByFloor.map(room => ({
-          ...room,
-          isBooked: (Array.isArray(room.booking) && room.booking.length > 0) || room.personPerRoom < personPerRoom,
-        }))
-      }
+  const roomQuery = floor ? { floor } : {};
 
-      // Get all rooms with related bookings that overlap with selected range
-      const rooms = await Room.find().populate({
-        path: 'booking',
-        match: {
-          checkIn: { $lt: checkOut },
-          checkOut: { $gt: checkIn },
-        },
-      }).lean();
+  const rooms = await Room.find(roomQuery).populate({
+    path: 'booking',
+    match: {
+      checkIn: { $lt: checkOut.toDate() },
+      checkOut: { $gt: checkIn.toDate() },
+    },
+  }).lean();
 
-      // Add isBooked field based on booking overlap or capacity
-      return rooms.map(room => ({
-        ...room,
-        isBooked: (Array.isArray(room.booking) && room.booking.length > 0) || room.personPerRoom < personPerRoom,
-      }));
-    }
+  return rooms.map(room => ({
+    ...room,
+    isBooked:
+      (Array.isArray(room.booking) && room.booking.length > 0) ||
+      room.personPerRoom < personPerRoom,
+  }));
+}
 
   },
   Mutation: {
@@ -149,18 +141,18 @@ export const resolvers = {
     createBooking: async (_, { input }) => {
       const { roomId, checkIn, checkOut, personPerRoom } = input;
 
-      const parsedCheckIn = new Date(checkIn);
-      const parsedCheckOut = new Date(checkOut);
+      const parsedCheckIn = dayjs(checkIn, 'DD-MM-YYYY', true);
+      const parsedCheckOut = dayjs(checkOut, 'DD-MM-YYYY', true);
 
-      if (isNaN(parsedCheckIn.getTime()) || isNaN(parsedCheckOut.getTime())) {
-        throw new Error("Invalid date format. Use YYYY-MM-DD.");
+      if (!parsedCheckIn.isValid() || !parsedCheckOut.isValid()) {
+        throw new Error("Invalid date format. Use DD-MM-YYYY.");
       }
 
 
       const booking = await Booking.create({
         room: roomId,
-        checkIn: parsedCheckIn,
-        checkOut: parsedCheckOut,
+        checkIn: parsedCheckIn.toDate(),
+        checkOut: parsedCheckOut.toDate(),
         numberOfPeople: personPerRoom,
         // user: req.user._id  <-- if required, pass this from auth context
       });

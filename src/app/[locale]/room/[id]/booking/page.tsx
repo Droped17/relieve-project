@@ -6,7 +6,7 @@ import HeaderText from "@/src/components/atoms/HeaderText"
 import Input from "@/src/components/atoms/Input"
 import Dialog from "@/src/components/molecules/Dialog"
 import PageTitle from "@/src/components/molecules/PageTitle"
-import { gql, useQuery } from "@apollo/client"
+import { gql, useMutation, useQuery } from "@apollo/client"
 import clsx from "clsx"
 import Image from "next/image"
 import { useParams, useRouter } from "next/navigation"
@@ -34,6 +34,29 @@ const FIND_ROOMS_BY_ID = gql`
 `;
 
 
+
+const CREATE_BOOKING = gql`
+
+    input CreateBookingInput {
+    roomId: ID!
+    checkIn: String!
+    checkOut: String!
+    personPerRoom: Int!
+    }
+
+    mutation CreateBooking($input: CreateBookingInput!){
+        createBooking(input: $input) {
+            _id
+            checkIn
+            checkOut
+            room {
+                _id
+            }
+        }
+    }
+`
+
+
 const Booking = () => {
 
     const [formData, setFormData] = useState<IFormData>({
@@ -50,6 +73,21 @@ const Booking = () => {
 
     const router = useRouter()
     const params = useParams()
+
+    const [createBooking] = useMutation(CREATE_BOOKING, {
+        variables: {
+            roomId: params.id,
+            checkIn: "", //formData in Redux
+            checkOut: "", //formData in Redux
+            personPerRoom: 2 //formData in Redux
+        },
+        onCompleted: (data) => {
+            console.log(data);
+        },
+        onError: (error) => {
+            console.error(error)
+        }
+    })
     const { data, loading } = useQuery(FIND_ROOMS_BY_ID, {
         variables: {
             id: params.id
@@ -59,6 +97,7 @@ const Booking = () => {
     const { personPerRoom, price, number, image } = data?.findRoomBy[0] || {};
 
     if (loading) return <p>Loading..</p>
+
 
 
     const handleNextStepper = () => {
@@ -94,6 +133,8 @@ const Booking = () => {
             console.error(error)
         }
     }
+
+    console.log(data);
 
 
     return (
@@ -187,12 +228,12 @@ const Booking = () => {
             {dialog && (
                 <Dialog className="w-full" onClose={() => setDialog(false)}>
                     <div className="p-4 text-center flex flex-col gap-4">
-                    <strong className="text-xl">Please Check Your Email</strong>
-                    <Divider />
-                    <p>We send you QRCode in your email please check and confirm booking in 1 hour</p>
-                    <div>
-                    <Button type="submit" onClick={() => router.replace(`/${params.locale}/transaction`)} disable={!formData.acceptForm} title="Confirm" className="w-[100px]" />
-                    </div>
+                        <strong className="text-xl">Please Check Your Email</strong>
+                        <Divider />
+                        <p>We send you QRCode in your email please check and confirm booking in 1 hour</p>
+                        <div>
+                            <Button type="submit" onClick={() => router.replace(`/${params.locale}/transaction`)} disable={!formData.acceptForm} title="Confirm" className="w-[100px]" />
+                        </div>
                     </div>
                 </Dialog>
             )}
