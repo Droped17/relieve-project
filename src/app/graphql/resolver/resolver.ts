@@ -7,6 +7,8 @@ import { IRoom, Room } from '@/src/models/Room';
 import { ITransaction, Transaction } from '@/src/models/Transaction';
 import { IUser, User } from '@/src/models/User';
 import { sendEmail } from '../../lib/mailer';
+import fs from 'fs';
+import path from 'path';
 
 /* For use DD-MM-YYYY format */
 dayjs.extend(customParseFormat);
@@ -90,32 +92,32 @@ export const resolvers = {
     rooms: async () => {
       return await Room.find()
     },
-allRooms: async (_, { date, nights, personPerRoom, floor }) => {
-  // Use dayjs to parse input date and add nights
-  const checkIn = dayjs(date, 'YYYY-MM-DD', true); // or 'DD-MM-YYYY' if needed
-  if (!checkIn.isValid()) {
-    throw new Error("Invalid date format. Use DD-MM-YYYY.");
-  }
+    allRooms: async (_, { date, nights, personPerRoom, floor }) => {
+      // Use dayjs to parse input date and add nights
+      const checkIn = dayjs(date, 'YYYY-MM-DD', true); // or 'DD-MM-YYYY' if needed
+      if (!checkIn.isValid()) {
+        throw new Error("Invalid date format. Use DD-MM-YYYY.");
+      }
 
-  const checkOut = checkIn.add(nights, 'day');
+      const checkOut = checkIn.add(nights, 'day');
 
-  const roomQuery = floor ? { floor } : {};
+      const roomQuery = floor ? { floor } : {};
 
-  const rooms = await Room.find(roomQuery).populate({
-    path: 'booking',
-    match: {
-      checkIn: { $lt: checkOut.toDate() },
-      checkOut: { $gt: checkIn.toDate() },
-    },
-  }).lean();
+      const rooms = await Room.find(roomQuery).populate({
+        path: 'booking',
+        match: {
+          checkIn: { $lt: checkOut.toDate() },
+          checkOut: { $gt: checkIn.toDate() },
+        },
+      }).lean();
 
-  return rooms.map(room => ({
-    ...room,
-    isBooked:
-      (Array.isArray(room.booking) && room.booking.length > 0) ||
-      room.personPerRoom < personPerRoom,
-  }));
-}
+      return rooms.map(room => ({
+        ...room,
+        isBooked:
+          (Array.isArray(room.booking) && room.booking.length > 0) ||
+          room.personPerRoom < personPerRoom,
+      }));
+    }
 
   },
   Mutation: {
@@ -169,22 +171,45 @@ allRooms: async (_, { date, nights, personPerRoom, floor }) => {
     },
 
     // MARK: MAILER
-    sendContactEmail: async(_: any, args: {to: string; subject: string; message: string }) => {
-      const html = `<p>${args.message}</p>`
+sendContactEmail: async (_: any, args: {
+  to: string;
+  subject: string;
+  message: string;
+  username: string;
+  actionUrl: string;
+}) => {
+  try {
+    const getEmailTemplate = (templateName: string, variables: Record<string, string>) => {
+      const filePath = path.join(process.cwd(), '/src/app/emailTemplates', `${templateName}.html`);
+      let template = fs.readFileSync(filePath, 'utf8');
 
-      try {
-        await sendEmail({
-          to: args.to,
-          subject: args.subject,
-          html
-        })
-
-        return {success: true, message: 'Email Sent Successfully!'}
-      } catch (error) {
-        console.error(`Email error:`, error)
-        return {success: false, message: 'Failed to send email'}
+      for (const key in variables) {
+        const value = variables[key];
+        const regex = new RegExp(`{{${key}}}`, 'g');
+        template = template.replace(regex, value);
       }
+
+      return template;
     }
+
+    const html = getEmailTemplate('booking', {
+      username: args.username,
+      actionUrl: args.actionUrl
+    });
+
+    await sendEmail({
+      to: args.to,
+      subject: args.subject,
+      html
+    });
+
+    return { success: true, message: 'Email Sent Successfully!' };
+  } catch (error) {
+    console.error('Email error:', error);
+    return { success: false, message: 'Failed to send email' };
+  }
+}
+
 
   }
 };
