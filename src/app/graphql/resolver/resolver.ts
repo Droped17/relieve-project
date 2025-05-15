@@ -9,6 +9,7 @@ import { IUser, User } from '@/src/models/User';
 import { sendEmail } from '../../lib/mailer';
 import fs from 'fs';
 import path from 'path';
+import { sendContactEmail } from '../../utils/sendContactEmail';
 
 /* For use DD-MM-YYYY format */
 dayjs.extend(customParseFormat);
@@ -163,52 +164,61 @@ export const resolvers = {
         guest
       });
 
-      await Room.findByIdAndUpdate(roomId, {
+      const result = await Room.findByIdAndUpdate(roomId, {
         $push: { booking: booking._id }
       });
+
+      if (result) {
+        await sendContactEmail({
+          to: guest.email,
+          subject: 'Booking Confirmation',
+          username: guest.firstName,
+          actionUrl: `http://localhost:3000/th/transaction`
+        })
+      }
 
       return booking;
     },
 
     // MARK: MAILER
-sendContactEmail: async (_: any, args: {
-  to: string;
-  subject: string;
-  message: string;
-  username: string;
-  actionUrl: string;
-}) => {
-  try {
-    const getEmailTemplate = (templateName: string, variables: Record<string, string>) => {
-      const filePath = path.join(process.cwd(), '/src/app/emailTemplates', `${templateName}.html`);
-      let template = fs.readFileSync(filePath, 'utf8');
+    sendContactEmail: async (_: any, args: {
+      to: string;
+      subject: string;
+      message: string;
+      username: string;
+      actionUrl: string;
+    }) => {
+      try {
+        const getEmailTemplate = (templateName: string, variables: Record<string, string>) => {
+          const filePath = path.join(process.cwd(), '/src/app/emailTemplates', `${templateName}.html`);
+          let template = fs.readFileSync(filePath, 'utf8');
 
-      for (const key in variables) {
-        const value = variables[key];
-        const regex = new RegExp(`{{${key}}}`, 'g');
-        template = template.replace(regex, value);
+          for (const key in variables) {
+            const value = variables[key];
+            const regex = new RegExp(`{{${key}}}`, 'g');
+            template = template.replace(regex, value);
+          }
+
+          return template;
+        }
+
+        const html = getEmailTemplate('booking', {
+          username: args.username,
+          actionUrl: args.actionUrl
+        });
+
+        await sendEmail({
+          to: args.to,
+          subject: args.subject,
+          html
+        });
+
+        return { success: true, message: 'Email Sent Successfully!' };
+      } catch (error) {
+        console.error('Email error:', error);
+        return { success: false, message: 'Failed to send email' };
       }
-
-      return template;
     }
-
-    const html = getEmailTemplate('booking', {
-      username: args.username,
-      actionUrl: args.actionUrl
-    });
-
-    await sendEmail({
-      to: args.to,
-      subject: args.subject,
-      html
-    });
-
-    return { success: true, message: 'Email Sent Successfully!' };
-  } catch (error) {
-    console.error('Email error:', error);
-    return { success: false, message: 'Failed to send email' };
-  }
-}
 
 
   }
