@@ -6,6 +6,7 @@ import { Booking } from '@/src/models/Booking';
 import { IRoom, Room } from '@/src/models/Room';
 import { ITransaction, Transaction } from '@/src/models/Transaction';
 import { IUser, User } from '@/src/models/User';
+import { sendEmail } from '../../lib/mailer';
 
 /* For use DD-MM-YYYY format */
 dayjs.extend(customParseFormat);
@@ -165,6 +166,24 @@ allRooms: async (_, { date, nights, personPerRoom, floor }) => {
       });
 
       return booking;
+    },
+
+    // MARK: MAILER
+    sendContactEmail: async(_: any, args: {to: string; subject: string; message: string }) => {
+      const html = `<p>${args.message}</p>`
+
+      try {
+        await sendEmail({
+          to: args.to,
+          subject: args.subject,
+          html
+        })
+
+        return {success: true, message: 'Email Sent Successfully!'}
+      } catch (error) {
+        console.error(`Email error:`, error)
+        return {success: false, message: 'Failed to send email'}
+      }
     }
 
   }

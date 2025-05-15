@@ -131,6 +131,15 @@ type Query {
     createTransaction(totalPrice: Int!): Transaction!
   }
 
+  type EmailResponse {
+    success: Boolean!
+    message: String!
+  }
+
+  type Mutation {
+    sendContactEmail(to: String!, subject: String!, message: String!): EmailResponse!
+  }
+
 extend type Mutation {
   createBooking(input: CreateBookingInput!): Booking!
 }
