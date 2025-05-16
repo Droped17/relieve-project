@@ -1,14 +1,15 @@
 import clsx from "clsx";
 
 interface ButtonProps {
-  title: string;
+  title?: string
   disable?: boolean
   className?: string;
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   type: "button" | "submit" | "reset" | undefined;
+  children: React.ReactNode;
 }
 
-const Button = ({ className, title, disable, onClick, type }: ButtonProps) => {
+const Button = ({ className, title, disable, onClick, type, children }: ButtonProps) => {
   const buttonClass = clsx(
     "cursor-pointer bg-primary hover:bg-secondary transition text-white py-2 rounded",
     disable && "bg-[var(--color-fade-gray)] cursor-not-allowed opacity-50",
@@ -18,6 +19,7 @@ const Button = ({ className, title, disable, onClick, type }: ButtonProps) => {
   return (
     <button onClick={onClick} type={type} disabled={disable} className={buttonClass}>
       {title}
+      {children}
     </button>
   );
 };
