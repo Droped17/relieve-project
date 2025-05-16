@@ -14,6 +14,8 @@ import { sendContactEmail } from '../../utils/sendContactEmail';
 /* For use DD-MM-YYYY format */
 dayjs.extend(customParseFormat);
 
+// [TODO]: Remove transaction in 1 hr if status !== PAID 
+
 export const resolvers = {
   Query: {
     users: async () => {

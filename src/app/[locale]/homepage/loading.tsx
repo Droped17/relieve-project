@@ -1,3 +1,5 @@
+/* [TODO]: Design Loading */
+
 const Loading = () => {
     return (
         <p>loading..</p>

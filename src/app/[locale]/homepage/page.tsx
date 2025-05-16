@@ -1,22 +1,26 @@
 'use client';
 
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@reduxjs/toolkit/query";
 import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { gql, useQuery } from "@apollo/client";
+import dayjs from "dayjs";
 import clsx from "clsx";
 import Image from "next/image";
+import { gql, useQuery } from "@apollo/client";
+import { setFormField } from "@/src/store/slice/bookingSlice";
+import { AppDispatch } from "@/src/store/store";
 import HeaderText from "@/src/components/atoms/HeaderText";
 import Divider from "@/src/components/atoms/Divider";
 import Input from "@/src/components/atoms/Input";
 import Dropdown from "@/src/components/atoms/Dropdown";
-import { useDispatch, useSelector } from "react-redux";
-import { setFormField } from "@/src/store/slice/bookingSlice";
-import { AppDispatch } from "@/src/store/store";
-import { RootState } from "@reduxjs/toolkit/query";
-import dayjs from "dayjs";
 
 // [TODO]: Add Skeletom when loading
+// [TODO]: Call Mutaion
+// [TODO]: Refactor
+// [TODO]: Update Style
+// [TODO]: Localization
 
 const GET_ALL_ROOMS = gql`
   query AllRooms($date: String!, $nights: Int!, $personPerRoom: Int!, $floor: Int) {
@@ -29,16 +33,19 @@ const GET_ALL_ROOMS = gql`
     }
   }
 `
+const currentDate = dayjs();
+currentDate.format('YYYY-MM-DD')
 
 const HomePage = () => {
-
-  const currentDate = dayjs();
-  currentDate.format('YYYY-MM-DD')
-
   const [floor, setFloor] = useState(1);
+  const [startDate, setStartDate] = useState(new Date());
 
   const formData = useSelector((state: RootState) => state.booking);
   const dispatch = useDispatch<AppDispatch>();
+
+  const router = useRouter()
+  const params = useParams()
+  const t = useTranslations()
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -49,6 +56,10 @@ const HomePage = () => {
       : value; // For 'date', just store as YYYY-MM-DD
 
     dispatch(setFormField({ field: name as any, value: parsedValue }));
+  };
+
+  const handleFloorChange = (newFloor: number) => {
+    setFloor(newFloor);
   };
 
 
@@ -77,18 +88,8 @@ const HomePage = () => {
     }
   }, [formData, floor, refetch]);
 
-  const router = useRouter()
-  const params = useParams()
-  const t = useTranslations()
-
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
-
-  const handleFloorChange = (newFloor: number) => {
-    setFloor(newFloor);
-  };
-
-  console.log(data);
 
   return (
     <div className="mx-auto max-w-[1024px] px-4 flex flex-col gap-4">

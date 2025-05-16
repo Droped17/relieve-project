@@ -3,15 +3,37 @@
 import Button from "@/src/components/atoms/Button"
 import HeaderText from "@/src/components/atoms/HeaderText"
 import Input from "@/src/components/atoms/Input"
+import { gql, useLazyQuery } from "@apollo/client"
+import clsx from "clsx"
 import { FormEvent, useState } from "react"
 
 interface IFormData {
     bookingNumber: string
 }
 
+const FIND_TRANSACTION_BY = gql`
+    query FindTransactionBy($id: ID) {
+        findTransactionBy(id: $id) {
+            _id
+            status
+            totalPrice
+        }
+    }
+
+`
+
 const TransactionPage = () => {
     const [formData, setFormData] = useState<IFormData>({
         bookingNumber: ""
+    })
+
+    const [findTransactionBy, { data, loading, error }] = useLazyQuery(FIND_TRANSACTION_BY, {
+        onCompleted: (data) => {
+            console.log(data);
+        },
+        onError: (error) => {
+            console.error(error)
+        }
     })
 
     const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -25,10 +47,18 @@ const TransactionPage = () => {
         e.preventDefault()
         try {
             console.log(formData);
+            findTransactionBy({
+                variables: {
+                    id: formData.bookingNumber
+                },
+            })
         } catch (error) {
             console.error(error)
         }
     }
+
+    if(loading) return <p>Loading..</p>
+    if(error) return <p>Error...</p>
 
     return (
         <div className="p-6 flex flex-col gap-8 max-w-[1024px] mx-auto">
@@ -42,21 +72,41 @@ const TransactionPage = () => {
 
 
             {/* [TODO]: Show when search booking number */}
-            <div>
-            <HeaderText title="Confirm Payment" className="font-bold text-lg"/>
-            </div>
-            <div className="border border-gray-200">
-                <input type="file" name="" id="" />
-            </div>
+            {data?.findTransactionBy && <div>
+                <div>
+                    <HeaderText title="Confirm Payment" className="font-bold text-lg" />
+                </div>
+                <div className={
+                    clsx('border-l-8', {
+                        'border-l-error': data.findTransactionBy[0].status === "NOT_PAID",
+                        'border-l-primary': data.findTransactionBy[0].status === "PAID",
+                        'border-l-warning': data.findTransactionBy[0].status === "PENDING",
+                    })
+                }>
+                    <div className="p-4 shadow-lg flex flex-col gap-1">
+                        <p>Total Price: {data.findTransactionBy[0].totalPrice}</p>
+                        <p>วันที่เข้าพัก</p>
+                        <p>จำนวนคืน</p>
+                        <p>สถานะการจอง :
+                            <strong className={
+                                clsx('', {
+                                    'text-error': data.findTransactionBy[0].status === "NOT_PAID",
+                                    'text-primary': data.findTransactionBy[0].status === "PAID",
+                                    'text-warning': data.findTransactionBy[0].status === "PENDING",
+                                })
+                            }>
+                                {data.findTransactionBy[0].status}
+                            </strong>
+                        </p>
+                        <div className="border border-gray-200 w-[200px]">
+                            <input type="file" name="" id="" className="w-[200px]"/>
+                        </div>
+                        <p className="font-thin text-xs">* file size less than 1 mb </p>
+                    </div>
 
-            <p>สถานะการจอง</p>
-            <div className="border border-gray-200 p-2">
-                <p>ชื่อผู้เข้าพัก</p>
-                <p>วันที่เข้าพัก</p>
-                <p>จำนวนคืน</p>
-                <p>ราคาห้อง</p>
-                <p>สถานะการจอง</p>
-            </div>
+                </div>
+            </div>}
+
         </div>
     )
 }

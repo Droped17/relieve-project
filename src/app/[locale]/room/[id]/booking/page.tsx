@@ -48,6 +48,12 @@ mutation CreateBooking($input: CreateBookingInput!){
 }
 `
 
+// [TODO]: Refactor Booking by Id Page
+// [TODO]: Create Stepper Component
+// [TODO]: Call Mutation
+// [TODO]: Localization
+// [TODO]: Test Booking Logic
+
 
 const Booking = () => {
 
@@ -142,23 +148,6 @@ const Booking = () => {
             console.error(error)
         }
     }
-
-    // console.log(bookingFormData.date);
-
-    const test = {
-        roomId: params.id,
-        checkIn: bookingFormData.date,
-        nights: bookingFormData.nights,
-        personPerRoom: bookingFormData.personPerRoom,
-        guest: {
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-            email: formData.email,
-            phone: formData.phone
-        }
-    }
-
-    console.log(test);
 
     return (
         <div className="p-6 max-w-[1024px] mx-auto">

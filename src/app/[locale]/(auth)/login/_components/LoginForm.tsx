@@ -1,12 +1,12 @@
 "use client"
 
+import { FormEvent, useState } from "react"
+import { signIn } from "next-auth/react"
+import { useParams } from "next/navigation"
+import { LoginSchema } from "../loginSchema"
 import Button from "@/src/components/atoms/Button"
 import Divider from "@/src/components/atoms/Divider"
 import Input from "@/src/components/atoms/Input"
-import { LoginSchema } from "../loginSchema"
-import { signIn } from "next-auth/react"
-import { useParams } from "next/navigation"
-import { FormEvent, useState } from "react"
 import HeaderText from "@/src/components/atoms/HeaderText"
 
 interface IFormData {
@@ -54,17 +54,19 @@ const LoginForm = () => {
     }
 
     return (
+        /* [TODO]: Responsive */
+        /* [TODO]: localization */
         <form
             onSubmit={handleSubmit}
             className="p-6 rounded-2xl shadow-lg bg-white w-[350px]"
         >
             <div className="flex flex-col gap-4">
-                 {/* Header Title*/}
                 <HeaderText title="Login" className="text-center text-2xl font-semibold" />
                 <Input id="email" type="email" name="email" value={formData.email} onChange={handleOnChange} label="Email Address" error={error.email} />
                 <Input id="password" type="password" name="password" value={formData.password} onChange={handleOnChange} label="Password" error={error.password} />
                 <Button title="Sign In" type="submit" />
                 <Divider />
+        {/* [TODO]: Re-Design Google Button */}
                 <button
                     type="button"
                     onClick={() => signIn('google')}
