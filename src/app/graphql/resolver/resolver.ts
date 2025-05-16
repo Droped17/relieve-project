@@ -86,12 +86,24 @@ export const resolvers = {
         ...room.toObject(),
       }));
     },
+    findTransactionBy: async (_, args: { id?: string }) => {
+      const filter: any = {};
+      if (args.id) filter._id = new Types.ObjectId(args.id);
+
+      const transaction = await Transaction.findById({
+        _id: args.id
+      })
+      return [transaction]
+    },
     booking: async () => {
       // populate User and Room
       return await Booking.find().populate('user').populate('room')
     },
     rooms: async () => {
       return await Room.find()
+    },
+    transaction: async () => {
+      return await Transaction.find()
     },
     allRooms: async (_, { date, nights, personPerRoom, floor }) => {
       // Use dayjs to parse input date and add nights
@@ -140,6 +152,7 @@ export const resolvers = {
       const newRoom = await Transaction.create({
         ...args,
       })
+      console.log(newRoom);
       return newRoom
     },
     createBooking: async (_, { input }) => {
@@ -169,15 +182,26 @@ export const resolvers = {
       });
 
       if (result) {
-        await sendContactEmail({
-          to: guest.email,
-          subject: 'Booking Confirmation',
-          username: guest.firstName,
-          actionUrl: `http://localhost:3000/th/transaction`
-        })
-      }
+        
+        // FOR DEV
+        // await sendContactEmail({
+        //   to: guest.email,
+        //   subject: 'Booking Confirmation',
+        //   username: guest.firstName,
+        //   actionUrl: `http://localhost:3000/th/transaction`
+        // })
 
-      return booking;
+        const room = await Room.findById(roomId)
+        console.log(room.price);
+
+        const newTransaction = await Transaction.create({
+          totalPrice: room.price * nights
+        })
+
+        if (newTransaction) {
+          return booking
+        }
+      }
     },
 
     // MARK: MAILER

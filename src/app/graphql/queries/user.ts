@@ -101,6 +101,7 @@ type Transaction {
 
 type Query {
   users: [User!]!
+  transaction: [Transaction!]!
   rooms(
     date: String
     nights: Int
@@ -114,6 +115,9 @@ type Query {
     nights: Int
     numberOfPeople: Int
   ): [Room!]!
+  findTransactionBy(
+    id: ID
+  ): [Transaction!]!
   booking: [Booking!]!
   allRooms(date: String!, nights: Int!, personPerRoom: Int!, floor: Int): [Room!]!
 }

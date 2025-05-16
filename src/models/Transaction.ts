@@ -1,29 +1,29 @@
 import mongoose, { Schema, Document, Types } from 'mongoose';
 
 enum ETransactionStatus {
-    PENDING = "pending",
-    PAID = "paid",
-    NOT_PAID = "not_paid"
+    PENDING = "PENDING",
+    PAID = "PAID",
+    NOT_PAID = "NOT_PAID"
 }
 
 export interface ITransaction extends Document {
     totalPrice: number;
-    request: string;
-    image: string
+    image?: string
     status: ETransactionStatus;
     createdAt: Date;
     updatedAt: Date;
 
     //Reference Model
     user: Types.ObjectId[]
+    booking: Types.ObjectId[]
 }
 
 const TransactionSchema: Schema = new Schema({
     totalPrice: { type: Number, required: true },
-    request: { type: String },
     image: { type: String },
     status: { type: String, enum: Object.values(ETransactionStatus), default: ETransactionStatus.PENDING, required: true },
     user: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    booking: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Booking' }],
 }, {
     timestamps: true
 });

@@ -15,7 +15,7 @@ interface InputProps {
 const Input = ({ id, type, name, value, onChange, className, label, error }: InputProps) => {
     return (
         <div className={clsx('flex flex-col gap-2', className)}>
-            {label && <label>{label}</label>}
+            {label && <label className="font-semibold">{label}</label>}
             <input
                 id={id}
                 type={type}
