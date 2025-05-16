@@ -97,6 +97,7 @@ type Transaction {
   createdAt: String!
   updatedAt: String!
   user: [User!]!
+  booking: [Booking!]!
 }
 
 type Query {

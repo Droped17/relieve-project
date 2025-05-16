@@ -88,13 +88,11 @@ export const resolvers = {
         ...room.toObject(),
       }));
     },
-    findTransactionBy: async (_, args: { id?: string }) => {
+    findTransactionBy: async (_, args: { id?: string, bookingId?: string }) => {
       const filter: any = {};
       if (args.id) filter._id = new Types.ObjectId(args.id);
 
-      const transaction = await Transaction.findById({
-        _id: args.id
-      })
+      const transaction = await Transaction.findById(args.id).populate('booking')
       return [transaction]
     },
     booking: async () => {
@@ -175,6 +173,7 @@ export const resolvers = {
         checkIn: parsedCheckIn.toDate(),
         checkOut: parsedCheckOut.toDate(),
         personPerRoom,
+        nights,
         // user: req.user._id  <-- if required, pass this from auth 
         guest
       });
@@ -197,7 +196,8 @@ export const resolvers = {
         console.log(room.price);
 
         const newTransaction = await Transaction.create({
-          totalPrice: room.price * nights
+          booking: booking._id,
+          totalPrice: room.price * nights,
         })
 
         if (newTransaction) {
