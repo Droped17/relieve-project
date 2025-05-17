@@ -1,13 +1,18 @@
 "use client"
 
+import { FormEvent, useState } from "react"
+import { CldUploadWidget } from "next-cloudinary"
+import Image from "next/image"
+import clsx from "clsx"
 import Button from "@/src/components/atoms/Button"
 import HeaderText from "@/src/components/atoms/HeaderText"
 import Input from "@/src/components/atoms/Input"
 import { gql, useLazyQuery, useMutation } from "@apollo/client"
-import clsx from "clsx"
-import { CldImage, CldUploadWidget } from "next-cloudinary"
-import Image from "next/image"
-import { FormEvent, useState } from "react"
+
+
+// [TODO]: Refactor Transaction Page
+// [TODO]: Call Mutation
+// [TODO]: Localization
 
 interface IFormData {
     bookingNumber: string
@@ -25,8 +30,8 @@ const FIND_TRANSACTION_BY = gql`
 `
 
 const UPLOAD_IMAGE = gql`
-  mutation UploadImage($imageUrl: String!) {
-    uploadImage(imageUrl: $imageUrl)
+  mutation UploadImage($imageUrl: String!, $transactionId: ID!) {
+    uploadImage(imageUrl: $imageUrl, transactionId: $transactionId)
   }
 `;
 
@@ -69,16 +74,6 @@ const TransactionPage = () => {
         }
     }
 
-    // const handleUpload = async (result: any) => {
-    //     const secureUrl = result?.info?.file.name;
-
-    //     console.log(`RESULT => `,result);
-
-    //     console.log(secureUrl);
-    //     setImageUrl(secureUrl);
-    //     await uploadImage({ variables: { imageUrl: secureUrl } });
-    // };
-
     const handleUpload = async (result: any) => {
         if (result?.event !== "success") {
             console.warn("Upload not completed yet:", result.event);
@@ -92,7 +87,8 @@ const TransactionPage = () => {
 
         console.log("Image uploaded successfully:", secureUrl);
         setImageUrl(secureUrl);
-        await uploadImage({ variables: { imageUrl: secureUrl, transactionId: data?.findTransactionBy[0]._id} });
+        const results = await uploadImage({ variables: { imageUrl: secureUrl, transactionId: data.findTransactionBy[0]._id} });
+        console.log(`UPLOAD RESULT => `,results);
     };
 
     if (loading) return <p>Loading..</p>
@@ -118,31 +114,29 @@ const TransactionPage = () => {
                 </div>
                 <div className={
                     clsx('border-l-8', {
-                        'border-l-error': data.findTransactionBy[0].status === "NOT_PAID",
-                        'border-l-primary': data.findTransactionBy[0].status === "PAID",
-                        'border-l-warning': data.findTransactionBy[0].status === "PENDING",
+                        'border-l-error': data.findTransactionBy[0]?.status === "NOT_PAID",
+                        'border-l-primary': data.findTransactionBy[0]?.status === "PAID",
+                        'border-l-warning': data.findTransactionBy[0]?.status === "PENDING",
                     })
                 }>
                     <div className="p-4 shadow-lg flex flex-col gap-1">
-                        <p>Total Price: {data.findTransactionBy[0].totalPrice}</p>
+                        <p>Total Price: {data.findTransactionBy[0]?.totalPrice}</p>
                         <p>วันที่เข้าพัก</p>
                         <p>จำนวนคืน</p>
                         <p>สถานะการจอง :
                             <strong className={
                                 clsx('', {
-                                    'text-error': data.findTransactionBy[0].status === "NOT_PAID",
-                                    'text-primary': data.findTransactionBy[0].status === "PAID",
-                                    'text-warning': data.findTransactionBy[0].status === "PENDING",
+                                    'text-error': data.findTransactionBy[0]?.status === "NOT_PAID",
+                                    'text-primary': data.findTransactionBy[0]?.status === "PAID",
+                                    'text-warning': data.findTransactionBy[0]?.status === "PENDING",
                                 })
                             }>
-                                {data.findTransactionBy[0].status}
+                                {data.findTransactionBy[0]?.status}
                             </strong>
                         </p>
-                        <div className="border border-gray-200 w-[200px]">
+                        {data.findTransactionBy[0]?.status !== "PAID" && <div className="border border-gray-200 w-[200px]">
                             <CldUploadWidget
                                 uploadPreset="ml_default"
-                                // onUploadAdded={handleUpload}
-                                // onUpload={handleUpload}
                                 onSuccess={handleUpload}
                             >
                                 {({ open }) => (
@@ -160,8 +154,8 @@ const TransactionPage = () => {
                                     <Image alt="" src={imageUrl} width={500} height={500} className="" />
                                 </div>
                             )}
-                        </div>
-                        <p className="font-thin text-xs">* file size less than 1 mb </p>
+                            <p className="font-thin text-xs">* file size less than 1 mb </p>
+                        </div>}
                     </div>
 
                 </div>

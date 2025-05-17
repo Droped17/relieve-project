@@ -93,7 +93,11 @@ export const resolvers = {
       if (args.id) filter._id = new Types.ObjectId(args.id);
 
       const transaction = await Transaction.findById(args.id).populate('booking')
-      return [transaction]
+      if (transaction) {
+        return [transaction]
+      } else {
+        return []
+      }
     },
     booking: async () => {
       // populate User and Room
@@ -250,11 +254,16 @@ export const resolvers = {
 
       const result = await Transaction.updateOne(
         { _id: transactionId },             // filter
-        { $set: { image: imageUrl } }       // update
+        { $set: {                           // update
+          image: imageUrl, 
+          status: "PAID"                    // [TODO]: status "PAID" will confirm by Admin
+        } }                                
       );
 
       console.log("Update result:", result);
       return result.modifiedCount > 0;
+      
+
     }
 
 

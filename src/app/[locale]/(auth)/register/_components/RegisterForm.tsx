@@ -1,36 +1,15 @@
 "use client"
 
-import Button from "@/src/components/atoms/Button";
-import Input from "@/src/components/atoms/Input";
-// import { REGISTER_USER } from "@/src/app/graphql/mutations/user.mutation";
-import { gql, useMutation } from "@apollo/client";
+import React, { FormEvent, useState } from "react"
 import { signIn } from "next-auth/react";
 import { useParams } from "next/navigation";
-import React, { FormEvent, useState } from "react"
+import { useMutation } from "@apollo/client";
 import { RegisterSchema } from "../registerSchema";
+import Button from "@/src/components/atoms/Button";
+import Input from "@/src/components/atoms/Input";
 import HeaderText from "@/src/components/atoms/HeaderText";
+import { CREATE_USER } from "@/src/app/graphql/mutations/user.mutation";
 
-/* CALL MUTAION */
-const CREATE_USER = gql`
-  mutation CreateUser(
-    $firstName: String!
-    $lastName: String!
-    $email: String!
-    $password: String!
-    $phone: String!
-  ) {
-    createUser(
-      firstName: $firstName
-      lastName: $lastName
-      email: $email
-      password: $password
-      phone: $phone
-    ) {
-      id
-      email
-    }
-  }
-`;
 
 interface IFormData {
     firstName: string;

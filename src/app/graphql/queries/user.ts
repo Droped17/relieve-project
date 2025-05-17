@@ -92,7 +92,7 @@ type Transaction {
   _id: ID!
   totalPrice: Int!
   request: String!
-  image: String!
+  image: String
   status: ETransactionStatus
   createdAt: String!
   updatedAt: String!
@@ -146,7 +146,7 @@ type Query {
   }
 
   type Mutation {
-   uploadImage(imageUrl: String!): Boolean!
+   uploadImage(imageUrl: String!, transactionId: ID!): Boolean!
   }
 
 extend type Mutation {
