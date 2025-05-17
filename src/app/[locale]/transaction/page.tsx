@@ -3,8 +3,10 @@
 import Button from "@/src/components/atoms/Button"
 import HeaderText from "@/src/components/atoms/HeaderText"
 import Input from "@/src/components/atoms/Input"
-import { gql, useLazyQuery } from "@apollo/client"
+import { gql, useLazyQuery, useMutation } from "@apollo/client"
 import clsx from "clsx"
+import { CldImage, CldUploadWidget } from "next-cloudinary"
+import Image from "next/image"
 import { FormEvent, useState } from "react"
 
 interface IFormData {
@@ -22,10 +24,19 @@ const FIND_TRANSACTION_BY = gql`
 
 `
 
+const UPLOAD_IMAGE = gql`
+  mutation UploadImage($imageUrl: String!) {
+    uploadImage(imageUrl: $imageUrl)
+  }
+`;
+
 const TransactionPage = () => {
     const [formData, setFormData] = useState<IFormData>({
         bookingNumber: ""
     })
+    const [imageUrl, setImageUrl] = useState<string | null>(null);
+
+    console.log(imageUrl);
 
     const [findTransactionBy, { data, loading, error }] = useLazyQuery(FIND_TRANSACTION_BY, {
         onCompleted: (data) => {
@@ -35,6 +46,7 @@ const TransactionPage = () => {
             console.error(error)
         }
     })
+    const [uploadImage] = useMutation(UPLOAD_IMAGE);
 
     const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData((prev) => ({
@@ -57,8 +69,36 @@ const TransactionPage = () => {
         }
     }
 
-    if(loading) return <p>Loading..</p>
-    if(error) return <p>Error...</p>
+    // const handleUpload = async (result: any) => {
+    //     const secureUrl = result?.info?.file.name;
+
+    //     console.log(`RESULT => `,result);
+
+    //     console.log(secureUrl);
+    //     setImageUrl(secureUrl);
+    //     await uploadImage({ variables: { imageUrl: secureUrl } });
+    // };
+
+    const handleUpload = async (result: any) => {
+        if (result?.event !== "success") {
+            console.warn("Upload not completed yet:", result.event);
+            return;
+        }
+        const secureUrl = result?.info?.secure_url;
+        if (!secureUrl) {
+            console.error("Upload succeeded but secure_url missing.");
+            return;
+        }
+
+        console.log("Image uploaded successfully:", secureUrl);
+        setImageUrl(secureUrl);
+        await uploadImage({ variables: { imageUrl: secureUrl, transactionId: data?.findTransactionBy[0]._id} });
+    };
+
+    if (loading) return <p>Loading..</p>
+    if (error) return <p>Error...</p>
+
+    console.log(data?.findTransactionBy);
 
     return (
         <div className="p-6 flex flex-col gap-8 max-w-[1024px] mx-auto">
@@ -99,7 +139,27 @@ const TransactionPage = () => {
                             </strong>
                         </p>
                         <div className="border border-gray-200 w-[200px]">
-                            <input type="file" name="" id="" className="w-[200px]"/>
+                            <CldUploadWidget
+                                uploadPreset="ml_default"
+                                // onUploadAdded={handleUpload}
+                                // onUpload={handleUpload}
+                                onSuccess={handleUpload}
+                            >
+                                {({ open }) => (
+                                    <button
+                                        onClick={() => open()}
+                                        className="bg-blue-500 text-white px-4 py-2 rounded"
+                                    >
+                                        Upload Image
+                                    </button>
+                                )}
+                            </CldUploadWidget>
+
+                            {imageUrl && (
+                                <div className="mt-4">
+                                    <Image alt="" src={imageUrl} width={500} height={500} className="" />
+                                </div>
+                            )}
                         </div>
                         <p className="font-thin text-xs">* file size less than 1 mb </p>
                     </div>

@@ -183,7 +183,7 @@ export const resolvers = {
       });
 
       if (result) {
-        
+
         // FOR DEV
         // await sendContactEmail({
         //   to: guest.email,
@@ -244,6 +244,17 @@ export const resolvers = {
         console.error('Email error:', error);
         return { success: false, message: 'Failed to send email' };
       }
+    },
+    uploadImage: async (_: any, { imageUrl, transactionId }: { imageUrl: string; transactionId: string }) => {
+      console.log("Image uploaded to:", imageUrl);
+
+      const result = await Transaction.updateOne(
+        { _id: transactionId },             // filter
+        { $set: { image: imageUrl } }       // update
+      );
+
+      console.log("Update result:", result);
+      return result.modifiedCount > 0;
     }
 
 

@@ -145,6 +145,10 @@ type Query {
     sendContactEmail(to: String!, subject: String!, message: String!): EmailResponse!
   }
 
+  type Mutation {
+   uploadImage(imageUrl: String!): Boolean!
+  }
+
 extend type Mutation {
   createBooking(input: CreateBookingInput!): Booking!
 }
