@@ -10,14 +10,37 @@ import { sendEmail } from '../../lib/mailer';
 import fs from 'fs';
 import path from 'path';
 import { sendContactEmail } from '../../utils/sendContactEmail';
+import { GraphQLContext } from '../context';
+
 
 /* For use DD-MM-YYYY format */
 dayjs.extend(customParseFormat);
+
+const requireAuth = (user) => {
+  if (!user) throw new Error("Not Authenticated");
+};
 
 // [TODO]: Remove transaction in 1 hr if status !== PAID 
 
 export const resolvers = {
   Query: {
+    myProfile: (_, args, context: GraphQLContext) => {
+
+      console.log(context);
+
+      // Check if user is authenticated
+      if (!context.isAuthenticated) {
+        throw new Error('Authentication required');
+      }
+
+      // Now you can use the user data from context
+      return {
+        id: context.user?.id,
+        name: context.user?.name,
+        email: context.user?.email,
+        // Other user fields
+      };
+    },
     protectedData: (_, args, context) => {
       if (!context.user) {
         throw new Error("Not Authenticated")
@@ -25,13 +48,14 @@ export const resolvers = {
       if (context.user.role !== "ADMIN") {
         throw new Error("Not Authorized")
       }
-      return {message: "This is protected data"}
+      return { message: "This is protected data" }
     },
     me: async (_: any, __: any, ctx: any) => {
       if (!ctx.session) throw new Error('Unauthorized')
       return ctx.session.user
     },
-    users: async () => {
+    users: async (_, __, context) => {
+      requireAuth(context.user);
       return await User.find();
     },
     findRoomBy: async (

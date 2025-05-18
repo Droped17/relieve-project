@@ -108,6 +108,7 @@ type Transaction {
 }
 
 type Query {
+  myProfile: User
   publicData: String
   userData: String @auth
   adminData: String @auth(requires: ADMIN)
