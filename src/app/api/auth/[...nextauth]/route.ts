@@ -13,7 +13,8 @@ export const authOptions = {
             name: "Credentials",
             credentials: {
                 email: { label: 'Email', type: 'email', placeholder: "email" },
-                password: { label: 'Password', type: 'password', placeholder: 'password' }
+                password: { label: 'Password', type: 'password', placeholder: 'password' },
+                name: {label: 'Name', type: "text"}
             },
             async authorize(credentials) {
                 const db = client.db()
@@ -50,7 +51,7 @@ export const authOptions = {
                 token.id = user.id
                 token.role = user.role
             }
-            console.log(token);
+            console.log(`JWT =>`,token);
             return token
         },
         session: async ({ session, token }) => {
@@ -58,13 +59,14 @@ export const authOptions = {
                 session.user.id = token.id
                 session.user.role = token.role
             }
-            console.log(session);
+            console.log(`SESSION =>`, session);
             return session
         }
     },
     pages: {
         signIn: "/th/login"
-    }
+    },
+    secret: process.env.NEXTAUTH_SECRET
 }
 
 const handler = NextAuth(authOptions)

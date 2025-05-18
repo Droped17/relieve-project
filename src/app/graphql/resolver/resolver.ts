@@ -18,6 +18,19 @@ dayjs.extend(customParseFormat);
 
 export const resolvers = {
   Query: {
+    protectedData: (_, args, context) => {
+      if (!context.user) {
+        throw new Error("Not Authenticated")
+      }
+      if (context.user.role !== "ADMIN") {
+        throw new Error("Not Authorized")
+      }
+      return {message: "This is protected data"}
+    },
+    me: async (_: any, __: any, ctx: any) => {
+      if (!ctx.session) throw new Error('Unauthorized')
+      return ctx.session.user
+    },
     users: async () => {
       return await User.find();
     },
@@ -254,15 +267,17 @@ export const resolvers = {
 
       const result = await Transaction.updateOne(
         { _id: transactionId },             // filter
-        { $set: {                           // update
-          image: imageUrl, 
-          status: "PAID"                    // [TODO]: status "PAID" will confirm by Admin
-        } }                                
+        {
+          $set: {                           // update
+            image: imageUrl,
+            status: "PAID"                    // [TODO]: status "PAID" will confirm by Admin
+          }
+        }
       );
 
       console.log("Update result:", result);
       return result.modifiedCount > 0;
-      
+
 
     }
 

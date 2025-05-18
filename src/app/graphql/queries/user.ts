@@ -1,6 +1,13 @@
 import { gql } from 'graphql-tag';
 
 export const typeDefs = gql`
+  directive @auth(requires: Role = USER) on FIELD_DEFINITION
+
+  enum Role {
+    USER
+    ADMIN
+  }
+
   enum ERoomStatus {
     EMPTY
     FULL
@@ -101,6 +108,11 @@ type Transaction {
 }
 
 type Query {
+  publicData: String
+  userData: String @auth
+  adminData: String @auth(requires: ADMIN)
+  protectedData: String
+  me: [User!]!
   users: [User!]!
   transaction: [Transaction!]!
   rooms(

@@ -38,7 +38,6 @@ currentDate.format('YYYY-MM-DD')
 
 const HomePage = () => {
   const [floor, setFloor] = useState(1);
-  const [startDate, setStartDate] = useState(new Date());
 
   const formData = useSelector((state: RootState) => state.booking);
   const dispatch = useDispatch<AppDispatch>();
