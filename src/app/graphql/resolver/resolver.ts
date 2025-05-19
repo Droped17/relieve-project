@@ -24,36 +24,20 @@ const requireAuth = (user) => {
 
 export const resolvers = {
   Query: {
+    /* MARK: PRIVATE */
     myProfile: (_, args, context: GraphQLContext) => {
-
-      console.log(context);
-
-      // Check if user is authenticated
       if (!context.isAuthenticated) {
         throw new Error('Authentication required');
       }
-
-      // Now you can use the user data from context
       return {
         id: context.user?.id,
         name: context.user?.name,
         email: context.user?.email,
-        // Other user fields
       };
     },
-    protectedData: (_, args, context) => {
-      if (!context.user) {
-        throw new Error("Not Authenticated")
-      }
-      if (context.user.role !== "ADMIN") {
-        throw new Error("Not Authorized")
-      }
-      return { message: "This is protected data" }
-    },
-    me: async (_: any, __: any, ctx: any) => {
-      if (!ctx.session) throw new Error('Unauthorized')
-      return ctx.session.user
-    },
+
+
+    /* MARK: PUBLIC */
     users: async (_, __, context) => {
       requireAuth(context.user);
       return await User.find();
@@ -140,9 +124,11 @@ export const resolvers = {
       // populate User and Room
       return await Booking.find().populate('user').populate('room')
     },
+    /* ADMIN */
     rooms: async () => {
       return await Room.find()
     },
+    /* ADMIN */
     transaction: async () => {
       return await Transaction.find()
     },
@@ -175,27 +161,33 @@ export const resolvers = {
 
   },
   Mutation: {
-    createUser: async (_: never, args: IUser) => {
+    /* USER, ADMIN */
+    createUser: async (_: never, args: IUser, context: GraphQLContext) => {
       const newUser = await User.create({
         ...args,
         password: await bcrypt.hash(args.password, 10)
       })
       return newUser
     },
-    createRoom: async (_: never, args: IRoom) => {
+    /* ADMIN */
+    createRoom: async (_: never, args: IRoom, context: GraphQLContext) => {
+      if (!context.isAdmin) {
+         throw new Error('Not Authorization');
+      }
       const newRoom = await Room.create({
         ...args,
       })
       return newRoom
     },
+    /* USER, ADMIN */
     createTransaction: async (_: never, args: ITransaction) => {
-      console.log(args);
       const newRoom = await Transaction.create({
         ...args,
       })
       console.log(newRoom);
       return newRoom
     },
+    /* USER, ADMIN */
     createBooking: async (_, { input }) => {
       const { roomId, checkIn, nights, personPerRoom, guest } = input;
 
@@ -246,7 +238,7 @@ export const resolvers = {
         }
       }
     },
-
+    /* USER */
     // MARK: MAILER
     sendContactEmail: async (_: any, args: {
       to: string;
@@ -286,6 +278,7 @@ export const resolvers = {
         return { success: false, message: 'Failed to send email' };
       }
     },
+    /* USER, ADMIN */
     uploadImage: async (_: any, { imageUrl, transactionId }: { imageUrl: string; transactionId: string }) => {
       console.log("Image uploaded to:", imageUrl);
 
@@ -301,10 +294,6 @@ export const resolvers = {
 
       console.log("Update result:", result);
       return result.modifiedCount > 0;
-
-
     }
-
-
   }
 };

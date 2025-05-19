@@ -51,7 +51,7 @@ export const authOptions = {
                 token.id = user.id
                 token.role = user.role
             }
-            console.log(`JWT =>`,token);
+            // console.log(`JWT =>`,token);
             return token
         },
         session: async ({ session, token }) => {
@@ -59,7 +59,7 @@ export const authOptions = {
                 session.user.id = token.id
                 session.user.role = token.role
             }
-            console.log(`SESSION =>`, session);
+            // console.log(`SESSION =>`, session);
             return session
         }
     },
