@@ -35,7 +35,7 @@ const roomStatus = [
     { id: 3, title: "ไม่พร้อมบริการ", className: "bg-gray" },
 ]
 
-const RoomList = () => {
+const RoomCard = () => {
     const [floor, setFloor] = useState(1);
     const formData = useSelector((state: RootState) => state.booking);
 
@@ -164,4 +164,4 @@ const RoomList = () => {
     )
 }
 
-export default RoomList
+export default RoomCard
