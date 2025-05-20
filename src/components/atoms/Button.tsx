@@ -11,9 +11,9 @@ interface ButtonProps {
 
 const Button = ({ className, title, disable, onClick, type, children }: ButtonProps) => {
   const buttonClass = clsx(
+    className,
     "cursor-pointer bg-primary hover:bg-secondary transition text-white py-2 rounded",
     disable && "bg-[var(--color-fade-gray)] cursor-not-allowed opacity-50",
-    className
   );
 
   return (

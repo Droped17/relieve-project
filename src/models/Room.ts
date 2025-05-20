@@ -7,6 +7,8 @@ enum ERoomStatus {
 }
 
 export interface IRoom extends Document {
+    /* [TODO]: Add Public Id for Room */
+    // publicId: string;
     number: string;
     detail: string[];
     price: number;

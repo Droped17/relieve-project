@@ -1,7 +1,5 @@
 "use client"
 
-import { setFormField } from "@/src/store/slice/bookingSlice";
-import { AppDispatch } from "@/src/store/store";
 import { gql, useQuery } from "@apollo/client";
 import { RootState } from "@reduxjs/toolkit/query";
 import clsx from "clsx";
@@ -10,11 +8,11 @@ import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import Input from "../atoms/Input";
-import Dropdown from "../atoms/Dropdown";
+import { useSelector } from "react-redux";
 import { SkeletonBox } from "../atoms/SkeletonBox";
 import { SkeletonText } from "../atoms/SkeletonText";
+import RoomStatus from "../molecules/RoomStatus";
+import "react-day-picker/style.css";
 
 const GET_ALL_ROOMS = gql`
   query AllRooms($date: String!, $nights: Int!, $personPerRoom: Int!, $floor: Int) {
@@ -30,30 +28,20 @@ const GET_ALL_ROOMS = gql`
 const currentDate = dayjs();
 currentDate.format('YYYY-MM-DD')
 
+
+const roomStatus = [
+    { id: 1, title: "ว่าง", className: "bg-primary" },
+    { id: 2, title: "เต็ม", className: "bg-error" },
+    { id: 3, title: "ไม่พร้อมบริการ", className: "bg-gray" },
+]
+
 const RoomList = () => {
     const [floor, setFloor] = useState(1);
     const formData = useSelector((state: RootState) => state.booking);
-    const dispatch = useDispatch<AppDispatch>();
 
     const router = useRouter()
     const params = useParams()
     const t = useTranslations()
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const { name, value } = e.target;
-
-        const numericFields = ['nights', 'numberOfPeople'];
-        const parsedValue = numericFields.includes(name)
-            ? Number(value)
-            : value; // For 'date', just store as YYYY-MM-DD
-
-        dispatch(setFormField({ field: name as any, value: parsedValue }));
-    };
-
-    const handleFloorChange = (newFloor: number) => {
-        setFloor(newFloor);
-    };
-
 
     const { data, loading, error, refetch } = useQuery(GET_ALL_ROOMS, {
         variables: {
@@ -80,44 +68,26 @@ const RoomList = () => {
         }
     }, [formData, floor, refetch]);
 
+    const handleFloorChange = (newFloor: number) => {
+        setFloor(newFloor);
+    };
+
     if (loading) return <SkeletonBox height="168px" className="p-2 flex flex-col gap-4">
-        <SkeletonText className="bg-gray-200"/>
-        <SkeletonText className="bg-gray-200"/>
-        <SkeletonText className="bg-gray-200"/>
-        <SkeletonText className="bg-gray-200"/>
+        <SkeletonText className="bg-gray-200" />
+        <SkeletonText className="bg-gray-200" />
+        <SkeletonText className="bg-gray-200" />
+        <SkeletonText className="bg-gray-200" />
     </SkeletonBox>;
     if (error) return <p>Error: {error.message}</p>;
 
-    return (
-        <div>
-            {/* Date Picker */}
-            <div className="flex justify-center">
-                <form className="">
-                    <div className="flex items-center gap-2" >
-                        <label>วันที่</label>
-                        <Input type="date" id="date" name="date" value={formData.date} onChange={handleChange} />
-                        <label>จำนวนคืน</label>
-                        <Dropdown name="nights" value={formData.nights} onChange={handleChange} className="border border-gray-200 p-2 rounded-sm" option={[1, 2, 3, 4]} />
-                        <label>จำนวนคน</label>
-                        <Dropdown name="person" value={formData.personPerRoom} onChange={handleChange} className="border border-gray-200 p-2 rounded-sm" option={[1, 2, 3, 4]} />
-                    </div>
 
-                </form>
-            </div>
+    return (
+        <>
             {/* Room Status */}
             <div className="flex gap-2">
-                <div className="flex items-center gap-2">
-                    <div className="h-2.5 w-2.5 bg-secondary rounded-full"></div>
-                    <p>ว่าง</p>
-                </div>
-                <div className="flex items-center gap-2">
-                    <div className="h-2.5 w-2.5 bg-error rounded-full"></div>
-                    <p>เต็ม</p>
-                </div>
-                <div className="flex items-center gap-2">
-                    <div className="h-2.5 w-2.5 bg-gray-300 rounded-full"></div>
-                    <p>ไม่พร้อมบริการ</p>
-                </div>
+                {roomStatus.map((item) => (
+                    <RoomStatus key={`${item.id}`} title={item.title} className={item.className} />
+                ))}
             </div>
 
             {/* Rooms */}
@@ -190,7 +160,7 @@ const RoomList = () => {
 
                 </div>
             </div>
-        </div>
+        </>
     )
 }
 

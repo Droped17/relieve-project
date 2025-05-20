@@ -2,9 +2,9 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 import dayjs from "dayjs"
 
 interface BookingState {
-    date: string,
-    nights: number,
-    personPerRoom: number
+    date?: string,
+    nights?: number,
+    personPerRoom?: number
 }
 
 const currentDate = dayjs();
@@ -22,8 +22,8 @@ export const BookingSlice = createSlice({
         setFormField: (state, action: PayloadAction<{ field: keyof FormState; value: any }>) => {
             state[action.payload.field] = action.payload.value;
         },
-        setFormData: (state, action: PayloadAction<BookingState>) => {
-            return action.payload;
+        setFormData: (state, action: PayloadAction<Partial<BookingState>>) => {
+            Object.assign(state, action.payload);
         },
         resetForm: () => initialState
     }

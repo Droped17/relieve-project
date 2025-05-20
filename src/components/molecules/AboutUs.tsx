@@ -1,6 +1,6 @@
+import { useTranslations } from "next-intl"
 import Image from "next/image"
 import HeaderText from "../atoms/HeaderText"
-import { useTranslations } from "next-intl"
 
 const AboutUs = () => {
     const t = useTranslations()
