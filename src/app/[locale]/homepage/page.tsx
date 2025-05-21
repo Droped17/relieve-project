@@ -13,14 +13,19 @@ import '../../style/embla.css'
 const HomePage = () => {
   const t = useTranslations()
 
-  const OPTIONS: EmblaOptionsType = {}
+  const OPTIONS: EmblaOptionsType = { loop: true }
   const SLIDE_COUNT = 5
   const SLIDES = Array.from(Array(SLIDE_COUNT).keys())
+
 
   return (
     <>
       <div className="mx-auto mb-10 max-w-[1024px] px-4 flex flex-col gap-4">
-        <div className="flex items-center min-h-[300px]">
+        <div className="flex gap-2 justify-center py-4">
+          <p className="border-b-2 border-primary">Home</p>
+          <p>Transaction</p>
+        </div>
+        <div className="flex items-center min-h-[250px]">
           <div className="flex-1/2">
             <HeaderText title={t('home_page.relieve')} className="text-center text-4xl mt-6 font-semibold text-tertiary" />
           </div>
@@ -41,63 +46,46 @@ const HomePage = () => {
             <div className="z-50">
               <p className="absolute right-5 top-5 text-warm text-xl font-semibold">SPECIAL ROOM</p>
               <p className="absolute right-5 top-12 text-warm text-sm">Room No.17</p>
+              <p className="absolute top-4/12 z-30 origin-left left-1/4 transform rotate-90 text-warning text-9xl">RELIEVE</p>
             </div>
-            <EmblaCarousel slides={SLIDES} options={OPTIONS} />
+            <Image alt="relieve" src="https://images.unsplash.com/photo-1616995942688-6ad1d3ee4a60?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" width={1500} height={500} className="rounded-4xl" />
           </div>
 
-          <div className="flex justify-between">
-            <div className="flex gap-3">
-              <Image alt="relieve" src="https://images.unsplash.com/photo-1551105378-78e609e1d468?q=80&w=1374&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" width={350} height={500} className="rounded-4xl hover:shadow-[10px_10px_16px_1px_rgba(0,_0,_0,_0.1)] transition duration-500" />
-              <div className="group flex flex-col text-xl overflow-auto">
-                {['R', 'E', 'L', 'I', 'E', 'V', 'E'].map((char, index) => (
-                  <p
-                    key={index}
-                    className={`font-semibold transition-transform duration-300 ease-out group-hover:-translate-y-2`}
-                    style={{ transitionDelay: `${index * 50}ms` }} // optional: stagger animation
-                  >
-                    {char}
-                  </p>
-                ))}
-              </div>
-            </div>
+          <EmblaCarousel slides={SLIDES} options={OPTIONS} />
 
-            <div className="flex flex-row items-stretch space-x-4">
-              <div className="w-0.5 bg-brown"></div>
-            </div>
-
-            <div className="flex gap-3">
-              <div className="flex flex-col justify-end text-lg">
-                {['R', 'E', 'L', 'A', 'X'].map((char, index) => (
-                  <p
-                    key={index}
-                    className={`transition-transform duration-300 ease-out group-hover:-translate-y-2`}
-                    style={{ transitionDelay: `${index * 50}ms` }} // optional: stagger animation
-                  >
-                    {char}
-                  </p>
-                ))}
-              </div>
-              <Image alt="relieve" src="https://images.unsplash.com/photo-1631819313347-a5dca24a04fa?w=400&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1yZWxhdGVkfDE0fHx8ZW58MHx8fHx8" width={350} height={500} className="rounded-4xl shadow-lg hover:shadow-2xl transition duration-500" />
-            </div>
-          </div>
         </div>
       </div>
-
       {/* FOOTER */}
-      <div className="bg-tertiary text-warm py-6">
+      <div className="bg-tertiary text-warm py-11">
         <div className="mx-auto max-w-[1024px]">
           <div className="flex-1/2 flex items-center">
             <div className="flex-1/2 flex flex-col gap-7">
               <div>
-                <p className="text-3xl">Contact Us</p>
-                <p>Tel: 0332222266</p>
-                <p>Email: relieve-test@gmail.com</p>
-
+                <p className="text-4xl font-semibold">Your space, your stay — believe in relieve</p>
               </div>
-              <Divider />
-              <p className="text-sm">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Fuga, dolores doloribus. Voluptatum eligendi nobis officia voluptates aperiam unde, corrupti, dolorum magnam doloremque est itaque voluptatibus? Soluta repellat repudiandae dolorum architecto?</p>
+
+              <div className="flex gap-10">
+
+                <div className="flex flex-col rounded-full w-1/2 text-warm hover:text-black transition duration-300 group">
+                  <div className="border-t">
+                    <p className="border w-max py-1 p-2 group-hover:bg-warning transition">
+                      YEAR FOUNDED
+                    </p>
+                  </div>
+                  <p className="text-end text-7xl">2025</p>
+                </div>
+
+                <div className="flex flex-col rounded-full w-1/2 text-warm hover:text-black transition duration-300 group">
+                  <div className="border-t">
+                    <p className="border w-max py-1 p-2 group-hover:bg-warning transition">
+                      LOCATION
+                    </p>
+                  </div>
+                  <p className="text-end text-7xl">Thailand</p>
+                </div>
+              </div>
+
             </div>
-            {/* <Image alt="relieve" src="https://images.unsplash.com/photo-1606011082438-5e55fea65538?q=80&w=2624&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" width={400} height={400} className="rounded-r-3xl" /> */}
           </div>
 
         </div>
