@@ -3,6 +3,8 @@
 @theme {
     /* Breakpoint */
     --breakpoint-*: initial;
+    --breakpoint-small-mobile: 320px;
+    --breakpoint-medium-mobile: 375px;
     --breakpoint-tablet: 40rem;
     /* 640px */
     --breakpoint-laptop: 64rem;

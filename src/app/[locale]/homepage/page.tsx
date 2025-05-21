@@ -43,15 +43,29 @@ const HomePage = () => {
           <Divider />
           {/* Image */}
           <div className="relative">
-            <div className="z-50">
+            <div className="z-50 absolute inset-0">
               <p className="absolute right-5 top-5 text-warm text-xl font-semibold">SPECIAL ROOM</p>
               <p className="absolute right-5 top-12 text-warm text-sm">Room No.17</p>
-              <p className="absolute top-4/12 z-30 origin-left left-1/4 transform rotate-90 text-warning text-9xl">RELIEVE</p>
+              <p className="absolute left-[450px] z-50 top-10 h-full flex items-center justify-center origin-[top_left] transform rotate-90 text-warning text-[200px]">
+                RE
+              </p>
+              <p className="absolute left-[600px] top-[220px] z-50 h-full flex items-center justify-center origin-[top_left] transform text-warning text-[200px]">
+                LIEV <span className="text-black">E</span>
+              </p>
+
             </div>
-            <Image alt="relieve" src="https://images.unsplash.com/photo-1616995942688-6ad1d3ee4a60?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" width={1500} height={500} className="rounded-4xl" />
+            <Image
+              alt="relieve"
+              src="https://images.unsplash.com/photo-1616995942688-6ad1d3ee4a60?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+              width={1500}
+              height={500}
+              className="rounded-4xl"
+            />
           </div>
 
-          <EmblaCarousel slides={SLIDES} options={OPTIONS} />
+
+
+          {/* <EmblaCarousel slides={SLIDES} options={OPTIONS} /> */}
 
         </div>
       </div>
@@ -74,7 +88,7 @@ const HomePage = () => {
                   </div>
                   <p className="text-end text-7xl">2025</p>
                 </div>
-
+                
                 <div className="flex flex-col rounded-full w-1/2 text-warm hover:text-black transition duration-300 group">
                   <div className="border-t">
                     <p className="border w-max py-1 p-2 group-hover:bg-warning transition">
