@@ -10,6 +10,7 @@ import Input from "@/src/components/atoms/Input"
 import { gql, useLazyQuery, useMutation } from "@apollo/client"
 import { useParams, usePathname } from "next/navigation"
 import Link from "next/link"
+import TabButton from "@/src/components/atoms/TabButton"
 
 
 // [TODO]: Refactor Transaction Page
@@ -108,21 +109,9 @@ const TransactionPage = () => {
     console.log(data?.findTransactionBy);
 
     return (
-        <div className="p-6 flex flex-col gap-8 max-w-[1024px] mx-auto">
-            <div className="flex gap-2 justify-center py-4">
-                {tabs.map((tab) => (
-                    <Link
-                        key={tab.path}
-                        href={tab.path}
-                        className={clsx(
-                            'pb-2 px-4',
-                            pathname === tab.path ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-600'
-                        )}
-                    >
-                        {tab.name}
-                    </Link>
-                ))}
-            </div>
+        <div className=" flex flex-col gap-8 max-w-[1024px] mx-auto">
+        {/* Tab Button */}
+        <TabButton tabs={tabs} />
             <HeaderText title="Check Transaction" className="text-2xl font-semibold text-center" />
             <form className="flex gap-2 items-end w-full" onSubmit={handleSubmit}>
                 <Input id="bookingNumber" name="bookingNumber" label="Booking Number" type="text" onChange={handleOnChange} value={formData.bookingNumber} className="w-full rounded-lg text-lg" />

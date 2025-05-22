@@ -40,14 +40,22 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
     <div className="embla">
       <div className="embla__viewport" ref={emblaRef}>
         <div className="embla__container">
-          {slides.map((image,index) => (
+          {slides.map((image, index) => (
             <div className="embla__slide" key={index}>
               <div className="embla__slide__number">
-                {/* <span>{index + 1}</span> */}
-                <Image alt='relieve' className='rounded-xl' src={image} width={1000} height={300}/>
+                <Image alt='relieve' className='rounded-xl' src={image} width={1000} height={300} />
               </div>
             </div>
           ))}
+        </div>
+      </div>
+      <div className='pt-8'>
+        <div
+          className={`embla__progress`.concat(
+            showAutoplayProgress ? '' : 'embla__progress--hidden'
+          )}
+        >
+          <div className="embla__progress__bar" ref={progressNode} />
         </div>
       </div>
 
@@ -62,15 +70,6 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
             disabled={nextBtnDisabled}
           />
         </div>
-
-        <div
-          className={`embla__progress`.concat(
-            showAutoplayProgress ? '' : ' embla__progress--hidden'
-          )}
-        >
-          <div className="embla__progress__bar" ref={progressNode} />
-        </div>
-
         <button className="embla__play" onClick={toggleAutoplay} type="button">
           {autoplayIsPlaying ? 'Stop' : 'Start'}
         </button>

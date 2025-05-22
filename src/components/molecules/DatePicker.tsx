@@ -31,7 +31,7 @@ export const DatePicker = () => {
         <>
             <div className='relative z-60'>
                 <div onClick={() => setOpenDate(!openDate)} className="border rounded-md border-gray-200 py-2 px-5 text-warm">{format(formData.date, 'dd-MM-yyyy') || 'Select Date'}</div>
-                {openDate && <div className='absolute bg-white p-4 rounded-3xl shadow-xl border border-gray-200'>
+                {openDate && <div className='absolute bg-white p-4 rounded-3xl shadow-xl border border-gray'>
                     <DayPicker
                         mode="single"
                         selected={selected}

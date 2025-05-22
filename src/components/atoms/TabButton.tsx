@@ -13,7 +13,7 @@ const TabButton = ({ tabs }: ITabButtonProps) => {
     const pathname = usePathname()
 
     return (
-        <div className="flex gap-2 justify-center py-4">
+        <div className="flex gap-2 justify-center pt-4">
             {tabs.map((tab) => (
                 <Link
                     key={tab.path}

@@ -30,7 +30,9 @@ const HomePage = () => {
   return (
     <>
       <div className="mx-auto mb-10 max-w-[1280px] px-8 flex flex-col gap-4">
+        {/* Tab Button */}
         <TabButton tabs={tabs} />
+        {/* Title */}
         <HomePageTitle />
         <div className="flex flex-col gap-6">
           {/* Filter Rooms */}

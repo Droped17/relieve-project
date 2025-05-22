@@ -16,14 +16,14 @@ const Footer = () => {
                                 </div>
                             </div>
 
-                            <div className="flex gap-10">
+                            <div className="flex gap-10 small-mobile:flex-col small-mobile:items-end tablet:flex-row">
                                 <div className="flex flex-col w-1/2 text-warm hover:text-warning transition duration-300 ">
                                     <div className="border-t">
                                         <p className="border w-max py-1 p-2 group-hover:bg-warning group-hover:text-black transition">
                                             YEAR FOUNDED
                                         </p>
                                     </div>
-                                    <p className="text-end text-7xl">2025</p>
+                                    <p className="text-end small-mobile:text-4xl tablet:text-7xl">2025</p>
                                 </div>
 
                                 <div className="flex flex-col w-1/2 text-warm hover:text-warning transition duration-300">
@@ -32,7 +32,7 @@ const Footer = () => {
                                             LOCATION
                                         </p>
                                     </div>
-                                    <p className="text-end text-7xl">Thailand</p>
+                                    <p className="text-end small-mobile:text-4xl tablet:text-7xl">Thailand</p>
                                 </div>
                             </div>
 

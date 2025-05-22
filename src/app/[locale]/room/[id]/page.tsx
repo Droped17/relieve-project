@@ -1,12 +1,13 @@
 "use client"
 
+import { gql, useQuery } from "@apollo/client"
 import { useState } from "react"
 import { useParams } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
 import Dialog from "@/src/components/molecules/Dialog"
 import PageTitle from "@/src/components/molecules/PageTitle"
-import { gql, useQuery } from "@apollo/client"
+import clsx from "clsx"
 
 // [TODO]: Refactor RoomPage
 // [TODO]: Call Mutation
@@ -34,17 +35,13 @@ const RoomPage = () => {
     })
 
     if (loading) return <p>Loading..</p>
-    if (error) {
-        console.error(error);
-    }
+    if (error) console.error(error);
+
 
     const handleSelectImage = (image: string) => {
         setSelectedImage(image);
         setDialog(true);
     };
-
-    console.log(data);
-
 
     return (
         <div className="p-6 flex flex-col gap-8 max-w-[1024px] mx-auto">
@@ -55,18 +52,19 @@ const RoomPage = () => {
                     <div className="grid grid-cols-6 gap-4">
                         {data?.findRoomBy[0].image.map((items, index) =>
                             <div
-                                key={`${items}+${index}`}
-                                className={index === 0 ? "col-span-6" : "col-span-2"}
+                                key={index}
+                                className={clsx(
+                                    index === 0 ? 'col-span-6 aspect-[2.5/1.5]' : 'col-span-2 aspect-square',
+                                    'relative'
+                                )}
                             >
-                                    <Image
-                                        alt="room-details-img"
-                                        src={items}
-                                        width={index === 0 ? 500 : 211}
-                                        height={index === 0 ? 500 : 211}
-                                        className="w-full h-auto object-cover"
-                                        onClick={() => handleSelectImage(items, index)}
-                                    />
-                   
+                                <Image
+                                    src={items}
+                                    alt="room"
+                                    fill
+                                    className="object-cover rounded"
+                                    onClick={() => handleSelectImage(items, index)}
+                                />
                             </div>
                         )}
                     </div>
