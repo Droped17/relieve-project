@@ -11,7 +11,7 @@ interface IDropdownProps {
 const Dropdown = ({name,value,option,onChange,className}: IDropdownProps) => {
     return (
         <select name={name} value={value} onChange={onChange} className={`${className} cursor-pointer w-[50px]`}>
-            {option.map((items) => <option key={items} value={items} className="border border-gray-200">
+            {option.map((items) => <option key={items} value={items} className="border border-gray-200 text-black">
                 {items}
             </option>)}
         </select>

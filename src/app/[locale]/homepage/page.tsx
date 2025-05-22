@@ -9,21 +9,44 @@ import FilterRoom from "@/src/components/molecules/FilterRoom";
 import RoomCard from "@/src/components/organisms/RoomCard";
 import EmblaCarousel from "@/src/components/molecules/EmblaCarousel";
 import '../../style/embla.css'
+import Link from "next/link";
+import clsx from "clsx";
+import { useParams, usePathname } from "next/navigation";
 
 const HomePage = () => {
   const t = useTranslations()
 
   const OPTIONS: EmblaOptionsType = { loop: true }
-  const SLIDE_COUNT = 5
-  const SLIDES = Array.from(Array(SLIDE_COUNT).keys())
+  const SLIDES =  [
+  "https://images.unsplash.com/photo-1619110457577-316b0a7457e5?q=80&w=2650&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  "https://images.unsplash.com/photo-1580870858053-8d0764624f4f?q=80&w=1568&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  "https://images.unsplash.com/photo-1565735852636-cbf956b1d01a?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+]
 
+const pathname = usePathname()
+const param = useParams()
+
+const tabs = [
+  { name: 'Home', path: `/${param.locale}/homepage` },
+  { name: 'Transaction', path: `/${param.locale}/transaction` },
+]
 
   return (
     <>
-      <div className="mx-auto mb-10 max-w-[1024px] px-4 flex flex-col gap-4">
+      <div className="mx-auto mb-10 max-w-[1280px] px-8 flex flex-col gap-4">
         <div className="flex gap-2 justify-center py-4">
-          <p className="border-b-2 border-primary">Home</p>
-          <p>Transaction</p>
+      {tabs.map((tab) => (
+        <Link
+          key={tab.path}
+          href={tab.path}
+          className={clsx(
+            'pb-2 px-4',
+            pathname === tab.path ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-600'
+          )}
+        >
+          {tab.name}
+        </Link>
+      ))}
         </div>
         <div className="flex items-center min-h-[250px]">
           <div className="flex-1/2">
@@ -42,17 +65,19 @@ const HomePage = () => {
           {/* Divider */}
           <Divider />
           {/* Image */}
-          <div className="relative">
+          <div className="relative group">
             <div className="z-50 absolute inset-0">
-              <p className="absolute right-5 top-5 text-warm text-xl font-semibold">SPECIAL ROOM</p>
+              <p className="absolute right-5 top-5 text-warm  font-semi-bold text-xl">SPECIAL ROOM</p>
               <p className="absolute right-5 top-12 text-warm text-sm">Room No.17</p>
-              <p className="absolute left-[450px] z-50 top-10 h-full flex items-center justify-center origin-[top_left] transform rotate-90 text-warning text-[200px]">
+              <p className="absolute left-10 top-2 text-warm small-mobile:text-[20px] medium-mobile:text-[50px] 
+              tablet:text-[100px] 
+              laptop:text-[150px] 
+              desktop:text-[200px] 
+              transition-all duration-500 
+              group-hover:drop-shadow-[20px_30px_0px_#310c0c]">
                 RE
               </p>
-              <p className="absolute left-[600px] top-[220px] z-50 h-full flex items-center justify-center origin-[top_left] transform text-warning text-[200px]">
-                LIEV <span className="text-black">E</span>
-              </p>
-
+              <p className="absolute right-5 bottom-1 text-warning small-mobile:text-[20px] medium-mobile:text-[50px] tablet:text-[100px] laptop:text-[150px] desktop:text-[200px] transition-all duration-500 group-hover:drop-shadow-[20px_30px_0px_#000000]">LIEVE</p>
             </div>
             <Image
               alt="relieve"
@@ -65,33 +90,37 @@ const HomePage = () => {
 
 
 
-          {/* <EmblaCarousel slides={SLIDES} options={OPTIONS} /> */}
+          <EmblaCarousel slides={SLIDES} options={OPTIONS} />
 
         </div>
       </div>
       {/* FOOTER */}
-      <div className="bg-tertiary text-warm py-11">
-        <div className="mx-auto max-w-[1024px]">
+      <div className="bg-black text-warm py-11">
+        <div className="mx-auto max-w-[1280px] px-8">
           <div className="flex-1/2 flex items-center">
             <div className="flex-1/2 flex flex-col gap-7">
-              <div>
-                <p className="text-4xl font-semibold">Your space, your stay — believe in relieve</p>
+              <div className="flex flex-col gap-4">
+                <p className="text-4xl font-semibold text-warm">{`"`}Your space, your stay{`"`} — be<span className="text-warning">lieve</span> in re<span className="text-warning">lieve</span></p>
+                <div>
+                  <p className="text-xl">Contact Us</p>
+                  <p>Email: relieve_test@gmail.com</p>
+                  <p>Tel: 00000000000</p>
+                </div>
               </div>
 
               <div className="flex gap-10">
-
-                <div className="flex flex-col rounded-full w-1/2 text-warm hover:text-black transition duration-300 group">
+                <div className="flex flex-col w-1/2 text-warm hover:text-warning transition duration-300 ">
                   <div className="border-t">
-                    <p className="border w-max py-1 p-2 group-hover:bg-warning transition">
+                    <p className="border w-max py-1 p-2 group-hover:bg-warning group-hover:text-black transition">
                       YEAR FOUNDED
                     </p>
                   </div>
                   <p className="text-end text-7xl">2025</p>
                 </div>
-                
-                <div className="flex flex-col rounded-full w-1/2 text-warm hover:text-black transition duration-300 group">
+
+                <div className="flex flex-col w-1/2 text-warm hover:text-warning transition duration-300">
                   <div className="border-t">
-                    <p className="border w-max py-1 p-2 group-hover:bg-warning transition">
+                    <p className="border w-max py-1 p-2 group-hover:bg-warning group-hover:text-black transition">
                       LOCATION
                     </p>
                   </div>

@@ -26,6 +26,7 @@
     --color-gray: #BCCCDC;
     --color-warm: #F6F1DE;
     --color-brown: #64441b;
+    --color-dark-brown: #3C2A21;
     --color-test: var(--color-gray)
 }
 

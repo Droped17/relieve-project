@@ -13,7 +13,7 @@ import { useAutoplay } from './EmblaCarouselAutoplay'
 import Image from 'next/image'
 
 type PropType = {
-  slides: number[]
+  slides: string[]
   options?: EmblaOptionsType
 }
 
@@ -40,11 +40,11 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
     <div className="embla">
       <div className="embla__viewport" ref={emblaRef}>
         <div className="embla__container">
-          {slides.map((index) => (
+          {slides.map((image,index) => (
             <div className="embla__slide" key={index}>
               <div className="embla__slide__number">
                 {/* <span>{index + 1}</span> */}
-                <Image alt='relieve' className='rounded-xl' src="https://images.unsplash.com/photo-1616995942688-6ad1d3ee4a60?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" width={1000} height={300}/>
+                <Image alt='relieve' className='rounded-xl' src={image} width={1000} height={300}/>
               </div>
             </div>
           ))}

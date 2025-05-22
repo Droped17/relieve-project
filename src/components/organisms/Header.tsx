@@ -19,14 +19,10 @@ const Header = () => {
                  <p>Relieve</p>
             </Link>
             </div>
-
             <div className="flex gap-4 items-center">
-                <div className="hover:bg-primary transition p-2 rounded-full">
-                    <Link href={`/${params.locale}/transaction`}>Transaction</Link>
-                </div>
                 {session.data ? (
                     <>
-                    <p>{session.data.user?.name}</p>
+                    <p>{session.data.user?.email}</p>
                     <button onClick={() => signOut({ callbackUrl: "/th/homepage" })} className="py-1 px-2 bg-red-400 hover:bg-red-500 text-white cursor-pointer transition rounded-md">Logout</button>
                     </>
 
