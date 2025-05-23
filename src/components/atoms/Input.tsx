@@ -9,7 +9,7 @@ interface InputProps {
     onChange: (event: ChangeEvent<HTMLInputElement>) => void
     className?: string
     label?: string
-    error?: string[]
+    error?: string | string[] | undefined
     readOnly?: boolean
 }
 
@@ -33,7 +33,7 @@ const Input = ({ id, type, name, value, onChange, className, label, error, readO
                     }
                 )}
             />
-            {error && <p className="text-red-500 text-sm">{error}</p>}
+            {error && <p className="text-error text-sm">{error}</p>}
         </div>
     )
 }

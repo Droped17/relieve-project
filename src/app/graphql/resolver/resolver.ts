@@ -109,19 +109,38 @@ export const resolvers = {
         ...room.toObject(),
       }));
     },
-    findTransactionBy: async (_, args: { id?: string, bookingId?: string }) => {
-      const filter: any = {};
-      if (args.id) filter._id = new Types.ObjectId(args.id);
-      
-      
+    findTransactionBy: async (
+      _,
+      args: { id?: string; bookingId?: string }
+    ) => {
+      try {
+        let transaction = null;
 
-      const transaction = await Transaction.findById(args.id).populate('booking')
-      if (transaction) {
-        return [transaction]
-      } else {
-        throw new Error("Not Found Transaction")
+        if (args.id) {
+          if (!Types.ObjectId.isValid(args.id)) {
+            throw new Error("Invalid transaction ID");
+          }
+
+          transaction = await Transaction.findById(args.id).populate("booking");
+        } else if (args.bookingId) {
+          if (!Types.ObjectId.isValid(args.bookingId)) {
+            throw new Error("Invalid booking ID");
+          }
+
+          // Find transaction that contains the booking ID
+          transaction = await Transaction.findOne({ booking: args.bookingId }).populate("booking");
+        }
+
+        if (!transaction) {
+          return [{success: false, message: "Not found transaction"}]
+        }
+
+        return [transaction];
+      } catch (err) {
+        throw new Error(err.message || "Failed to fetch transaction");
       }
     },
+
     booking: async () => {
       // populate User and Room
       return await Booking.find().populate('user').populate('room')
@@ -202,8 +221,8 @@ export const resolvers = {
       }
 
       /* Check exists booking */
-      const isBooked = await Booking.exists({ 
-        room: roomId, 
+      const isBooked = await Booking.exists({
+        room: roomId,
         checkIn: parsedCheckIn
       });
 

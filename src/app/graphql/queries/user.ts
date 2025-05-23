@@ -98,15 +98,15 @@ type Booking {
 }
 
 type Transaction {
-  _id: ID!
-  totalPrice: Int!
-  request: String!
+  _id: ID
+  totalPrice: Int
+  request: String
   image: String
   status: ETransactionStatus
   createdAt: String!
   updatedAt: String!
-  user: [User!]!
-  booking: [Booking!]!
+  user: [User!]
+  booking: [Booking!]
 }
 
 type Query {
