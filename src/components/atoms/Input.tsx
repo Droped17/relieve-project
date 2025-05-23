@@ -10,9 +10,10 @@ interface InputProps {
     className?: string
     label?: string
     error?: string[]
+    readOnly?: boolean
 }
 
-const Input = ({ id, type, name, value, onChange, className, label, error }: InputProps) => {
+const Input = ({ id, type, name, value, onChange, className, label, error, readOnly }: InputProps) => {
     return (
         <div className={clsx('flex flex-col gap-2', className)}>
             {label && <label className="font-semibold">{label}</label>}
@@ -22,11 +23,13 @@ const Input = ({ id, type, name, value, onChange, className, label, error }: Inp
                 name={name}
                 value={value}
                 onChange={onChange}
+                readOnly={readOnly}
                 className={clsx(
-                    'border border-gray-200 focus:border-green-800 outline-none transition px-3 py-2 rounded',
+                    `border border-gray-200 outline-none transition px-3 py-2 rounded`,
+                    readOnly ? 'focus:outline-none pointer-events-none bg-gray-100 text-gray-500' : 'focus:border-green-800',
                     className,
                     {
-                        'border-red-500': error, 
+                        'border-red-500': error,
                     }
                 )}
             />

@@ -66,6 +66,7 @@ enum EBookingStatus {
 
 type Room {
   _id: ID!
+  publicId: String
   number: String!
   detail: [String!]!
   price: Float!
@@ -90,7 +91,7 @@ type Booking {
   nights: Int!
   personPerRoom: Int!
   guest: Guest! 
-  request: String!
+  request: String
   user: User!
   room: Room!
 }
@@ -142,7 +143,7 @@ type Query {
   }
 
   type Mutation {
-    createRoom(number: String!, detail: [String!]!, price: Float!, floor: Int!, image: [String]!, personPerRoom: Int!): Room!
+    createRoom(publicId: String! ,number: String!, detail: [String!]!, price: Float!, floor: Int!, image: [String]!, personPerRoom: Int!): Room!
   }
 
   type Mutation {

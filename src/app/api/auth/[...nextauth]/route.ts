@@ -24,12 +24,15 @@ export const authOptions = {
                 })
                 
                 if (foundUser && (await bcrypt.compare(credentials.password, foundUser.password))) {
-                    console.log('FOUND');
+                    console.log(`USER NEXTAUTH =>`,foundUser);
                     return {
                         id: foundUser.id,
-                        name: foundUser.name,
+                        firstName: foundUser.firstName,
+                        lastName: foundUser.lastName,
                         email: foundUser.email,
-                        role: foundUser.role
+                        role: foundUser.role,
+                        phone: foundUser.phone
+
                     }
                 } else {
                     throw new Error('Invalid Email or Password')
@@ -50,6 +53,10 @@ export const authOptions = {
             if (user) {
                 token.id = user.id
                 token.role = user.role
+                token.firstName = user.firstName
+                token.lastName = user.lastName
+                token.email = user.email
+                token.phone = user.phone
             }
             // console.log(`JWT =>`,token);
             return token
@@ -58,6 +65,10 @@ export const authOptions = {
             if (session.user) {
                 session.user.id = token.id
                 session.user.role = token.role
+                session.user.firstName = token.firstName
+                session.user.lastName = token.lastName
+                session.user.email = token.email
+                session.user.phone = token.phone
             }
             // console.log(`SESSION =>`, session);
             return session

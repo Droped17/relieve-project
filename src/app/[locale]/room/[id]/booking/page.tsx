@@ -9,9 +9,10 @@ import PageTitle from "@/src/components/molecules/PageTitle"
 import { gql, useMutation, useQuery } from "@apollo/client"
 import { RootState } from "@reduxjs/toolkit/query"
 import clsx from "clsx"
+import { useSession } from "next-auth/react"
 import Image from "next/image"
 import { useParams, useRouter } from "next/navigation"
-import { FormEvent, useState } from "react"
+import { FormEvent, useEffect, useState } from "react"
 import { useSelector } from "react-redux"
 
 interface IFormData {
@@ -56,6 +57,7 @@ mutation CreateBooking($input: CreateBookingInput!){
 
 
 const Booking = () => {
+    const session = useSession()
 
     const [formData, setFormData] = useState<IFormData>({
         firstName: '',
@@ -65,16 +67,19 @@ const Booking = () => {
         request: '',
         date: new Date().toISOString(),
         acceptForm: false,
-    })
+    });
     const [stepper, setStepper] = useState<number>(1)
     const [dialog, setDialog] = useState<boolean>(false)
 
     const bookingFormData = useSelector((state: RootState) => state.booking);
 
-    console.log(bookingFormData);
+    console.log(formData);
 
     const router = useRouter()
     const params = useParams()
+
+    const isGuest = !session?.data?.user;
+
 
     const [createBooking] = useMutation(CREATE_BOOKING, {
         onCompleted: (data) => {
@@ -93,9 +98,19 @@ const Booking = () => {
 
     const { personPerRoom, price, number, image } = data?.findRoomBy[0] || {};
 
+    useEffect(() => {
+        if (session?.data?.user) {
+            setFormData((prev) => ({
+                ...prev,
+                firstName: session.data.user?.firstName || '',
+                lastName: session.data.user?.lastName || '',
+                email: session.data.user?.email || '',
+                phone: session.data.user?.phone || '',
+            }));
+        }
+    }, [session?.data?.user]);
+
     if (loading) return <p>Loading..</p>
-
-
 
     const handleNextStepper = () => {
         setStepper(prev => (prev >= 3) ? 1 : prev + 1)
@@ -176,18 +191,34 @@ const Booking = () => {
 
             {/* Step 1 */}
             {stepper === 1 &&
-                <div className="p-4 max-w-[1024px] mx-auto">
-                    <HeaderText title="User Details" className="font-semibold text-xl" />
-                    <form className="flex flex-col gap-3">
-                        <Input type="text" label="Firstname" name="firstName" id="firstName" value={formData.firstName} onChange={handleOnChange} />
-                        <Input type="text" label="Lastname" name="lastName" id="lastName" value={formData.lastName} onChange={handleOnChange} />
-                        <Input type="email" label="Email" name="email" id="email" value={formData.email} onChange={handleOnChange} />
-                        <Input type="text" label="Phone" name="phone" id="phone" value={formData.phone} onChange={handleOnChange} />
-                        <div className="text-end">
-                            <Button type="button" onClick={handleNextStepper} title="Next" className="w-[100px]" />
+                <>
+                    {isGuest ? <div className="p-4 max-w-[1024px] mx-auto">
+                        <HeaderText title="User Details" className="font-semibold text-xl" />
+                        <form className="flex flex-col gap-3">
+                            <Input type="text" label="Firstname" name="firstName" id="firstName" value={formData.firstName} onChange={handleOnChange} />
+                            <Input type="text" label="Lastname" name="lastName" id="lastName" value={formData.lastName} onChange={handleOnChange} />
+                            <Input type="email" label="Email" name="email" id="email" value={formData.email} onChange={handleOnChange} />
+                            <Input type="text" label="Phone" name="phone" id="phone" value={formData.phone} onChange={handleOnChange} />
+                            <div className="text-end">
+                                <Button type="button" onClick={handleNextStepper} title="Next" className="w-[100px]" />
+                            </div>
+                        </form>
+                    </div> :
+                        <div className="p-4 max-w-[1024px] mx-auto">
+                            <HeaderText title="User Details" className="font-semibold text-xl" />
+                            <form className="flex flex-col gap-3">
+                                <Input type="text" label="Firstname" name="firstName" id="firstName" readOnly={true} value={session.data?.user?.firstName} onChange={handleOnChange} />
+                                <Input type="text" label="Lastname" name="lastName" id="lastName" readOnly={true} value={session.data?.user?.lastName} onChange={handleOnChange} />
+                                <Input type="email" label="Email" name="email" id="email" readOnly={true} value={session.data?.user?.email} onChange={handleOnChange} />
+                                <Input type="text" label="Phone" name="phone" id="phone" readOnly={true} value={session.data?.user.phone} onChange={handleOnChange} />
+                                <div className="text-end">
+                                    <Button type="button" onClick={handleNextStepper} title="Next" className="w-[100px]" />
+                                </div>
+                            </form>
                         </div>
-                    </form>
-                </div>}
+                    }
+                </>
+            }
             {/* Step 2 */}
             {stepper === 2 && <div className="p-4 max-w-[1024px] mx-auto flex flex-col gap-3">
                 <div className="flex justify-center">
@@ -199,7 +230,7 @@ const Booking = () => {
                     <li>จำนวนผู้เข้าพัก : {personPerRoom}</li>
                     <li>ราคา : {price}</li>
                     <li>หมายเหตุ</li>
-                    <textarea name="request" id="request" onChange={handleOnChange} value={formData.request} className="w-full border border-gray-200 rounded-md mt-2"></textarea>
+                    <textarea name="request" id="request" onChange={handleOnChange} value={formData.request} className="w-full min-h-20 border border-gray-200 focus:border-green-800 focus:outline-none transition rounded-md mt-2 p-2"></textarea>
                 </div>
                 <div className="flex justify-end gap-3">
                     <Button type="button" onClick={handleBackStepper} title="Back" className="w-[100px] bg-test" />

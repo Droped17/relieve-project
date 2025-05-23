@@ -8,7 +8,7 @@ enum ERoomStatus {
 
 export interface IRoom extends Document {
     /* [TODO]: Add Public Id for Room */
-    // publicId: string;
+    publicId: string;
     number: string;
     detail: string[];
     price: number;
@@ -24,7 +24,8 @@ export interface IRoom extends Document {
 }
 
 const RoomSchema: Schema = new Schema({
-    number: { type: String, required: true, unique: true  },
+    publicId: { type: String, reqiured: true, unique: true },
+    number: { type: String, required: true, unique: true },
     detail: { type: [String], required: true },
     price: { type: Number, required: true},
     floor: { type: Number, required: true },
