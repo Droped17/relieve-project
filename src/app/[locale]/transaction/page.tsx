@@ -27,6 +27,12 @@ const FIND_TRANSACTION_BY = gql`
             _id
             status
             totalPrice
+            booking {
+                _id
+                checkIn
+                checkOut
+                nights
+            }
         }
     }
 
@@ -44,8 +50,6 @@ const TransactionPage = () => {
     })
     const [imageUrl, setImageUrl] = useState<string | null>(null);
 
-    console.log(imageUrl);
-
     const [findTransactionBy, { data, loading, error }] = useLazyQuery(FIND_TRANSACTION_BY, {
         onCompleted: (data) => {
             console.log(data);
@@ -54,24 +58,25 @@ const TransactionPage = () => {
             console.error(error)
         }
     })
+
     const [uploadImage] = useMutation(UPLOAD_IMAGE);
-
-
+    
+    
     const param = useParams()
     const tabs = [
         { name: 'Home', path: `/${param.locale}/homepage` },
         { name: 'Transaction', path: `/${param.locale}/transaction` },
     ]
-
+    
     const pathname = usePathname()
-
+    
     const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData((prev) => ({
             ...prev,
             [e.target.name]: e.target.value
         }))
     }
-
+    
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault()
         try {
@@ -85,7 +90,7 @@ const TransactionPage = () => {
             console.error(error)
         }
     }
-
+    
     const handleUpload = async (result: any) => {
         if (result?.event !== "success") {
             console.warn("Upload not completed yet:", result.event);
@@ -96,22 +101,21 @@ const TransactionPage = () => {
             console.error("Upload succeeded but secure_url missing.");
             return;
         }
-
+        
         console.log("Image uploaded successfully:", secureUrl);
         setImageUrl(secureUrl);
         const results = await uploadImage({ variables: { imageUrl: secureUrl, transactionId: data.findTransactionBy[0]._id } });
         console.log(`UPLOAD RESULT => `, results);
     };
-
+    
     if (loading) return <p>Loading..</p>
     if (error) return <p>Error...</p>
-
-    console.log(data?.findTransactionBy);
-
+    
+    
     return (
         <div className=" flex flex-col gap-8 max-w-[1024px] mx-auto">
-        {/* Tab Button */}
-        <TabButton tabs={tabs} />
+            {/* Tab Button */}
+            <TabButton tabs={tabs} />
             <HeaderText title="Check Transaction" className="text-2xl font-semibold text-center" />
             <form className="flex gap-2 items-end w-full" onSubmit={handleSubmit}>
                 <Input id="bookingNumber" name="bookingNumber" label="Booking Number" type="text" onChange={handleOnChange} value={formData.bookingNumber} className="w-full rounded-lg text-lg" />
@@ -135,8 +139,8 @@ const TransactionPage = () => {
                 }>
                     <div className="p-4 shadow-lg flex flex-col gap-1">
                         <p>Total Price: {data.findTransactionBy[0]?.totalPrice}</p>
-                        <p>วันที่เข้าพัก</p>
-                        <p>จำนวนคืน</p>
+                        <p>วันที่เข้าพัก : {data.findTransactionBy[0]?.booking[0]?.checkIn}</p>
+                        <p>จำนวนคืน : {data.findTransactionBy[0]?.booking[0]?.nights}</p>
                         <p>สถานะการจอง :
                             <strong className={
                                 clsx('', {

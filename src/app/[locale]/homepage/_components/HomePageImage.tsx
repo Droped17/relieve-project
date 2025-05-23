@@ -5,15 +5,16 @@ const HomePageImage = () => {
     // [TODO]: Localization
     return (
         <div className="relative group">
-            <div className="z-50 absolute inset-0">
-                <p className="absolute right-5 top-5 text-warm  font-semi-bold text-xl">SPECIAL ROOM</p>
-                <p className="absolute right-5 top-12 text-warm text-sm">Room No.17</p>
+            <div className="z-50 absolute inset-0 hover:backdrop-blur-xs rounded-4xl duration-300">
+                <p className="absolute right-5 top-5 text-warm  font-semi-bold text-xl opacity-0 group-hover:opacity-100 duration-300">SPECIAL ROOM</p>
+                <p className="absolute right-5 top-12 text-warm text-sm opacity-0 group-hover:opacity-100 duration-300">Room No.17</p>
                 <p className="absolute left-10 top-2 text-warm small-mobile:text-[20px] medium-mobile:text-[50px] 
                       tablet:text-[100px] 
                       laptop:text-[150px] 
                       desktop:text-[200px] 
                       transition-all duration-500 
-                      group-hover:drop-shadow-[20px_30px_0px_#310c0c]">
+                      group-hover:drop-shadow-[20px_30px_0px_#310c0c]
+                      ">
                     RE
                 </p>
                 <p className="absolute right-5 bottom-1 text-warning small-mobile:text-[20px] medium-mobile:text-[50px] tablet:text-[100px] laptop:text-[150px] desktop:text-[200px] transition-all duration-500 group-hover:drop-shadow-[20px_30px_0px_#000000]">LIEVE</p>

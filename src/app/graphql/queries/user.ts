@@ -40,6 +40,7 @@ input CreateBookingInput {
   checkIn: String!
   nights: Int!
   personPerRoom: Int!
+  request: String
   guest: GuestInput
 }
 

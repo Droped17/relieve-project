@@ -112,12 +112,14 @@ export const resolvers = {
     findTransactionBy: async (_, args: { id?: string, bookingId?: string }) => {
       const filter: any = {};
       if (args.id) filter._id = new Types.ObjectId(args.id);
+      
+      
 
       const transaction = await Transaction.findById(args.id).populate('booking')
       if (transaction) {
         return [transaction]
       } else {
-        return []
+        throw new Error("Not Found Transaction")
       }
     },
     booking: async () => {
@@ -172,7 +174,7 @@ export const resolvers = {
     /* ADMIN */
     createRoom: async (_: never, args: IRoom, context: GraphQLContext) => {
       if (!context.isAdmin) {
-         throw new Error('Not Authorization');
+        throw new Error('Not Authorization');
       }
       const newRoom = await Room.create({
         ...args,
@@ -188,26 +190,34 @@ export const resolvers = {
       return newRoom
     },
     /* USER, ADMIN */
+    /* [TODO]: Fix request input */
     createBooking: async (_, { input }) => {
-      const { roomId, checkIn, nights, personPerRoom, guest } = input;
+      const { roomId, checkIn, nights, personPerRoom, guest, request } = input;
 
       const parsedCheckIn = dayjs(checkIn, 'YYYY-MM-DD', true);
+      const parsedCheckOut = parsedCheckIn.add(nights, 'day')
 
       if (!parsedCheckIn.isValid()) {
         throw new Error("Invalid date format. Use YYYY-MM-DD.");
       }
 
-      const parsedCheckOut = parsedCheckIn.add(nights, 'day')
+      /* Check exists booking */
+      const isBooked = await Booking.exists({ 
+        room: roomId, 
+        checkIn: parsedCheckIn
+      });
 
-      /* [TODO]: handle User and Guest */
-      /* [TODO]: handle logic for check booked */
+      if (isBooked) {
+        throw new Error("This room is already booked.");
+      }
+
       const booking = await Booking.create({
         room: roomId,
         checkIn: parsedCheckIn.toDate(),
         checkOut: parsedCheckOut.toDate(),
         personPerRoom,
         nights,
-        // user: req.user._id  <-- if required, pass this from auth 
+        request,
         guest
       });
 
@@ -226,8 +236,8 @@ export const resolvers = {
         // })
 
         const room = await Room.findById(roomId)
-        console.log(room.price);
 
+        /* Create Transaction */
         const newTransaction = await Transaction.create({
           booking: booking._id,
           totalPrice: room.price * nights,

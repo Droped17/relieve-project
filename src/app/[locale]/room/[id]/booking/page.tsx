@@ -42,6 +42,7 @@ mutation CreateBooking($input: CreateBookingInput!){
         _id
         checkIn
         checkOut
+        request
         room {
             _id
         }
@@ -135,7 +136,6 @@ const Booking = () => {
         }));
     };
 
-
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault()
         try {
@@ -150,6 +150,7 @@ const Booking = () => {
                         checkIn: bookingFormData.date,
                         nights: bookingFormData.nights,
                         personPerRoom: bookingFormData.personPerRoom,
+                        request: formData.request,
                         guest: {
                             firstName: formData.firstName,
                             lastName: formData.lastName,
@@ -227,8 +228,9 @@ const Booking = () => {
                 </div>
                 <div>
                     <HeaderText title={`Room No. ${number}`} className="font-semibold text-xl" />
-                    <li>จำนวนผู้เข้าพัก : {personPerRoom}</li>
-                    <li>ราคา : {price}</li>
+                    <li>จำนวนผู้เข้าพักต่อห้อง : {personPerRoom} คน</li>
+                    <li>ราคาต่อคืน : {price} บาท</li>
+                    <li>จำนวนวันเข้าพัก : {bookingFormData.nights} คืน</li>
                     <li>หมายเหตุ</li>
                     <textarea name="request" id="request" onChange={handleOnChange} value={formData.request} className="w-full min-h-20 border border-gray-200 focus:border-green-800 focus:outline-none transition rounded-md mt-2 p-2"></textarea>
                 </div>
@@ -257,7 +259,7 @@ const Booking = () => {
                     </div>
                     <div className="flex justify-between text-xl my-2">
                         <p>ยอดรวม</p>
-                        <strong>800</strong>
+                        <strong>{price * bookingFormData.nights} <span>&#3647;</span></strong>
                     </div>
 
                     <div className="flex justify-end gap-3 mt-3">
