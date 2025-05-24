@@ -24,14 +24,18 @@ interface IFormData {
 const FIND_TRANSACTION_BY = gql`
     query FindTransactionBy($id: ID) {
         findTransactionBy(id: $id) {
-            _id
             status
-            totalPrice
-            booking {
+            message
+            data {
                 _id
-                checkIn
-                checkOut
-                nights
+                status
+                totalPrice
+                booking {
+                    _id
+                    checkIn
+                    checkOut
+                    nights
+                }
             }
         }
     }
@@ -50,7 +54,7 @@ const TransactionPage = () => {
     })
     const [imageUrl, setImageUrl] = useState<string | null>(null);
 
-    const [findTransactionBy, { data, loading, error }] = useLazyQuery(FIND_TRANSACTION_BY, {
+    const [findTransactionBy, { data, loading }] = useLazyQuery(FIND_TRANSACTION_BY, {
         onCompleted: (data) => {
             console.log(data);
         },
@@ -59,7 +63,7 @@ const TransactionPage = () => {
         }
     })
 
-    const booking = data?.findTransactionBy?.[0]?.booking?.[0];
+    const booking = data?.findTransactionBy?.data?.booking?.[0];
 
     const [uploadImage] = useMutation(UPLOAD_IMAGE);
 
@@ -108,52 +112,49 @@ const TransactionPage = () => {
         console.log(`UPLOAD RESULT => `, results);
     };
 
-    if (loading) return <p>Loading..</p>
-
     return (
         <div className="mx-auto mb-10 max-w-[1280px] px-8 flex flex-col gap-4">
             {/* Tab Button */}
             <TabButton tabs={tabs} />
             <HeaderText title="Check Transaction" className="text-2xl font-semibold text-center" />
             <div className="flex flex-col gap-1">
-            <form className="flex gap-2 items-end w-full" onSubmit={handleSubmit}>
-                <Input id="bookingNumber" name="bookingNumber" label="Transaction ID" type="text" onChange={handleOnChange} value={formData.bookingNumber} className={`w-full rounded-lg text-lg ${error && 'border-red-500'}`} />
-                <Button type="submit" className="rounded-full p-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF"><path d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z" /></svg>
-                </Button>
-            </form>
-            {error && <p className="text-error text-xs">{error.message}</p>}
+                <form className="flex gap-2 items-end w-full" onSubmit={handleSubmit}>
+                    <Input id="bookingNumber" name="bookingNumber" label="Transaction ID" type="text" onChange={handleOnChange} value={formData.bookingNumber} className={`w-full rounded-lg text-lg ${data?.findTransactionBy.message === "Invalid transaction ID" && 'border-red-500'}`} />
+                    <Button type="submit" className="rounded-full p-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF"><path d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z" /></svg>
+                    </Button>
+                </form>
+                {data?.findTransactionBy.message === "Invalid transaction ID" && <p className="text-error text-xs">{data.findTransactionBy.message}</p>}
+                {data?.findTransactionBy.message === "Transaction not found" && <div className="text-xl text-center mt-5">{data.findTransactionBy.message}</div>}
             </div>
 
-
-            {/* [TODO]: Show when search booking number */}
-            {data?.findTransactionBy && <div>
-
-                {booking ? <div>
+            {loading ? <p>Loading..</p> : <div>
+                {/* [TODO]: Show when search booking number */}
+                {booking && <div>
                     <HeaderText title="Confirm Payment" className="font-bold text-lg" />
                     <div className={
                         clsx('border-l-8', {
-                            'border-l-error': data.findTransactionBy[0]?.status === "NOT_PAID",
-                            'border-l-primary': data.findTransactionBy[0]?.status === "PAID",
-                            'border-l-warning': data.findTransactionBy[0]?.status === "PENDING",
+                            'border-l-error': data.findTransactionBy.data?.status === "NOT_PAID",
+                            'border-l-primary': data.findTransactionBy.data?.status === "PAID",
+                            'border-l-warning': data.findTransactionBy.data?.status === "PENDING",
                         })
                     }>
                         <div className="p-4 shadow-lg flex flex-col gap-1">
-                            <p>Total Price: {data.findTransactionBy[0]?.totalPrice}</p>
+                            <p>Total Price: {data.findTransactionBy.data?.totalPrice}</p>
                             <p>วันที่เข้าพัก : {booking?.checkIn ? dayjs(Number(booking.checkIn)).format("DD-MM-YYYY") : "N/A"}</p>
                             <p>จำนวนคืน : {booking?.nights ?? "N/A"}</p>
                             <p>สถานะการจอง :
                                 <strong className={
                                     clsx('', {
-                                        'text-error': data.findTransactionBy[0]?.status === "NOT_PAID",
-                                        'text-primary': data.findTransactionBy[0]?.status === "PAID",
-                                        'text-warning': data.findTransactionBy[0]?.status === "PENDING",
+                                        'text-error': data.findTransactionBy.data?.status === "NOT_PAID",
+                                        'text-primary': data.findTransactionBy.data?.status === "PAID",
+                                        'text-warning': data.findTransactionBy.data?.status === "PENDING",
                                     })
                                 }>
-                                    {data.findTransactionBy[0]?.status}
+                                    {data.findTransactionBy.data?.status}
                                 </strong>
                             </p>
-                            {data.findTransactionBy[0]?.status !== "PAID" && <div className="w-[200px]">
+                            {data.findTransactionBy.data?.status !== "PAID" && <div className="w-[200px]">
                                 <CldUploadWidget
                                     uploadPreset="ml_default"
                                     onSuccess={handleUpload}
@@ -176,11 +177,9 @@ const TransactionPage = () => {
                                 <p className="font-thin text-xs">* file size less than 1 mb </p>
                             </div>}
                         </div>
-
                     </div>
-                </div> : <p className="text-center text-3xl">Not Found</p>}
+                </div>}
             </div>}
-
         </div>
     )
 }

@@ -11,6 +11,7 @@ import fs from 'fs';
 import path from 'path';
 import { sendContactEmail } from '../../utils/sendContactEmail';
 import { GraphQLContext } from '../context';
+import { CommonResponse, EStatus } from '../commonResponse';
 
 
 /* For use DD-MM-YYYY format */
@@ -112,34 +113,50 @@ export const resolvers = {
     findTransactionBy: async (
       _,
       args: { id?: string; bookingId?: string }
-    ) => {
+    ): Promise<CommonResponse> => {
       try {
         let transaction = null;
 
         if (args.id) {
           if (!Types.ObjectId.isValid(args.id)) {
-            throw new Error("Invalid transaction ID");
+            return {
+              status: EStatus.ERROR,
+              message: "Invalid transaction ID",
+            };
           }
 
           transaction = await Transaction.findById(args.id).populate("booking");
         } else if (args.bookingId) {
           if (!Types.ObjectId.isValid(args.bookingId)) {
-            throw new Error("Invalid booking ID");
+            return {
+              status: EStatus.ERROR,
+              message: "Invalid booking ID",
+            };
           }
 
-          // Find transaction that contains the booking ID
           transaction = await Transaction.findOne({ booking: args.bookingId }).populate("booking");
         }
 
         if (!transaction) {
-          return [{success: false, message: "Not found transaction"}]
+          return {
+            status: EStatus.ERROR,
+            message: "Transaction not found",
+          };
         }
 
-        return [transaction];
+        return {
+          status: EStatus.SUCCESS,
+          message: "Transaction found",
+          data: transaction,
+        };
       } catch (err) {
-        throw new Error(err.message || "Failed to fetch transaction");
+        return {
+          status: EStatus.ERROR,
+          message: err.message || "Failed to fetch transaction",
+        };
       }
     },
+
 
     booking: async () => {
       // populate User and Room

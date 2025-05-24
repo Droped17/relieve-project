@@ -27,6 +27,8 @@ const HomePage = () => {
     { name: 'Transaction', path: `/${params.locale}/transaction` },
   ]
 
+  /* [TODO]: Fix progress bug screen */
+
   return (
     <>
       <div className="mx-auto mb-10 max-w-[1280px] px-8 flex flex-col gap-4">

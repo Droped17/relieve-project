@@ -14,10 +14,21 @@ export const typeDefs = gql`
     NULL_VALUE
   }
 
+  enum EStatus {
+    SUCCESS
+    ERROR
+  }
+  
   enum ETransactionStatus {
     PENDING
     PAID
     NOT_PAID 
+}
+
+type TransactionResponse {
+  status: EStatus!
+  message: String!
+  data: Transaction
 }
 
 type Guest {
@@ -131,9 +142,7 @@ type Query {
     nights: Int
     numberOfPeople: Int
   ): [Room!]!
-  findTransactionBy(
-    id: ID
-  ): [Transaction!]!
+  findTransactionBy(id: ID): TransactionResponse!
   booking: [Booking!]!
   allRooms(date: String!, nights: Int!, personPerRoom: Int!, floor: Int): [Room!]!
 }
