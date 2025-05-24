@@ -72,7 +72,7 @@ export default async function middleware(request: NextRequest) {
 
           console.log(`Redirecting to: ${unauthorizedPath}`);
           const url = new URL(unauthorizedPath, request.url);
-          return NextResponse.redirect(url);
+          return NextResponse.redirect('/not-found');
         }
       }
     } catch (error) {

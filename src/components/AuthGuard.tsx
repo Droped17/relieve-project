@@ -2,7 +2,7 @@ import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 
-const AuthGuard = ({children, requiredRole = null}) => {
+const AuthGuard = ({children, requiredRole = "ADMIN"}) => {
     const {data: session, status} = useSession()
     const router = useRouter()
 
