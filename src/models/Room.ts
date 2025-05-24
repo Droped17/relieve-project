@@ -24,13 +24,13 @@ export interface IRoom extends Document {
 }
 
 const RoomSchema: Schema = new Schema({
-    publicId: { type: String, reqiured: true, unique: true },
-    number: { type: String, required: true, unique: true },
-    detail: { type: [String], required: true },
-    price: { type: Number, required: true},
-    floor: { type: Number, required: true },
-    image: { type: [String], required: true },
-    personPerRoom: {type: Number, required: true},
+    publicId: { type: String, unique: true },
+    number: { type: String, unique: true },
+    detail: { type: [String] },
+    price: { type: Number },
+    floor: { type: Number },
+    image: { type: [String] },
+    personPerRoom: {type: Number },
     availabilityStatus: {type: String},
     status: { type: String, enum: Object.values(ERoomStatus), default: ERoomStatus.EMPTY },
 

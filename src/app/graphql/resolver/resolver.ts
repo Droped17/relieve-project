@@ -21,6 +21,11 @@ const requireAuth = (user) => {
   if (!user) throw new Error("Not Authenticated");
 };
 
+type Image = {
+  id: string;
+  url: string;
+};
+
 // [TODO]: Remove transaction in 1 hr if status !== PAID 
 
 export const resolvers = {
@@ -208,12 +213,22 @@ export const resolvers = {
       return newUser
     },
     /* ADMIN */
-    createRoom: async (_: never, args: IRoom, context: GraphQLContext) => {
+    createRoom: async (_, {input}, context: GraphQLContext) => {
+      
       if (!context.isAdmin) {
         throw new Error('Not Authorization');
       }
+
+      console.log(`Create Room Input => `, input);
+
+      const { number, detail, price, floor, image, personPerRoom } = input;
       const newRoom = await Room.create({
-        ...args,
+        number,
+        detail,
+        price,
+        floor,
+        image,
+        personPerRoom
       })
       return newRoom
     },
@@ -340,6 +355,6 @@ export const resolvers = {
 
       console.log("Update result:", result);
       return result.modifiedCount > 0;
-    }
+    },
   }
 };

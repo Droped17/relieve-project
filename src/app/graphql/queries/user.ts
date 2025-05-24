@@ -55,6 +55,15 @@ input CreateBookingInput {
   guest: GuestInput
 }
 
+input CreateRoomInput {
+  number: String!
+  detail: [String!]! 
+  price: Float!
+  floor: Int!
+  personPerRoom: Int!
+  image: [String!]!
+}
+
 type CreateBookingResponse {
   bookingId: ID!
 }
@@ -152,8 +161,8 @@ type Query {
     createUser(firstName: String!, lastName: String!, email: String!, password: String!, phone: String!): User!
   }
 
-  type Mutation {
-    createRoom(publicId: String! ,number: String!, detail: [String!]!, price: Float!, floor: Int!, image: [String]!, personPerRoom: Int!): Room!
+  extend type Mutation {
+    createRoom(input: CreateRoomInput!): Room!
   }
 
   type Mutation {

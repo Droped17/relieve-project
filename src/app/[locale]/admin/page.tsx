@@ -26,7 +26,7 @@ const AdminPage = () => {
                 </div>
                 <div>
                     <p>Chart for guest per month</p>
-                    <MyChart />
+                    <MyChart/>
                 </div>
             </div>
         </AuthGuard>

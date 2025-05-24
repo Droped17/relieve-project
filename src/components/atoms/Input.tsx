@@ -3,7 +3,7 @@ import { ChangeEvent } from "react"
 
 interface InputProps {
     id: string
-    type: 'text' | 'email' | 'password' | 'number' | 'date'
+    type: 'text' | 'email' | 'password' | 'number' | 'date' | 'checkbox'
     name: string
     value?: any
     onChange: (event: ChangeEvent<HTMLInputElement>) => void
