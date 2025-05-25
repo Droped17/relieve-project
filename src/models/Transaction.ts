@@ -16,6 +16,7 @@ export interface ITransaction extends Document {
     //Reference Model
     user: Types.ObjectId[]
     booking: Types.ObjectId[]
+    room: Types.ObjectId[]
 }
 
 const TransactionSchema: Schema = new Schema({
@@ -24,6 +25,7 @@ const TransactionSchema: Schema = new Schema({
     status: { type: String, enum: Object.values(ETransactionStatus), default: ETransactionStatus.PENDING, required: true },
     user: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     booking: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Booking' }],
+    room: {type: mongoose.Schema.Types.ObjectId, ref: 'Room'}
 }, {
     timestamps: true
 });

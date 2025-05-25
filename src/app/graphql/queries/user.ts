@@ -31,6 +31,12 @@ type TransactionResponse {
   data: Transaction
 }
 
+type TransactionsResponse {
+  status: EStatus!
+  message: String!
+  data: [Transaction!]
+}
+
 type Guest {
   firstName: String
   lastName: String
@@ -127,6 +133,7 @@ type Transaction {
   updatedAt: String!
   user: [User!]
   booking: [Booking!]
+  room: Room!
 }
 
 type Query {
@@ -152,6 +159,7 @@ type Query {
     numberOfPeople: Int
   ): [Room!]!
   findTransactionBy(id: ID): TransactionResponse!
+  findTransactionByStatus(status: String!): TransactionsResponse!
   booking: [Booking!]!
   allRooms(date: String!, nights: Int!, personPerRoom: Int!, floor: Int): [Room!]!
 }

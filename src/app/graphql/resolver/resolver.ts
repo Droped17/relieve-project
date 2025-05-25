@@ -162,6 +162,47 @@ export const resolvers = {
       }
     },
 
+    findTransactionByStatus: async (
+      _,
+      args: { status?: string }
+    ): Promise<CommonResponse> => {
+
+      try {
+        const filter: any = {}
+
+        if (args.status) {
+          filter.status = args.status
+        }
+
+        /* room in booking */
+        const transactions = await Transaction.find(filter).populate({
+          path: 'booking',
+          populate: {
+            path: 'room',
+            /* query only usage data */
+            select: ['floor','number']
+          }
+        })
+
+        if (!transactions.length) {
+          return {
+            status: EStatus.ERROR,
+            message: "No transactions found",
+          };
+        }
+
+        return {
+          status: EStatus.SUCCESS,
+          message: "Transactions fetched",
+          data: transactions,
+        };
+      } catch (err) {
+        return {
+          status: EStatus.ERROR,
+          message: err.message || "Failed to fetch transactions",
+        };
+      }
+    },
 
     booking: async () => {
       // populate User and Room
@@ -173,7 +214,7 @@ export const resolvers = {
     },
     /* ADMIN */
     transaction: async () => {
-      return await Transaction.find()
+      return await Transaction.find().populate('user').populate('booking')
     },
     allRooms: async (_, { date, nights, personPerRoom, floor }) => {
       // Use dayjs to parse input date and add nights
@@ -213,8 +254,8 @@ export const resolvers = {
       return newUser
     },
     /* ADMIN */
-    createRoom: async (_, {input}, context: GraphQLContext) => {
-      
+    createRoom: async (_, { input }, context: GraphQLContext) => {
+
       if (!context.isAdmin) {
         throw new Error('Not Authorization');
       }

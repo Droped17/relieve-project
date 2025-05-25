@@ -108,7 +108,7 @@ const TransactionPage = () => {
 
         console.log("Image uploaded successfully:", secureUrl);
         setImageUrl(secureUrl);
-        const results = await uploadImage({ variables: { imageUrl: secureUrl, transactionId: data.findTransactionBy[0]._id } });
+        const results = await uploadImage({ variables: { imageUrl: secureUrl, transactionId: data.findTransactionBy.data._id } });
         console.log(`UPLOAD RESULT => `, results);
     };
 
