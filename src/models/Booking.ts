@@ -27,6 +27,8 @@ export interface IBooking extends Document {
         email: string
         phone: string
     }
+    checkedInAt?: Date;
+    checkedOutAt?: Date;
 }
 
 const BookingSchema: Schema = new Schema({
@@ -47,6 +49,8 @@ const BookingSchema: Schema = new Schema({
         default: EBookingStatus.PENDING,
         required: true
     },
+    checkedInAt: { type: Date },
+    checkedOutAt: { type: Date },
 
     /* Reference Model */
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },

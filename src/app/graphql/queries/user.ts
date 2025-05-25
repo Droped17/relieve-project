@@ -136,6 +136,12 @@ type Transaction {
   room: Room!
 }
 
+type RoomStats {
+  date: String
+  emptyRoomsCount: Int
+  checkInRoomsCount: Int
+}
+
 type Query {
   myProfile: User
   publicData: String
@@ -162,6 +168,8 @@ type Query {
   findTransactionByStatus(status: String!): TransactionsResponse!
   booking: [Booking!]!
   allRooms(date: String!, nights: Int!, personPerRoom: Int!, floor: Int): [Room!]!
+  availableRoom(date: String!, nights: Int!, personPerRoom: Int!, floor: Int): Int!
+  roomStatByDate(date: String!): RoomStats!
 }
 
 
@@ -193,5 +201,9 @@ type Query {
 extend type Mutation {
   createBooking(input: CreateBookingInput!): Booking!
 }
+
+  type Mutation {
+    confirmTransaction(id: ID): Boolean!
+  }
 
 `;

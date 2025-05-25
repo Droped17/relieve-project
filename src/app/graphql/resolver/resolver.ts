@@ -42,6 +42,40 @@ export const resolvers = {
       };
     },
 
+    /* MARK: ROOM */
+    roomStatByDate: async(_, {date}) => {
+      const targetDate = dayjs(date, 'YYYY-MM-DD', true)
+      if (!targetDate.isValid()) {
+        throw new Error("Invalid date format.")
+      }
+
+      const [totalRoom, bookingOnDate] = await Promise.all([
+        Room.countDocuments(), // total room,
+        Booking.find({
+          checkIn: {$lte: targetDate.toDate()},
+          checkOut: {$gt: targetDate.toDate()}
+        }).lean()
+      ])
+
+      const occupiedRoomId = new Set(bookingOnDate.map(b => b.room.toString()))
+
+      
+      const checkInRoomCount = bookingOnDate.filter(b => dayjs(b.checkIn).isSame(targetDate, 'day')).length;
+      
+      console.log(occupiedRoomId);
+      console.log(date);
+      console.log(checkInRoomCount);
+      console.log(totalRoom);
+
+      return {
+        date,
+        emptyRoomCount: totalRoom - occupiedRoomId.size,
+        checkInRoomCount
+      }
+
+    },
+    /* MARK: BOOKING */
+    /* MARK: TRANSACTION */
 
     /* MARK: PUBLIC */
     users: async (_, __, context) => {
@@ -180,7 +214,7 @@ export const resolvers = {
           populate: {
             path: 'room',
             /* query only usage data */
-            select: ['floor','number']
+            select: ['floor', 'number']
           }
         })
 
@@ -241,8 +275,7 @@ export const resolvers = {
           (Array.isArray(room.booking) && room.booking.length > 0) ||
           room.personPerRoom < personPerRoom,
       }));
-    }
-
+    },
   },
   Mutation: {
     /* USER, ADMIN */
@@ -380,6 +413,20 @@ export const resolvers = {
         return { success: false, message: 'Failed to send email' };
       }
     },
+    confirmTransaction: async (_: any, { id }: { id: string }) => {
+      console.log(id);
+      const result = await Transaction.updateOne({
+        _id: id
+      },
+        {
+          $set: {
+            status: "SUCCESS"
+          }
+        }
+      )
+      console.log(result);
+      return result.modifiedCount > 0;
+    },
     /* USER, ADMIN */
     uploadImage: async (_: any, { imageUrl, transactionId }: { imageUrl: string; transactionId: string }) => {
       console.log("Image uploaded to:", imageUrl);
@@ -389,7 +436,6 @@ export const resolvers = {
         {
           $set: {                           // update
             image: imageUrl,
-            status: "PAID"                    // [TODO]: status "PAID" will confirm by Admin
           }
         }
       );

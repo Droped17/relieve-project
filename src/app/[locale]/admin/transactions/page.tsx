@@ -1,7 +1,9 @@
 "use client"
 
-import { gql, useQuery } from "@apollo/client"
+import Button from "@/src/components/atoms/Button"
+import { gql, useMutation, useQuery } from "@apollo/client"
 import dayjs from "dayjs"
+import Image from "next/image"
 
 const PENDING_TRANSACTION = gql`
     query Transaction($status: String!) {
@@ -9,6 +11,8 @@ const PENDING_TRANSACTION = gql`
     message
     status
     data {
+        _id
+        image
         status
         totalPrice
         booking {
@@ -24,6 +28,12 @@ const PENDING_TRANSACTION = gql`
     }
 `
 
+const CONFIRM_TRANSACTION = gql`
+    mutation ConfirmTransaction($id: ID) {
+        confirmTransaction(id: $id)
+    }
+`
+
 const TransactionPage = () => {
 
     const { data, loading, error } = useQuery(PENDING_TRANSACTION, {
@@ -32,9 +42,32 @@ const TransactionPage = () => {
         }
     })
 
+    const [confirmTransaction] = useMutation(CONFIRM_TRANSACTION, {
+        onCompleted: (data) => {
+            console.log(data);
+        },
+        onError: (err) => {
+            console.error(err)
+        }
+    })
+
     if (loading) return <p>Loading..</p>
 
+    console.log(data);
 
+    const handleConfirm = async (id: string) => {
+        try {
+            console.log(id);
+            console.log('Submit Button');
+            await confirmTransaction({
+                variables: {
+                    id: data?.findTransactionByStatus?.data[0]._id
+                }
+            })
+        } catch (error) {
+            console.error(error)
+        }
+    }
 
     return (
         <div className="flex flex-col gap-4 max-w-[1280px] px-8">
@@ -43,19 +76,28 @@ const TransactionPage = () => {
                 {data.findTransactionByStatus?.data?.map((transaction: any, index: number) => (
                     <div
                         key={index}
-                        className="flex flex-col p-6 justify-between border border-gray-100 border-l-8 border-l-warning shadow-lg cursor-pointer hover:shadow-xl transition duration-300 min-w-[300px]"
+                        className="flex flex-col gap-6 p-6 justify-between border border-gray-100 border-l-8 border-l-warning shadow-lg cursor-pointer hover:shadow-xl transition duration-300 min-w-[400px]"
                     >
-                        {/* Loop over booking array */}
-                        {transaction.booking.map((booking: any, idx: number) => (
-                            <div key={idx}>
-                                <p>Room No.: {booking.room?.number ?? 'N/A'}</p>
-                                <p>Floor: {booking.room?.floor ?? 'N/A'}</p>
-                                <p>Check In: {dayjs(Number(booking.checkIn)).format("DD/MM/YYYY")}</p>
-                                <p>Check In: {dayjs(Number(booking.checkOut)).format("DD/MM/YYYY")}</p>
-                            </div>
-                        ))}
+                        <div className="flex gap-8">
+                            {/* Loop over booking array */}
+                            {transaction.booking.map((booking: any, idx: number) => (
+                                <div key={idx} className="flex flex-col justify-center">
+                                    <p>Room No.: {booking.room?.number ?? 'N/A'}</p>
+                                    <p>Floor: {booking.room?.floor ?? 'N/A'}</p>
+                                    <p>Check In: {dayjs(Number(booking.checkIn)).format("DD/MM/YYYY")}</p>
+                                    <p>Check In: {dayjs(Number(booking.checkOut)).format("DD/MM/YYYY")}</p>
+                                    <p>Total Price: {transaction.totalPrice}</p>
+                                </div>
+                            ))}
 
-                        <p>Total Price: {transaction.totalPrice}</p>
+                            <div className="flex items-center justify-center border border-gray-200 w-full">
+                            {transaction.image ? <Image alt="" src={transaction.image} width={100} height={100} /> : <p>No Image</p>}
+
+                            </div>
+                        </div>
+
+                        <Button type="submit" title="Confirm" onClick={() => handleConfirm(transaction._id)} />
+
                     </div>
                 ))}
             </div> : <p>Not Found</p>}
