@@ -58,7 +58,6 @@ export const authOptions = {
                 token.email = user.email
                 token.phone = user.phone
             }
-            // console.log(`JWT =>`,token);
             return token
         },
         session: async ({ session, token }) => {
@@ -70,12 +69,12 @@ export const authOptions = {
                 session.user.email = token.email
                 session.user.phone = token.phone
             }
-            // console.log(`SESSION =>`, session);
             return session
         }
     },
     pages: {
-        signIn: "/th/login"
+        signIn: "/th/login",
+        error: "/th/login"
     },
     secret: process.env.NEXTAUTH_SECRET
 }

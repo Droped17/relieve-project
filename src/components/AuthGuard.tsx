@@ -1,8 +1,9 @@
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 
 const AuthGuard = ({children, requiredRole = "ADMIN"}) => {
+    const [allowed, setAllowed] = useState<boolean>(false);
     const {data: session, status} = useSession()
     const router = useRouter()
 
@@ -10,16 +11,17 @@ const AuthGuard = ({children, requiredRole = "ADMIN"}) => {
         if (status === "loading") return 
 
         if (!session) {
-            router.push('/not-found')
+            router.replace('/not-found')
             return
         }
 
         if (requiredRole && session.user?.role !== requiredRole) {
-            router.push('/unauthorized')
+            router.replace('/not-found')
         }
+        setAllowed(true);
     },[session, status, router, requiredRole])
 
-    if (status === "loading") {
+    if (status === "loading" || !allowed) {
         return <div>Loading...</div>
     }
 

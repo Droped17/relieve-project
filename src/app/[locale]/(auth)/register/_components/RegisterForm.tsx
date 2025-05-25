@@ -78,7 +78,7 @@ const RegisterForm = () => {
     return (
         /* [TODO: Refactor this input */
         /* [TODO: Localization */
-        <form onSubmit={handleSubmit} className="flex flex-col gap-2 p-6 rounded-2xl shadow-lg bg-white w-[450px]">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-2 p-6 rounded-2xl shadow-lg bg-white small-mobile:w-[280px] tablet:w-[450px]">
             <HeaderText title="Register" className="text-center text-2xl font-semibold" />
             <Input id="firstName" name="firstName" type="text" value={formData.firstName} onChange={handleOnChange} label="Firstname" error={error.firstName}/>
             <Input id="lastName" name="lastName" type="text" value={formData.lastName} onChange={handleOnChange} label="Lastname" error={error.lastName}/>

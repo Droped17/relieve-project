@@ -58,7 +58,7 @@ const LoginForm = () => {
         /* [TODO]: localization */
         <form
             onSubmit={handleSubmit}
-            className="p-6 rounded-2xl shadow-lg bg-white w-[350px]"
+            className="p-6 rounded-2xl shadow-lg bg-white small-mobile:w-[280px] tablet:w-[350px]"
         >
             <div className="flex flex-col gap-4">
                 <HeaderText title="Login" className="text-center text-2xl font-semibold" />
