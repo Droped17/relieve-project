@@ -113,7 +113,7 @@ const TransactionPage = () => {
     };
 
     return (
-        <div className="mx-auto mb-10 max-w-[1280px] px-8 flex flex-col gap-4">
+        <div className="mx-auto mb-10 max-w-[1280px]  small-mobile:px-2 medium-mobile:px-8 flex flex-col gap-4">
             {/* Tab Button */}
             <TabButton tabs={tabs} />
             <HeaderText title="Check Transaction" className="text-2xl font-semibold text-center" />

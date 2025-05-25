@@ -6,6 +6,7 @@ import { CldUploadWidget } from "next-cloudinary"
 import { ChangeEvent, FormEvent, useState } from "react"
 import Image from "next/image"
 import { gql, useMutation } from "@apollo/client"
+import { useParams, useRouter } from "next/navigation"
 
 interface IFormData {
     number: string
@@ -49,12 +50,15 @@ const AddRoom = () => {
         image: [],
         personPerRoom: 2
     });
-
     const [imageUrls, setImageUrls] = useState<string[]>([]);
+
+    const router = useRouter()
+    const params = useParams()
 
     const [createRoom] = useMutation(CREATE_ROOM, {
         onCompleted: (data) => {
             console.log(data);
+            router.replace(`/${params.locale}/admin`)
         },
         onError: (error) => {
             console.error(error)
