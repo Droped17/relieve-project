@@ -93,7 +93,7 @@ const RoomCard = () => {
             {/* Rooms */}
             <div className="flex justify-between shadow-lg">
                 <div>
-                    {data.allRooms.slice(0, 7).map((item, index) => (
+                    {data.allRooms.slice(0, 5).map((item, index) => (
                         <button
                             key={`${item.id}+${index}`}
                             disabled={item.isBooked === true}
@@ -112,11 +112,11 @@ const RoomCard = () => {
                     ))}
                 </div>
                 <div className="flex items-center justify-center w-full border border-gray-200 bg-warm">
-                    <p>FREE SPACE</p>
+                    <p>No Event</p>
                 </div>
                 {/* RIGHT */}
-                <div>
-                    {data.allRooms.slice(7, 14).map((item, index) => (
+                <div className="bg-fade-gray">
+                    {data.allRooms.slice(5, 10).map((item, index) => (
                         <button
                             key={`${item.id}+${index}`}
                             disabled={item.isBooked === true}
@@ -126,7 +126,7 @@ const RoomCard = () => {
                                 {
                                     'bg-gray-200 hover:bg-gray-300 transition cursor-pointer': item.status === 'NULL_VALUE',
                                     'bg-red-300': item.isBooked === true,
-                                    'bg-green-300 hover:bg-green-400 transition cursor-pointer': !item.isBooked,
+                                    'bg-secondary hover:bg-primary transition cursor-pointer': !item.isBooked,
                                 },
                             )}
                         >

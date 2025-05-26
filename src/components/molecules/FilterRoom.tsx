@@ -1,41 +1,45 @@
-import { useDispatch, useSelector } from "react-redux";
 import { useTranslations } from "next-intl";
-import { RootState } from "@reduxjs/toolkit/query";
-import { AppDispatch } from "@/src/store/store";
+import { useDispatch, useSelector } from "react-redux";
 import { setFormField } from "@/src/store/slice/bookingSlice";
-import DatePicker from "./DatePicker"
-import Dropdown from "../atoms/Dropdown"
+import { RootState } from "@/src/store/store";
+import { AppDispatch } from "@/src/store/store";
+import DatePicker from "./DatePicker";
+import Dropdown from "./Dropdown";
+
+const nightOptions = [1, 2, 3, 4];
+const personOptions = [1, 2, 3, 4];
 
 const FilterRoom = () => {
-  /* [TODO]: Localization */
   const formData = useSelector((state: RootState) => state.booking);
   const dispatch = useDispatch<AppDispatch>();
+  const t = useTranslations();
 
-  const t = useTranslations()
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-
-    const numericFields = ['nights', 'personPerRoom'];
-    const parsedValue = numericFields.includes(name)
-      ? Number(value)
-      : value;
-
-    dispatch(setFormField({ field: name as any, value: parsedValue }));
+  const handleChange = (name: string, value: number | string) => {
+    dispatch(setFormField({ field: name as keyof typeof formData, value }));
   };
 
-    return (
-        <div className="flex gap-4 small-mobile:flex-col tablet:flex-row justify-center items-center border border-gray-100 p-4 rounded-2xl">
-            <p className="text-tertiary">วันที่</p>
-            <DatePicker />
+  return (
+    <div className="flex gap-4 small-mobile:flex-col tablet:flex-row justify-center items-center   p-4 rounded-2xl">
+      <label className="text-tertiary">{'วันที่'}</label>
+      <DatePicker />
 
-            <p className="text-tertiary">จำนวนคืน</p>
-            <Dropdown name="nights" value={formData.nights} onChange={handleChange} className="border border-gray-200 p-2 rounded-md" option={[1, 2, 3, 4]} />
+      <label className="text-tertiary">{'จำนวนคืน'}</label>
+      <Dropdown
+        name="nights"
+        value={formData.nights}
+        onChange={handleChange}
+        option={nightOptions}
+      />
 
-            <p className="text-tertiary">จำนวนผู้เข้าพัก</p>
-            <Dropdown name="personPerRoom" value={formData.personPerRoom} onChange={handleChange} className="border border-gray-200 p-2 rounded-md" option={[1, 2, 3, 4]} />
-        </div>
-    )
-}
+      <label className="text-tertiary">{'จำนวนผู้เข้าพัก'}</label>
+      <Dropdown
+        name="personPerRoom"
+        value={formData.personPerRoom}
+        onChange={handleChange}
+        option={personOptions}
+      />
+    </div>
+  );
+};
 
-export default FilterRoom
+export default FilterRoom;

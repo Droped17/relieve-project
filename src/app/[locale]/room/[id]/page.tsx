@@ -70,9 +70,14 @@ const RoomPage = () => {
                     </div>
                 </div>
                 <div className="flex-1/3 px-4 flex flex-col justify-between">
+                    <div className="flex flex-col gap-7">
+                        <p>
+                            {data?.findRoomBy[0].detail[0]}
+                        </p>
                     <div>
                         <p>สิ่งของอำนวยความสะดวก</p>
                         {data?.findRoomBy[0].detail.map((item, index) => index !== 0 && <li key={index}>{item}</li>)}
+                    </div>
                     </div>
 
                     <div className="flex justify-end">

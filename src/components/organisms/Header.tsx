@@ -3,18 +3,20 @@
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
+import HeaderText from "../atoms/HeaderText";
+import { useTranslations } from "next-intl";
 
 const Header = () => {
 
     const session = useSession()
     const params = useParams()
-
+    const t = useTranslations()
 
     return (
         <header className="flex items-center border-b border-gray-300 bg-secondary small-mobile:px-2 medium-mobile:px-8 py-4 justify-between h-16">
             <div className="flex items-center">
             <Link href={`/${params.locale}/homepage`} className="flex items-center gap-2 font-mono text-lg font-bold text-tertiary">
-                 <p>Relieve</p>
+                Relieve
             </Link>
             </div>
             <div className="flex gap-4 items-center">

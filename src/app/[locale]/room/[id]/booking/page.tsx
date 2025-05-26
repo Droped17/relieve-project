@@ -6,14 +6,16 @@ import HeaderText from "@/src/components/atoms/HeaderText"
 import Input from "@/src/components/atoms/Input"
 import Dialog from "@/src/components/molecules/Dialog"
 import PageTitle from "@/src/components/molecules/PageTitle"
+import { RootState } from "@/src/store/store"
 import { gql, useMutation, useQuery } from "@apollo/client"
-import { RootState } from "@reduxjs/toolkit/query"
+
 import clsx from "clsx"
 import { useSession } from "next-auth/react"
 import Image from "next/image"
 import { useParams, useRouter } from "next/navigation"
 import { FormEvent, useEffect, useState } from "react"
 import { useSelector } from "react-redux"
+import { BookingSchema } from "./bookingSchema"
 
 interface IFormData {
     firstName: string
@@ -71,6 +73,7 @@ const Booking = () => {
     });
     const [stepper, setStepper] = useState<number>(1)
     const [dialog, setDialog] = useState<boolean>(false)
+    const [error, setError] = useState<Record<string, string[]>>({});
 
     const bookingFormData = useSelector((state: RootState) => state.booking);
 
@@ -78,6 +81,7 @@ const Booking = () => {
 
     const router = useRouter()
     const params = useParams()
+    const schema = BookingSchema()
 
     const isGuest = !session?.data?.user;
 
@@ -114,7 +118,25 @@ const Booking = () => {
     if (loading) return <p>Loading..</p>
 
     const handleNextStepper = () => {
-        setStepper(prev => (prev >= 3) ? 1 : prev + 1)
+        try {
+            if (stepper === 1) {
+                console.log('STEP 1');
+                const validatedFormData = schema.safeParse(formData)
+                if (validatedFormData.success) {
+                    // SUCCESS
+                    setStepper(prev => (prev >= 3) ? 1 : prev + 1)
+                } else {
+                    // ERROR
+                    console.log(validatedFormData.error.format());
+                    setError(validatedFormData.error.flatten().fieldErrors)
+                }
+            } else {
+                setStepper(prev => (prev >= 3) ? 1 : prev + 1)
+            }
+        } catch (error) {
+            console.error(error)
+        }
+
     }
 
     const handleBackStepper = () => {
@@ -196,10 +218,10 @@ const Booking = () => {
                     {isGuest ? <div className="p-4 max-w-[1024px] mx-auto">
                         <HeaderText title="User Details" className="font-semibold text-xl" />
                         <form className="flex flex-col gap-3">
-                            <Input type="text" label="Firstname" name="firstName" id="firstName" value={formData.firstName} onChange={handleOnChange} />
-                            <Input type="text" label="Lastname" name="lastName" id="lastName" value={formData.lastName} onChange={handleOnChange} />
-                            <Input type="email" label="Email" name="email" id="email" value={formData.email} onChange={handleOnChange} />
-                            <Input type="text" label="Phone" name="phone" id="phone" value={formData.phone} onChange={handleOnChange} />
+                            <Input type="text" label="Firstname" name="firstName" id="firstName" value={formData.firstName} onChange={handleOnChange} error={error.firstName} />
+                            <Input type="text" label="Lastname" name="lastName" id="lastName" value={formData.lastName} onChange={handleOnChange} error={error.lastName} />
+                            <Input type="email" label="Email" name="email" id="email" value={formData.email} onChange={handleOnChange} error={error.email} />
+                            <Input type="text" label="Phone" name="phone" id="phone" value={formData.phone} onChange={handleOnChange} error={error.phone} />
                             <div className="text-end">
                                 <Button type="button" onClick={handleNextStepper} title="Next" className="w-[100px]" />
                             </div>
