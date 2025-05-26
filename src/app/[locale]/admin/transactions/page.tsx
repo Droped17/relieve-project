@@ -96,7 +96,11 @@ const TransactionPage = () => {
                             </div>
                         </div>
 
-                        <Button type="submit" title="Confirm" onClick={() => handleConfirm(transaction._id)} />
+                        <div className="flex justify-end gap-2">
+                        <Button type="submit" title="Delete" className="p-4 bg-red-400 hover:bg-red-500" />
+                        <Button type="submit" title="Confirm" className="p-4 bg-primary hover:bg-secondary" onClick={() => handleConfirm(transaction._id)} />
+
+                        </div>
 
                     </div>
                 ))}

@@ -36,6 +36,7 @@ const FIND_TRANSACTION_BY = gql`
                     checkOut
                     nights
                 }
+                image
             }
         }
     }
@@ -65,7 +66,17 @@ const TransactionPage = () => {
 
     const booking = data?.findTransactionBy?.data?.booking?.[0];
 
-    const [uploadImage] = useMutation(UPLOAD_IMAGE);
+    const [uploadImage, { client: uploadImageClient }] = useMutation(UPLOAD_IMAGE, {
+        onCompleted: () => {
+            uploadImageClient.cache.evict({
+                id: 'ROOT_QUERY',
+                fieldName: 'findTransactionBy',
+            })
+        },
+        onError: (error) => {
+            console.error(error)
+        }
+    });
 
 
     const param = useParams()
@@ -112,6 +123,8 @@ const TransactionPage = () => {
         console.log(`UPLOAD RESULT => `, results);
     };
 
+    console.log(data?.findTransactionBy?.data?.image);
+
     return (
         <div className="mx-auto mb-10 max-w-[1280px]  small-mobile:px-2 medium-mobile:px-8 flex flex-col gap-4">
             {/* Tab Button */}
@@ -120,7 +133,7 @@ const TransactionPage = () => {
             <div className="flex flex-col gap-1">
                 <form className="flex gap-2 items-end w-full" onSubmit={handleSubmit}>
                     <Input id="bookingNumber" name="bookingNumber" label="Transaction ID" type="text" onChange={handleOnChange} value={formData.bookingNumber} className={`w-full rounded-lg text-lg ${data?.findTransactionBy.message === "Invalid transaction ID" && 'border-red-500'}`} />
-                    <Button type="submit" className="rounded-full p-2">
+                    <Button type="submit" className="rounded-full p-2 bg-primary hover:bg-secondary">
                         <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF"><path d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z" /></svg>
                     </Button>
                 </form>
@@ -154,7 +167,7 @@ const TransactionPage = () => {
                                     {data.findTransactionBy.data?.status}
                                 </strong>
                             </p>
-                            {data.findTransactionBy.data?.status !== "PAID" && <div className="w-[200px]">
+                            {!data?.findTransactionBy?.data?.image && <div className="w-[200px]">
                                 <CldUploadWidget
                                     uploadPreset="ml_default"
                                     onSuccess={handleUpload}

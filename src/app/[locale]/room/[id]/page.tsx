@@ -44,10 +44,10 @@ const RoomPage = () => {
     };
 
     return (
-        <div className="p-6 flex flex-col gap-8 max-w-[1024px] mx-auto">
+        <div className="small-mobile:p-3 tablet:p-8 flex flex-col small-mobile:gap-4 tablet:gap-8 max-w-[1024px] mx-auto">
             <PageTitle callBackUrl={`/${params.locale}/homepage`} title={`Room ${data?.findRoomBy[0].number}`} />
 
-            <div className="flex justify-between">
+            <div className="flex small-mobile:flex-col small-mobile:gap-6 tablet:flex-row tablet:gap-0 justify-between">
                 <div className="flex-2/3">
                     <div className="grid grid-cols-6 gap-4">
                         {data?.findRoomBy[0].image.map((items, index) =>
@@ -71,12 +71,12 @@ const RoomPage = () => {
                 </div>
                 <div className="flex-1/3 px-4 flex flex-col justify-between">
                     <div className="flex flex-col gap-7">
-                        <p>
+                        <p className="small-mobile:text-sm tablet:text-[16px] font-light">
                             {data?.findRoomBy[0].detail[0]}
                         </p>
                     <div>
-                        <p>สิ่งของอำนวยความสะดวก</p>
-                        {data?.findRoomBy[0].detail.map((item, index) => index !== 0 && <li key={index}>{item}</li>)}
+                        <p className="small-mobile:text-sm tablet:text-lg mb-2">สิ่งของอำนวยความสะดวก</p>
+                        {data?.findRoomBy[0].detail.map((item, index) => index !== 0 && <li key={index} className="small-mobile:text-sm tablet:text-[16px]">{item}</li>)}
                     </div>
                     </div>
 

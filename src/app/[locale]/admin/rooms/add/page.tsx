@@ -194,7 +194,7 @@ const AddRoom = () => {
 
 
                 <div className="flex justify-end">
-                    <Button type="submit" title="Add" className="py-2 px-4 rounded-lg" />
+                    <Button type="submit" title="Add" className="py-2 px-4 rounded-lg bg-primary hover:bg-secondary" />
                 </div>
             </form>
         </div>

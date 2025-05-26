@@ -40,13 +40,13 @@ const Dropdown = ({ name, value, option, onChange, className }: DropdownProps) =
       </button>
 
       {isOpen && (
-        <ul className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-md">
+        <ul className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-md">
           {option.map((item) => (
             <li
               key={item}
               onClick={() => handleSelect(item)}
               className={`flex justify-center py-2 px-5 cursor-pointer hover:bg-gray-100 ${
-                item === value ? "bg-blue-100 font-semibold" : ""
+                item === value ? "bg-secondary font-semibold" : ""
               }`}
             >
               {item}

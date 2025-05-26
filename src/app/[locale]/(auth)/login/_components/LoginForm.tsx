@@ -64,7 +64,7 @@ const LoginForm = () => {
                 <HeaderText title="Login" className="text-center text-2xl font-semibold" />
                 <Input id="email" type="email" name="email" value={formData.email} onChange={handleOnChange} label="Email Address" error={error.email} />
                 <Input id="password" type="password" name="password" value={formData.password} onChange={handleOnChange} label="Password" error={error.password} />
-                <Button title="Sign In" type="submit" />
+                <Button title="Sign In" type="submit" className="bg-primary hover:bg-secondary"/>
                 <Divider />
         {/* [TODO]: Re-Design Google Button */}
                 <button

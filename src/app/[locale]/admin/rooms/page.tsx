@@ -8,7 +8,7 @@ const RoomsPage = () => {
             <div className="flex justify-between">
                 <p className="text-2xl font-semibold">Rooms</p>
                 <Link href="/admin/rooms/add">
-                    <Button type="button" title="Add Room" className="p-2" />
+                    <Button type="button" title="Add Room" className="p-2 bg-primary hover:bg-secondary" />
                 </Link>
             </div>
             <div className="overflow-hidden rounded-lg border border-gray-200">

@@ -85,7 +85,7 @@ const RegisterForm = () => {
             <Input id="email" name="email" type="email" value={formData.email} onChange={handleOnChange} label="Email" error={error.email}/>
             <Input id="password" name="password" type="password" value={formData.password} onChange={handleOnChange} label="Password" error={error.password}/>
             <Input id="phone" name="phone" type="text" value={formData.phone} onChange={handleOnChange} label="Phone" error={error.phone}/>
-            <Button type="submit" title="Register"className="mt-5" />
+            <Button type="submit" title="Register"className="bg-primary hover:bg-secondary mt-5" />
         </form>
     )
 }

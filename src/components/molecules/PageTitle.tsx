@@ -20,7 +20,7 @@ const PageTitle = ({ title, callBackUrl }: IPageTitleProps) => {
             <path d="M400-80 0-480l400-400 71 71-329 329 329 329-71 71Z" />
           </svg>
         </Link>
-        <HeaderText title={`${title}`} className="font-semibold text-2xl" />
+        <HeaderText title={`${title}`} className="font-semibold small-mobile:text-lg tablet:text-2xl" />
       </div>
     );
   };
