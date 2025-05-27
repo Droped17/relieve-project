@@ -5,6 +5,7 @@ import { gql, useMutation, useQuery } from "@apollo/client"
 import clsx from "clsx"
 import dayjs from "dayjs"
 import Image from "next/image"
+import Loading from "../../loading"
 
 const PENDING_TRANSACTION = gql`
     query Transaction($status: String!) {
@@ -43,9 +44,13 @@ const TransactionPage = () => {
         }
     })
 
-    const [confirmTransaction] = useMutation(CONFIRM_TRANSACTION, {
+    const [confirmTransaction, { client: confirmTransactionClient, loading: confirmTransactionLoading }] = useMutation(CONFIRM_TRANSACTION, {
         onCompleted: (data) => {
             console.log(data);
+            confirmTransactionClient.cache.evict({
+                id: 'ROOT_QUERY',
+                fieldName: 'findTransactionByStatus',
+            })
         },
         onError: (err) => {
             console.error(err)
@@ -53,6 +58,7 @@ const TransactionPage = () => {
     })
 
     if (loading) return <p>Loading..</p>
+    if (confirmTransactionLoading) return <Loading />
 
     console.log(data);
 
@@ -116,7 +122,7 @@ const TransactionPage = () => {
 
                         <div className="flex justify-end gap-2">
                             <Button type="submit" title="Delete" className="p-4 bg-red-400 hover:bg-red-500" />
-                            <Button type="submit" title="Confirm" className="p-4 bg-primary hover:bg-secondary" onClick={() => handleConfirm(transaction._id)} />
+                            {transaction.image && <Button type="submit" title="Confirm" className="p-4 bg-primary hover:bg-secondary" onClick={() => handleConfirm(transaction._id)} />}
                         </div>
 
                     </div>

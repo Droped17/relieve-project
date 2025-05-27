@@ -11,7 +11,7 @@ const HomePageTitle = () => {
         <div className="flex small-mobile:flex-col small-mobile:py-0 tablet:flex-row tablet:py-5 items-center">
             <div className="flex-1/2">
                 {/* Animation */}
-                 <Lottie animationData={loadingAnimation} loop={true} className="small-mobile:h-[50px] medium-mobile:h-[200px] tablet:h-[400px]"/> 
+                 <Lottie animationData={loadingAnimation} loop={true} className="small-mobile:h-[150px] medium-mobile:h-[200px] tablet:h-[400px]"/> 
             </div>
             <div className="flex-1/2">
                 {/* Relieve Details */}

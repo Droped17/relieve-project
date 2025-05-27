@@ -13,7 +13,7 @@ const Header = () => {
     const t = useTranslations()
 
     return (
-        <header className="flex items-center border-b border-gray-300 bg-secondary small-mobile:px-2 medium-mobile:px-8 py-4 justify-between h-16">
+        <header className="flex sticky top-0 z-50 opacity-90 backdrop-blur-3xl items-center border-b border-gray-200 bg-fade-gray small-mobile:px-2 medium-mobile:px-8 py-4 justify-between h-16">
             <div className="flex items-center">
             <Link href={`/${params.locale}/homepage`} className="flex items-center gap-2 font-mono text-lg font-bold text-tertiary">
                 Relieve

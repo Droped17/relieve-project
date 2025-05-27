@@ -16,6 +16,7 @@ import { useParams, useRouter } from "next/navigation"
 import { FormEvent, useEffect, useState } from "react"
 import { useSelector } from "react-redux"
 import { BookingSchema } from "./bookingSchema"
+import Loading from "../../../loading"
 
 interface IFormData {
     firstName: string
@@ -86,14 +87,14 @@ const Booking = () => {
     const isGuest = !session?.data?.user;
 
 
-    const [createBooking] = useMutation(CREATE_BOOKING, {
+    const [createBooking, {loading: creating}] = useMutation(CREATE_BOOKING, {
         onCompleted: (data) => {
             console.log(data);
             setDialog(true);
         },
         onError: (error) => {
             console.error(error)
-        }
+        },
     })
     const { data, loading } = useQuery(FIND_ROOMS_BY_ID, {
         variables: {
@@ -115,7 +116,8 @@ const Booking = () => {
         }
     }, [session?.data?.user]);
 
-    if (loading) return <p>Loading..</p>
+    if (loading) return <Loading />
+    if (creating) return <Loading />
 
     const handleNextStepper = () => {
         try {

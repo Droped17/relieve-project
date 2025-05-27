@@ -351,15 +351,6 @@ export const resolvers = {
       });
 
       if (result) {
-
-        // FOR DEV
-        // await sendContactEmail({
-        //   to: guest.email,
-        //   subject: 'Booking Confirmation',
-        //   username: guest.firstName,
-        //   actionUrl: `http://localhost:3000/th/transaction`
-        // })
-
         const room = await Room.findById(roomId)
 
         /* Create Transaction */
@@ -369,6 +360,15 @@ export const resolvers = {
         })
 
         if (newTransaction) {
+          console.log(newTransaction);
+        // FOR DEV
+        await sendContactEmail({
+          to: guest.email,
+          subject: 'Booking Confirmation',
+          username: guest.firstName,
+          actionUrl: `http://localhost:3000/th/transaction`,
+          transactionId: newTransaction._id 
+        })
           return booking
         }
       }
