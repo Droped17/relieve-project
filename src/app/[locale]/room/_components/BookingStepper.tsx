@@ -95,7 +95,7 @@ const BookingStepper = ({ formData, setFormData, setDialog }: IBookingStepperPro
                 phone: session.data.user?.phone || '',
             }));
         }
-    }, [session?.data?.user]);
+    }, [session?.data?.user, setFormData]);
 
     const handleNextStepper = () => {
         try {
