@@ -1,17 +1,17 @@
 "use client"
 
-import { gql, useQuery } from "@apollo/client";
-import { RootState } from "@reduxjs/toolkit/query";
-import clsx from "clsx";
-import dayjs from "dayjs";
-import { useTranslations } from "next-intl";
-import { useParams, useRouter } from "next/navigation";
-
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { SkeletonBox } from "../atoms/SkeletonBox";
-import { SkeletonText } from "../atoms/SkeletonText";
-import RoomStatus from "../molecules/RoomStatus";
+import { RootState } from "@/src/store/store";
+// import { useTranslations } from "next-intl";
+import { useParams, useRouter } from "next/navigation";
+import dayjs from "dayjs";
+import { Room } from "@/src/types/room";
+import { gql, useQuery } from "@apollo/client";
+import SkeletonBox from "../atoms/SkeletonBox";
+import SkeletonText from "../atoms/SkeletonText";
+import RoomButton from "../molecules/RoomButton";
+import HomePageRoomStatus from "@/src/app/[locale]/homepage/_components/HomePageRoomStatus";
 import "react-day-picker/style.css";
 
 const GET_ALL_ROOMS = gql`
@@ -28,20 +28,13 @@ const GET_ALL_ROOMS = gql`
 const currentDate = dayjs();
 currentDate.format('YYYY-MM-DD')
 
-
-const roomStatus = [
-    { id: 1, title: "ว่าง", className: "bg-primary" },
-    { id: 2, title: "เต็ม", className: "bg-error" },
-    { id: 3, title: "ไม่พร้อมบริการ", className: "bg-gray" },
-]
-
 const RoomCard = () => {
     const [floor, setFloor] = useState(1);
     const formData = useSelector((state: RootState) => state.booking);
 
     const router = useRouter()
     const params = useParams()
-    const t = useTranslations()
+    // const t = useTranslations()
 
     const { data, loading, error, refetch } = useQuery(GET_ALL_ROOMS, {
         variables: {
@@ -84,31 +77,19 @@ const RoomCard = () => {
     return (
         <>
             {/* Room Status */}
-            <div className="flex gap-2">
-                {roomStatus.map((item) => (
-                    <RoomStatus key={`${item.id}`} title={item.title} className={item.className} />
-                ))}
-            </div>
-
+            <HomePageRoomStatus />
             {/* Rooms */}
-            <div className="flex justify-between shadow-lg">
-                <div>
-                    {data.allRooms.slice(0, 5).map((item, index) => (
-                        <button
-                            key={`${item.id}+${index}`}
-                            disabled={item.isBooked === true}
+            <div className="flex justify-between shadow-[0px_1px_11px_3px_rgba(0,_0,_0,_0.1)]">
+                <div className="bg-fade-gray">
+                    {data.allRooms.slice(0, 5).map((item: Room, index: number) => (
+                        <RoomButton
+                            key={`${item._id}`}
+                            number={item.number}
+                            isBooked={item.isBooked}
+                            status={item.status}
+                            isLast={index === data.allRooms.slice(0, 5).length - 1}
                             onClick={() => router.push(`/${params.locale}/room/${item._id}`)}
-                            className={clsx(
-                                'border  border-gray-200 p-4 w-28 flex justify-center',
-                                {
-                                    'bg-gray-200 hover:bg-gray-300 transition cursor-pointer': item.status === 'NULL_VALUE',
-                                    'bg-red-300': item.isBooked === true,
-                                    'bg-secondary hover:bg-primary transition cursor-pointer': !item.isBooked,
-                                },
-                            )}
-                        >
-                            {item.number}
-                        </button>
+                        />
                     ))}
                 </div>
                 <div className="flex items-center justify-center w-full border border-gray-200 bg-warm">
@@ -116,31 +97,20 @@ const RoomCard = () => {
                 </div>
                 {/* RIGHT */}
                 <div className="bg-fade-gray">
-                    {data.allRooms.slice(5, 10).map((item, index) => (
-                        <button
-                            key={`${item.id}+${index}`}
-                            disabled={item.isBooked === true}
+                    {data.allRooms.slice(5, 10).map((item: Room, index: number) => (
+                        <RoomButton
+                            key={item._id}
+                            number={item.number}
+                            isBooked={item.isBooked}
+                            status={item.status}
+                            isLast={index === data.allRooms.slice(5, 10).length - 1}
                             onClick={() => router.push(`/${params.locale}/room/${item._id}`)}
-                            className={clsx(
-                                'border  border-gray-200 p-4 w-28 flex justify-center',
-                                {
-                                    'bg-gray-200 hover:bg-gray-300 transition cursor-pointer': item.status === 'NULL_VALUE',
-                                    'bg-red-300': item.isBooked === true,
-                                    'bg-secondary hover:bg-primary transition cursor-pointer': !item.isBooked,
-                                },
-                            )}
-                        >
-                            {item.number}
-                        </button>
+                        />
                     ))}
                 </div>
-
             </div>
-
-
             {/* Select Floor */}
             <div className="flex justify-between items-center">
-                {/* [TODO]: Change this time */}
                 <p className="font-semibold text-lg">{currentDate.format('DD-MM-YYYY')}</p>
                 <div className="flex gap-2">
                     <button
@@ -157,7 +127,6 @@ const RoomCard = () => {
                     >
                         Floor 2
                     </button>
-
                 </div>
             </div>
         </>

@@ -15,10 +15,11 @@ import Image from 'next/image'
 type PropType = {
   slides: string[]
   options?: EmblaOptionsType
+  autoSlide?: boolean
 }
 
 const EmblaCarousel: React.FC<PropType> = (props) => {
-  const { slides, options } = props
+  const { slides, options, autoSlide = false } = props
   const progressNode = useRef<HTMLDivElement>(null)
   const [emblaRef, emblaApi] = useEmblaCarousel(options, [
     Autoplay({ playOnInit: false, delay: 5000 })
@@ -49,17 +50,8 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
           ))}
         </div>
       </div>
-      <div className='pt-8'>
-        <div
-          className={`embla__progress`.concat(
-            showAutoplayProgress ? '' : 'embla__progress--hidden'
-          )}
-        >
-          <div className="embla__progress__bar" ref={progressNode} />
-        </div>
-      </div>
 
-      <div className="embla__controls">
+      {autoSlide && <div className="embla__controls">
         <div className="embla__buttons">
           <PrevButton
             onClick={() => onAutoplayButtonClick(onPrevButtonClick)}
@@ -70,10 +62,19 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
             disabled={nextBtnDisabled}
           />
         </div>
+        <div className='pt-8'>
+          <div
+            className={`embla__progress`.concat(
+              showAutoplayProgress ? '' : 'embla__progress--hidden'
+            )}
+          >
+            <div className="embla__progress__bar" ref={progressNode} />
+          </div>
+        </div>
         <button className="embla__play" onClick={toggleAutoplay} type="button">
           {autoplayIsPlaying ? 'Stop' : 'Start'}
         </button>
-      </div>
+      </div>}
     </div>
   )
 }

@@ -1,7 +1,6 @@
 import Image from "next/image"
 
 const HomePageImage = () => {
-    // [TODO]: Refactor
     // [TODO]: Localization
     return (
         <div className="relative group">

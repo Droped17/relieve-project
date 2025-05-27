@@ -1,33 +1,19 @@
 "use client"
 
-import { FormEvent, useEffect, useState } from "react"
-import { gql, useMutation, useQuery } from "@apollo/client"
-import { RootState } from "@/src/store/store"
-import { useSelector } from "react-redux"
-import { useSession } from "next-auth/react"
-import { useParams, useRouter } from "next/navigation"
-import { EmblaOptionsType } from "embla-carousel"
+import { Dispatch, FormEvent, SetStateAction, useEffect, useState } from "react"
 import clsx from "clsx"
-import { BookingSchema } from "./bookingSchema"
-import Loading from "../../../loading"
-import Button from "@/src/components/atoms/Button"
-import Divider from "@/src/components/atoms/Divider"
 import HeaderText from "@/src/components/atoms/HeaderText"
 import Input from "@/src/components/atoms/Input"
-import Dialog from "@/src/components/molecules/Dialog"
-import PageTitle from "@/src/components/molecules/PageTitle"
+import Button from "@/src/components/atoms/Button"
 import EmblaCarousel from "@/src/components/molecules/EmblaCarousel"
-import BookingStepper from "../../_components/BookingStepper"
-
-interface IFormData {
-    firstName: string
-    lastName: string
-    email: string
-    phone: string
-    request: string
-    date: string
-    acceptForm: boolean
-}
+import { BookingSchema } from "../[id]/booking/bookingSchema"
+import { useSession } from "next-auth/react"
+import { EmblaOptionsType } from "embla-carousel"
+import { useParams } from "next/navigation"
+import { useSelector } from "react-redux"
+import { RootState } from "@/src/store/store"
+import { gql, useMutation, useQuery } from "@apollo/client"
+import Loading from "../../loading"
 
 const FIND_ROOMS_BY_ID = gql`
   query FindRoomBy($id: ID) {
@@ -54,43 +40,148 @@ mutation CreateBooking($input: CreateBookingInput!){
 }
 `
 
+interface IFormData {
+    firstName: string
+    lastName: string
+    email: string
+    phone: string
+    request: string
+    date: string
+    acceptForm: boolean
+}
 
-// [TODO]: Refactor Booking by Id Page
-// [TODO]: Create Stepper Component
-// [TODO]: Call Mutation
-// [TODO]: Localization
-// [TODO]: Test Booking Logic
+interface IBookingStepperProps {
+    formData: IFormData
+    setFormData: Dispatch<SetStateAction<IFormData>>
+    setDialog: Dispatch<SetStateAction<boolean>>
+}
 
+const OPTIONS: EmblaOptionsType = { loop: true }
 
-const Booking = () => {
-    const [formData, setFormData] = useState<IFormData>({
-        firstName: '',
-        lastName: '',
-        email: '',
-        phone: '',
-        request: '',
-        date: new Date().toISOString(),
-        acceptForm: false,
-    });
-    const [dialog, setDialog] = useState<boolean>(false)
+const BookingStepper = ({ formData, setFormData, setDialog }: IBookingStepperProps) => {
 
-    const router = useRouter()
+    const [stepper, setStepper] = useState<number>(1)
+    const [error, setError] = useState<Record<string, string[]>>({});
+
+    const bookingFormData = useSelector((state: RootState) => state.booking);
+    const session = useSession()
     const params = useParams()
+    const schema = BookingSchema()
+
+    const { data, loading } = useQuery(FIND_ROOMS_BY_ID, {
+        variables: {
+            id: params.id
+        }
+    })
+    const [createBooking, { loading: creating }] = useMutation(CREATE_BOOKING, {
+        onCompleted: () => {
+            setDialog(true);
+        },
+        onError: (error) => {
+            console.error(error)
+        },
+    })
+
+    const isGuest = !session?.data?.user;
+    const { personPerRoom, price, number, image } = data?.findRoomBy[0] || {};
+
+    useEffect(() => {
+        if (session?.data?.user) {
+            setFormData((prev) => ({
+                ...prev,
+                firstName: session.data.user?.firstName || '',
+                lastName: session.data.user?.lastName || '',
+                email: session.data.user?.email || '',
+                phone: session.data.user?.phone || '',
+            }));
+        }
+    }, [session?.data?.user]);
+
+    const handleNextStepper = () => {
+        try {
+            if (stepper === 1) {
+                console.log('STEP 1');
+                const validatedFormData = schema.safeParse(formData)
+                if (validatedFormData.success) {
+                    // SUCCESS
+                    setStepper(prev => (prev >= 3) ? 1 : prev + 1)
+                } else {
+                    // ERROR
+                    console.log(validatedFormData.error.format());
+                    setError(validatedFormData.error.flatten().fieldErrors)
+                }
+            } else {
+                setStepper(prev => (prev >= 3) ? 1 : prev + 1)
+            }
+        } catch (error) {
+            console.error(error)
+        }
+
+    }
+
+    const handleBackStepper = () => {
+        setStepper(stepper - 1)
+    }
+
+    const handleOnChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const target = e.target;
+        const { name, type, value } = target;
+
+        const newValue =
+            type === 'checkbox'
+                ? (target as HTMLInputElement).checked
+                : value;
+
+        setFormData((prev) => ({
+            ...prev,
+            [name]: newValue
+        }));
+    };
+
+    const handleSubmit = async (e: FormEvent) => {
+        e.preventDefault()
+        try {
+            if (!params.id || !bookingFormData.date || !formData.firstName || !formData.lastName) {
+                console.error("Missing required fields");
+                return;
+            }
+            await createBooking({
+                variables: {
+                    input: {
+                        roomId: params.id,
+                        checkIn: bookingFormData.date,
+                        nights: bookingFormData.nights,
+                        personPerRoom: bookingFormData.personPerRoom,
+                        request: formData.request,
+                        guest: {
+                            firstName: formData.firstName,
+                            lastName: formData.lastName,
+                            email: formData.email,
+                            phone: formData.phone
+                        }
+                    }
+                },
+            })
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+        if (loading) return <Loading />
+    if (creating) return <Loading />
+
 
     return (
-        <div className="small-mobile:p-3 tablet:p-6 max-w-[1024px] mx-auto">
-            <PageTitle callBackUrl={`/${params.locale}/room/${params.id}`} title={'Back'} />
-
-            <HeaderText title="Booking" className="text-2xl font-semibold text-center" />
-        
-            {/* <div className="mx-auto max-w-[1024px] py-4 flex justify-between relative">
-                
+        <>
+            {/* Stepper */}
+            <div className="mx-auto max-w-[1024px] py-4 flex justify-between relative">
+                {/* Base gray line */}
                 <div className="absolute top-1/2 inset-x-6 h-1 bg-gray-300 -z-10"></div>
-                
+                {/* Base green line */}
                 <div className={`${stepper === 1 ? 'w-0' : stepper === 2 && 'w-[50%]'} absolute top-1/2 inset-x-6 h-1 bg-primary -z-10 transition-all duration-700`}></div>
 
 
-                
+                {/* Steps */}
                 <div className={clsx('w-12 h-12 rounded-full z-10 flex justify-center items-center text-white text-lg', {
                     'bg-primary': stepper >= 1
                 })}>
@@ -106,10 +197,10 @@ const Booking = () => {
                 })}>
                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF"><path d="M200-80q-33 0-56.5-23.5T120-160v-480q0-33 23.5-56.5T200-720h80q0-83 58.5-141.5T480-920q83 0 141.5 58.5T680-720h80q33 0 56.5 23.5T840-640v480q0 33-23.5 56.5T760-80H200Zm0-80h560v-480H200v480Zm280-240q83 0 141.5-58.5T680-600h-80q0 50-35 85t-85 35q-50 0-85-35t-35-85h-80q0 83 58.5 141.5T480-400ZM360-720h240q0-50-35-85t-85-35q-50 0-85 35t-35 85ZM200-160v-480 480Z" /></svg>
                 </div>
-            </div> */}
+            </div>
 
-        
-            {/* {stepper === 1 &&
+            {/* Step 1 */}
+            {stepper === 1 &&
                 <>
                     {isGuest ? <div className="py-4 max-w-[1024px] mx-auto">
                         <HeaderText title="User Details" className="font-semibold text-xl mb-2" />
@@ -138,7 +229,7 @@ const Booking = () => {
                     }
                 </>
             }
-
+            {/* Step 2 */}
             {stepper === 2 && <div className="max-w-[1024px] py-4 mx-auto flex flex-col gap-3">
                 <div className="flex justify-center">
                     <EmblaCarousel slides={image} options={OPTIONS} />
@@ -156,7 +247,7 @@ const Booking = () => {
                     <Button type="button" onClick={handleNextStepper} title="Next" className="w-[100px] bg-primary hover:bg-secondary" />
                 </div>
             </div>}
-            
+            {/* Step 3 */}
             {stepper === 3 && <div className="flex gap-2 max-w-[1024px] mx-auto">
                 <div className="flex flex-col">
                     <HeaderText title="Payment" className="font-semibold text-lg" />
@@ -184,26 +275,9 @@ const Booking = () => {
                         <Button type="submit" onClick={handleSubmit} disable={!formData.acceptForm} title="Payment" className="w-[100px] bg-primary hover:bg-secondary" />
                     </div>
                 </div>
-            </div>} */}
-
-            <BookingStepper formData={formData} setFormData={setFormData} setDialog={setDialog}/>
-
-
-            {dialog && (
-                <Dialog className="w-full" onClose={() => setDialog(false)}>
-                    <div className="p-4 text-center flex flex-col gap-4">
-                        <strong className="text-xl">Please Check Your Email</strong>
-                        <Divider />
-                        <p>We send you QRCode in your email please check and confirm booking in 1 hour</p>
-                        <div>
-                            <Button type="submit" onClick={() => router.replace(`/${params.locale}/transaction`)} disable={!formData.acceptForm} title="Confirm" className="w-[100px] bg-primary hover:bg-secondary" />
-                        </div>
-                    </div>
-                </Dialog>
-            )}
-
-        </div>
+            </div>}
+        </>
     )
 }
 
-export default Booking
+export default BookingStepper

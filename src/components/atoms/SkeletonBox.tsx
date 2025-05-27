@@ -1,5 +1,4 @@
-// atoms/SkeletonBox.tsx
-export const SkeletonBox = ({
+const SkeletonBox = ({
   width = '100%',
   height = '1rem',
   className = '',
@@ -15,3 +14,5 @@ export const SkeletonBox = ({
     style={{ width, height }}
   >{children}</div>
 )
+
+export default SkeletonBox

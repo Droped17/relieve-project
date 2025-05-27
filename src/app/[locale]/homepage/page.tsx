@@ -27,8 +27,6 @@ const HomePage = () => {
     { name: 'Transaction', path: `/${params.locale}/transaction` },
   ]
 
-  /* [TODO]: Fix progress bug screen */
-
   return (
     <>
       <div className="mx-auto mb-10 max-w-[1280px] small-mobile:px-2 medium-mobile:px-8 flex flex-col gap-4">
@@ -46,7 +44,7 @@ const HomePage = () => {
           {/* Image */}
           <HomePageImage />
           {/* Carousel */}
-          <EmblaCarousel slides={SLIDES} options={OPTIONS} />
+          <EmblaCarousel slides={SLIDES} options={OPTIONS}/>
         </div>
       </div>
       {/* FOOTER */}
