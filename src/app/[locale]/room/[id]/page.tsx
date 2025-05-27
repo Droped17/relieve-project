@@ -8,6 +8,7 @@ import Link from "next/link"
 import Dialog from "@/src/components/molecules/Dialog"
 import PageTitle from "@/src/components/molecules/PageTitle"
 import clsx from "clsx"
+import Loading from "../../loading"
 
 // [TODO]: Refactor RoomPage
 // [TODO]: Call Mutation
@@ -34,7 +35,7 @@ const RoomPage = () => {
         variables: { id: params.id }
     })
 
-    if (loading) return <p>Loading..</p>
+    if (loading) return <Loading />
     if (error) console.error(error);
 
 
