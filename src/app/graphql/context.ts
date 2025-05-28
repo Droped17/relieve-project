@@ -1,9 +1,10 @@
 // app/graphql/context.ts
 import { getServerSession } from "next-auth/next";
 import { NextRequest } from "next/server";
-import { authOptions } from "../api/auth/[...nextauth]/route";
+import { authOptions } from "../lib/auth-option";
 
-export const createContext = async ({ req }: { req: NextRequest }) => {
+
+export const createContext = async ({}: { req: NextRequest }) => {
   // Get the session using NextAuth
   const session = await getServerSession(authOptions);
   
@@ -27,7 +28,7 @@ export interface GraphQLContext {
     name?: string;
     email?: string;
     role?: string;
-    [key: string]: any;
+    [key: string]: unknown;
   } | null;
   isAuthenticated: boolean;
   userRole: string | null;

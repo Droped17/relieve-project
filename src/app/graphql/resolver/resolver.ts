@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as bcrypt from 'bcrypt'
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { Types } from 'mongoose';
 import { Booking } from '@/src/models/Booking';
-import { IRoom, Room } from '@/src/models/Room';
+import { Room } from '@/src/models/Room';
 import { ITransaction, Transaction } from '@/src/models/Transaction';
 import { IUser, User } from '@/src/models/User';
 import { sendEmail } from '../../lib/mailer';
@@ -19,11 +20,6 @@ dayjs.extend(customParseFormat);
 
 const requireAuth = (user) => {
   if (!user) throw new Error("Not Authenticated");
-};
-
-type Image = {
-  id: string;
-  url: string;
 };
 
 // [TODO]: Remove transaction in 1 hr if status !== PAID 
@@ -43,7 +39,7 @@ export const resolvers = {
     },
 
     /* MARK: ROOM */
-    roomStatByDate: async(_, {date}) => {
+    roomStatByDate: async (_, { date }) => {
       const targetDate = dayjs(date, 'YYYY-MM-DD', true)
       if (!targetDate.isValid()) {
         throw new Error("Invalid date format.")
@@ -52,16 +48,16 @@ export const resolvers = {
       const [totalRoom, bookingOnDate] = await Promise.all([
         Room.countDocuments(), // total room,
         Booking.find({
-          checkIn: {$lte: targetDate.toDate()},
-          checkOut: {$gt: targetDate.toDate()}
+          checkIn: { $lte: targetDate.toDate() },
+          checkOut: { $gt: targetDate.toDate() }
         }).lean()
       ])
 
       const occupiedRoomId = new Set(bookingOnDate.map(b => b.room.toString()))
 
-      
+
       const checkInRoomCount = bookingOnDate.filter(b => dayjs(b.checkIn).isSame(targetDate, 'day')).length;
-      
+
       console.log(occupiedRoomId);
       console.log(date);
       console.log(checkInRoomCount);
@@ -280,6 +276,9 @@ export const resolvers = {
   Mutation: {
     /* USER, ADMIN */
     createUser: async (_: never, args: IUser, context: GraphQLContext) => {
+      if (!context.isAdmin) {
+        throw new Error('Not Authorization');
+      }
       const newUser = await User.create({
         ...args,
         password: await bcrypt.hash(args.password, 10)
@@ -292,8 +291,6 @@ export const resolvers = {
       if (!context.isAdmin) {
         throw new Error('Not Authorization');
       }
-
-      console.log(`Create Room Input => `, input);
 
       const { number, detail, price, floor, image, personPerRoom } = input;
       const newRoom = await Room.create({
@@ -361,14 +358,14 @@ export const resolvers = {
 
         if (newTransaction) {
           console.log(newTransaction);
-        // FOR DEV
-        await sendContactEmail({
-          to: guest.email,
-          subject: 'Booking Confirmation',
-          username: guest.firstName,
-          actionUrl: `http://localhost:3000/th/transaction`,
-          transactionId: newTransaction._id 
-        })
+          // FOR DEV
+          await sendContactEmail({
+            to: guest.email,
+            subject: 'Booking Confirmation',
+            username: guest.firstName,
+            actionUrl: `http://localhost:3000/th/transaction`,
+            transactionId: newTransaction._id
+          })
           return booking
         }
       }

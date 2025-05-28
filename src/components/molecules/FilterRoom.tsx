@@ -1,4 +1,4 @@
-import { useTranslations } from "next-intl";
+// import { useTranslations } from "next-intl";
 import { useDispatch, useSelector } from "react-redux";
 import { setFormField } from "@/src/store/slice/bookingSlice";
 import { RootState } from "@/src/store/store";
@@ -12,7 +12,7 @@ const personOptions = [1, 2, 3, 4];
 const FilterRoom = () => {
   const formData = useSelector((state: RootState) => state.booking);
   const dispatch = useDispatch<AppDispatch>();
-  const t = useTranslations();
+  // const t = useTranslations();
 
   const handleChange = (name: string, value: number | string) => {
     dispatch(setFormField({ field: name as keyof typeof formData, value }));

@@ -31,7 +31,7 @@ const PENDING_TRANSACTION = gql`
 
 const AdminPage = () => {
 
-    const { data, loading, error } = useQuery(PENDING_TRANSACTION, {
+    const { data } = useQuery(PENDING_TRANSACTION, {
         variables: {
             status: "PENDING"
         }

@@ -3,7 +3,7 @@ export enum EStatus {
   SUCCESS = "SUCCESS",
 }
 
-export interface CommonResponse<T = any> {
+export interface CommonResponse<T> {
   status: EStatus;
   message: string;
   data?: T;

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import Button from "@/src/components/atoms/Button"
@@ -38,7 +39,7 @@ const CONFIRM_TRANSACTION = gql`
 
 const TransactionPage = () => {
 
-    const { data, loading, error } = useQuery(PENDING_TRANSACTION, {
+    const { data, loading } = useQuery(PENDING_TRANSACTION, {
         variables: {
             status: "PENDING"
         }

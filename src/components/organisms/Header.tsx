@@ -3,13 +3,13 @@
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
-import { useTranslations } from "next-intl";
+// import { useTranslations } from "next-intl";
 
 const Header = () => {
 
     const session = useSession()
     const params = useParams()
-    const t = useTranslations()
+    // const t = useTranslations()
     
     /* [TODO]: Localization */
 

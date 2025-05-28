@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import { FormEvent, useState } from "react"
@@ -108,22 +109,16 @@ const TransactionPage = () => {
 
     const handleUpload = async (result: any) => {
         if (result?.event !== "success") {
-            console.warn("Upload not completed yet:", result.event);
             return;
         }
         const secureUrl = result?.info?.secure_url;
         if (!secureUrl) {
-            console.error("Upload succeeded but secure_url missing.");
             return;
         }
-
-        console.log("Image uploaded successfully:", secureUrl);
         setImageUrl(secureUrl);
-        const results = await uploadImage({ variables: { imageUrl: secureUrl, transactionId: data.findTransactionBy.data._id } });
-        console.log(`UPLOAD RESULT => `, results);
+        await uploadImage({ variables: { imageUrl: secureUrl, transactionId: data.findTransactionBy.data._id } });
     };
 
-    console.log(data?.findTransactionBy?.data?.image);
 
     return (
         <div className="mx-auto mb-10 max-w-[1280px]  small-mobile:px-2 medium-mobile:px-8 flex flex-col gap-4">
