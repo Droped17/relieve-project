@@ -89,10 +89,10 @@ const BookingStepper = ({ formData, setFormData, setDialog }: IBookingStepperPro
         if (session?.data?.user) {
             setFormData((prev) => ({
                 ...prev,
-                firstName: session.data.user?.firstName || '',
-                lastName: session.data.user?.lastName || '',
-                email: session.data.user?.email || '',
-                phone: session.data.user?.phone || '',
+                // firstName: session.data.user?.firstName || '',
+                // lastName: session.data.user?.lastName || '',
+                // email: session.data.user?.email || '',
+                // phone: session.data.user?.phone || '',
             }));
         }
     }, [session?.data?.user, setFormData]);
@@ -216,7 +216,7 @@ const BookingStepper = ({ formData, setFormData, setDialog }: IBookingStepperPro
                     </div> :
                         <div className="max-w-[1024px] mx-auto">
                             <HeaderText title="User Details" className="font-semibold text-xl mb-2" />
-                            <form className="flex flex-col gap-3">
+                            {/* <form className="flex flex-col gap-3">
                                 <Input type="text" label="Firstname" name="firstName" id="firstName" readOnly={true} value={session.data?.user?.firstName} onChange={handleOnChange} />
                                 <Input type="text" label="Lastname" name="lastName" id="lastName" readOnly={true} value={session.data?.user?.lastName} onChange={handleOnChange} />
                                 <Input type="email" label="Email" name="email" id="email" readOnly={true} value={session.data?.user?.email} onChange={handleOnChange} />
@@ -224,7 +224,7 @@ const BookingStepper = ({ formData, setFormData, setDialog }: IBookingStepperPro
                                 <div className="text-end">
                                     <Button type="button" onClick={handleNextStepper} title="Next" className="w-[100px] bg-primary hover:bg-secondary " />
                                 </div>
-                            </form>
+                            </form> */}
                         </div>
                     }
                 </>

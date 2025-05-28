@@ -1,8 +1,13 @@
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
+import { ReactNode, useEffect, useState } from "react"
 
-const AuthGuard = ({children, requiredRole = "ADMIN"}) => {
+interface AuthGuardProps {
+    children: ReactNode; // 'children' can be any React node
+    requiredRole?: "ADMIN" | "USER"; 
+}
+
+const AuthGuard = ({children, requiredRole = "ADMIN"}: AuthGuardProps) => {
     const [allowed, setAllowed] = useState<boolean>(false);
     const {data: session, status} = useSession()
     const router = useRouter()

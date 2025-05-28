@@ -1,45 +1,56 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
 import { ApolloServer } from '@apollo/server';
 import { startServerAndCreateNextHandler } from '@as-integrations/next';
 import { typeDefs } from '@/src/app/graphql/queries/user';
 import { resolvers } from '../../graphql/resolver/resolver';
-// import dbConnect from '@/src/lib/mongoose';
-// import { createContext } from '../../graphql/context';
+import { NextRequest } from 'next/server';
+import dbConnect from '@/src/lib/mongoose';
 
 const server = new ApolloServer({
   typeDefs,
   resolvers,
 });
 
-const handler = startServerAndCreateNextHandler(server)
+// interface RouteHandlerContext {
+//   params: {}; // Or { [key: string]: string | string[] }; if you might have dynamic params
+// }
 
-export {handler as GET, handler as POST}
-
-// export const GET = startServerAndCreateNextHandler(server, {
-//   context: async (req) => {
-//     await dbConnect(); 
-//     // Call your createContext function with the request
-//     const authContext = await createContext({ req });
-
-//     console.log(`CONTEXT =>`,authContext);
-    
-//     // Merge database connection with auth context
+// const handler = startServerAndCreateNextHandler<NextRequest, RouteHandlerContext>(server, {
+//   context: async (req, res) => {
+//     // You can add your context logic here, e.g., authentication
+//     // For now, we just ensure `params` is present.
 //     return {
-//       ...authContext,
-//       // Add any additional context properties needed in resolvers
-//       db: { connected: true }
+//       req,
+//       res,
+//       params: {}, // Provide an empty params object
+//       // ... any other context properties you need
 //     };
 //   },
 // });
 
-// export const POST = startServerAndCreateNextHandler(server, {
-//   context: async (req) => {
-//     await dbConnect();
-//     const authContext = await createContext({ req });
-    
-//     return {
-//       ...authContext,
-//       db: { connected: true }
-//     };
-//   },
-// });
+export async function POST(req: NextRequest, {params}: {params: Promise<{id: string}>}) {
+  await dbConnect()
+  const handler = startServerAndCreateNextHandler(server, {
+    context: async (req, res) => {
+      // You can add context here, like authenticated user, etc.
+      return { req, res };
+    },
+  });
+  return handler(req);
+}
+
+// For GET requests (e.g., Apollo Playground)
+export async function GET(req: NextRequest, {params}: {params: Promise<{id: string}>}) {
+  await dbConnect()
+  const handler = startServerAndCreateNextHandler(server, {
+    context: async (req, res) => {
+      return { req, res };
+    },
+  });
+  return handler(req);
+}
+
+
+
+// export { handler as GET, handler as POST };

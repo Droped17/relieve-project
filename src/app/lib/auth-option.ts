@@ -1,10 +1,14 @@
-import { MongoDBAdapter } from '@auth/mongodb-adapter'
+import { MongoDBAdapter } from '@next-auth/mongodb-adapter';
 import CredentialProvider from 'next-auth/providers/credentials'
-import dbConnect from '@/src/lib/mongoose'
-import client from '@/src/app/lib/db'
+// import dbConnect from '@/src/lib/mongoose'
+// import client from '@/src/app/lib/db'
 import * as bcrypt from 'bcrypt'
+import { AuthOptions, SessionStrategy } from 'next-auth'
+// import client from '@/src/app/lib/db';
+// import dbConnect from '@/src/lib/mongoose';
+import clientPromise from '@/src/app/lib/db';
 
-export const authOptions = {
+export const authOptions: AuthOptions = {
     providers: [
         CredentialProvider({
             name: "Credentials",
@@ -14,7 +18,8 @@ export const authOptions = {
                 name: { label: 'Name', type: "text" }
             },
             async authorize(credentials) {
-                const db = client.db()
+                // const db = client.db()
+                const db = (await clientPromise).db()
                 if (!credentials) return null
                 const foundUser = await db.collection("users").findOne({ email: credentials.email })
                 if (foundUser && await bcrypt.compare(credentials.password, foundUser.password)) {
@@ -26,15 +31,17 @@ export const authOptions = {
                         role: foundUser.role,
                         phone: foundUser.phone
                     }
-                } else {
+                }
+                else {
                     throw new Error('Invalid Email or Password')
                 }
             },
         }),
     ],
-    adapter: MongoDBAdapter(dbConnect()),
+    adapter: MongoDBAdapter(clientPromise),
+    // adapter: MongoDBAdapter(dbConnect()),
     session: {
-        strategy: 'jwt',
+        strategy: 'jwt' as SessionStrategy
     },
     callbacks: {
         jwt: async ({ token, user }) => {

@@ -35,7 +35,7 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
   const { autoplayIsPlaying, toggleAutoplay, onAutoplayButtonClick } =
     useAutoplay(emblaApi)
 
-  const { showAutoplayProgress } = useAutoplayProgress(emblaApi, progressNode)
+  const { showAutoplayProgress } = useAutoplayProgress(emblaApi, progressNode as React.RefObject<HTMLElement>);
 
   return (
     <div className="embla">

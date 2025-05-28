@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as bcrypt from 'bcrypt'
 import dayjs from 'dayjs';
@@ -11,35 +12,35 @@ import { sendEmail } from '../../lib/mailer';
 import fs from 'fs';
 import path from 'path';
 import { sendContactEmail } from '../../utils/sendContactEmail';
-import { GraphQLContext } from '../context';
+// import { GraphQLContext } from '../context';
 import { CommonResponse, EStatus } from '../commonResponse';
 
 
 /* For use DD-MM-YYYY format */
 dayjs.extend(customParseFormat);
 
-const requireAuth = (user) => {
-  if (!user) throw new Error("Not Authenticated");
-};
+// const requireAuth = (user) => {
+//   if (!user) throw new Error("Not Authenticated");
+// };
 
 // [TODO]: Remove transaction in 1 hr if status !== PAID 
 
 export const resolvers = {
   Query: {
     /* MARK: PRIVATE */
-    myProfile: (_, args, context: GraphQLContext) => {
-      if (!context.isAuthenticated) {
-        throw new Error('Authentication required');
-      }
-      return {
-        id: context.user?.id,
-        name: context.user?.name,
-        email: context.user?.email,
-      };
-    },
+    // myProfile: (_, args) => {
+    //   // if (!context.isAuthenticated) {
+    //   //   throw new Error('Authentication required');
+    //   // }
+    //   // return {
+    //   //   id: context.user?.id,
+    //   //   name: context.user?.name,
+    //   //   email: context.user?.email,
+    //   // };
+    // },
 
     /* MARK: ROOM */
-    roomStatByDate: async (_, { date }) => {
+    roomStatByDate: async (_: any, { date }: any) => {
       const targetDate = dayjs(date, 'YYYY-MM-DD', true)
       if (!targetDate.isValid()) {
         throw new Error("Invalid date format.")
@@ -74,10 +75,10 @@ export const resolvers = {
     /* MARK: TRANSACTION */
 
     /* MARK: PUBLIC */
-    users: async (_, __, context) => {
-      requireAuth(context.user);
-      return await User.find();
-    },
+    // users: async (_, __, context) => {
+    //   requireAuth(context.user);
+    //   return await User.find();
+    // },
     findRoomBy: async (
       _: unknown,
       args: {
@@ -146,9 +147,9 @@ export const resolvers = {
       }));
     },
     findTransactionBy: async (
-      _,
+      _: any,
       args: { id?: string; bookingId?: string }
-    ): Promise<CommonResponse> => {
+    ): Promise<CommonResponse<ITransaction[]>> => {
       try {
         let transaction = null;
 
@@ -184,7 +185,7 @@ export const resolvers = {
           message: "Transaction found",
           data: transaction,
         };
-      } catch (err) {
+      } catch (err: any) {
         return {
           status: EStatus.ERROR,
           message: err.message || "Failed to fetch transaction",
@@ -193,9 +194,9 @@ export const resolvers = {
     },
 
     findTransactionByStatus: async (
-      _,
+      _: any,
       args: { status?: string }
-    ): Promise<CommonResponse> => {
+    ): Promise<CommonResponse<ITransaction[]>> => {
 
       try {
         const filter: any = {}
@@ -226,7 +227,7 @@ export const resolvers = {
           message: "Transactions fetched",
           data: transactions,
         };
-      } catch (err) {
+      } catch (err: any) {
         return {
           status: EStatus.ERROR,
           message: err.message || "Failed to fetch transactions",
@@ -246,7 +247,7 @@ export const resolvers = {
     transaction: async () => {
       return await Transaction.find().populate('user').populate('booking')
     },
-    allRooms: async (_, { date, nights, personPerRoom, floor }) => {
+    allRooms: async (_: any, { date, nights, personPerRoom, floor }: any) => {
       // Use dayjs to parse input date and add nights
       const checkIn = dayjs(date, 'YYYY-MM-DD', true); // or 'DD-MM-YYYY' if needed
       if (!checkIn.isValid()) {
@@ -275,10 +276,10 @@ export const resolvers = {
   },
   Mutation: {
     /* USER, ADMIN */
-    createUser: async (_: never, args: IUser, context: GraphQLContext) => {
-      if (!context.isAdmin) {
-        throw new Error('Not Authorization');
-      }
+    createUser: async (_: never, args: IUser) => {
+      // if (!context.isAdmin) {
+      //   throw new Error('Not Authorization');
+      // }
       const newUser = await User.create({
         ...args,
         password: await bcrypt.hash(args.password, 10)
@@ -286,11 +287,11 @@ export const resolvers = {
       return newUser
     },
     /* ADMIN */
-    createRoom: async (_, { input }, context: GraphQLContext) => {
+    createRoom: async (_: any, { input }: any) => {
 
-      if (!context.isAdmin) {
-        throw new Error('Not Authorization');
-      }
+      // if (!context.isAdmin) {
+      //   throw new Error('Not Authorization');
+      // }
 
       const { number, detail, price, floor, image, personPerRoom } = input;
       const newRoom = await Room.create({
@@ -313,7 +314,7 @@ export const resolvers = {
     },
     /* USER, ADMIN */
     /* [TODO]: Fix request input */
-    createBooking: async (_, { input }) => {
+    createBooking: async (_: any, { input }: any) => {
       const { roomId, checkIn, nights, personPerRoom, guest, request } = input;
 
       const parsedCheckIn = dayjs(checkIn, 'YYYY-MM-DD', true);
