@@ -1,7 +1,7 @@
 {
   "headers": [
     {
-      "source": "/api/graphql(.*)",
+      "source": "/api/graphql",
       "headers": [
         {
           "key": "Access-Control-Allow-Credentials",
