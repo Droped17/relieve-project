@@ -39,8 +39,6 @@ export const DatePicker = () => {
         }
     };
 
-    console.log(formData);
-
     return (
         <>
             <div className='relative z-10' ref={dropdownRef}>

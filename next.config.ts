@@ -39,6 +39,15 @@ const nextConfig: NextConfig = {
     images: {
         domains: ['images.unsplash.com', 'plus.unsplash.com', 'res.cloudinary.com']
     },
+    async redirects() {
+        return [
+            {
+                source: '/th',
+                destination: '/th/homepage',
+                permanent: true
+            }
+        ]
+    },
 };
  
 const withNextIntl = createNextIntlPlugin('./src/app/i18n/request.ts');
