@@ -111,7 +111,8 @@ function setCorsHeaders(response: NextResponse, request: NextRequest) {
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   // Connect to the database
-  await dbConnect();
+  const result = await dbConnect();
+  console.log(`CONNECT DB`,result);
 
   // Call the Apollo handler once to process the request and get the response
   const response = await apolloHandler(req) as NextResponse<unknown>
@@ -123,7 +124,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 // For GET requests (e.g., Apollo Playground, introspection queries)
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   // Connect to the database
-  await dbConnect();
+  const result = await dbConnect();
+  console.log(`CONNECT DB`,result);
 
   // Call the Apollo handler once to process the request and get the response
   const response = await apolloHandler(req) as NextResponse<unknown>

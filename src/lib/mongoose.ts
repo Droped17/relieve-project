@@ -62,8 +62,8 @@ async function dbConnect() {
 
   // Ensure only one connection promise is active
   if (!cached.promise) {
-    console.log('Connecting to DB...'); // Informative message
-    cached.promise = mongoose.connect(MONGODB_URI).then((mongoose) => {
+    console.log('Connecting to DB...', process.env.MONGODB_URI); // Informative message
+    cached.promise = mongoose.connect(`${process.env.MONGODB_URI}`).then((mongoose) => {
       console.log('DB connected successfully!'); // Informative message
       return mongoose;
     }).catch(err => {

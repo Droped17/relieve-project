@@ -7,6 +7,7 @@ import { AuthOptions, SessionStrategy } from 'next-auth'
 // import client from '@/src/app/lib/db';
 // import dbConnect from '@/src/lib/mongoose';
 import clientPromise from '@/src/app/lib/db';
+import dbConnect from '@/src/lib/mongoose';
 
 export const authOptions: AuthOptions = {
     providers: [
@@ -19,7 +20,7 @@ export const authOptions: AuthOptions = {
             },
             async authorize(credentials) {
                 // const db = client.db()
-                const db = (await clientPromise).db()
+                // const db = (await clientPromise).db()
                 if (!credentials) return null
                 const foundUser = await db.collection("users").findOne({ email: credentials.email })
                 if (foundUser && await bcrypt.compare(credentials.password, foundUser.password)) {
@@ -39,7 +40,6 @@ export const authOptions: AuthOptions = {
         }),
     ],
     adapter: MongoDBAdapter(clientPromise),
-    // adapter: MongoDBAdapter(dbConnect()),
     session: {
         strategy: 'jwt' as SessionStrategy
     },
