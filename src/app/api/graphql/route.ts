@@ -92,10 +92,15 @@ function setCorsHeaders(response: NextResponse, request: NextRequest) {
   ];
   const requestOrigin = request.headers.get('origin');
 
+   console.log('Request Origin:', requestOrigin);
+   console.log('Allowed Origins:', allowedOrigins);
+   console.log('Is Origin Allowed:', requestOrigin && allowedOrigins.includes(requestOrigin));
+
   if (requestOrigin && allowedOrigins.includes(requestOrigin)) {
     response.headers.set('Access-Control-Allow-Origin', requestOrigin);
+     console.log('Access-Control-Allow-Origin set to:', requestOrigin);
   } else {
-
+    console.warn('Origin NOT allowed or missing:', requestOrigin);
   }
 
   response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -130,10 +135,11 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 // Handle preflight OPTIONS requests for CORS
 export async function OPTIONS(request: NextRequest) {
   // Create a new NextResponse with a 204 No Content status for preflight
-  const response = new NextResponse(null, { status: 204 });
+  let response = new NextResponse(null, { status: 204 });
 
   // Set CORS headers for the preflight response
-  setCorsHeaders(response, request);
+  // setCorsHeaders(response, request);
+  response = setCorsHeaders(response,request);
 
   // Cache preflight response for 24 hours (86400 seconds)
   response.headers.set('Access-Control-Max-Age', '86400');
