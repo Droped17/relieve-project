@@ -86,7 +86,7 @@ const apolloHandler = startServerAndCreateNextHandler(server, {
 // Helper function to set CORS headers on a NextResponse object
 function setCorsHeaders(response: NextResponse, request: NextRequest) {
    const allowedOrigins = [
-    'https://relieve-project.vercel.app/api/graphql',
+    'https://relieve-project.vercel.app',
     // Add other allowed origins if any
   ];
   const requestOrigin = request.headers.get('origin');
