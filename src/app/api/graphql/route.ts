@@ -85,15 +85,26 @@ const apolloHandler = startServerAndCreateNextHandler(server, {
 
 // Helper function to set CORS headers on a NextResponse object
 function setCorsHeaders(response: NextResponse, request: NextRequest) {
-  // Determine the allowed origin. In production, you should
-  // explicitly list allowed origins rather than using a dynamic origin
-  // from the request header or a wildcard.
-  const origin = request.headers.get('origin') || '*'; // Get the origin from the request, fallback to '*'
+   const allowedOrigins = [
+    'https://relieve-project.vercel.app',
+    // Add other allowed origins if any
+  ];
+  const requestOrigin = request.headers.get('origin');
 
-  response.headers.set('Access-Control-Allow-Origin', origin);
+  if (requestOrigin && allowedOrigins.includes(requestOrigin)) {
+    response.headers.set('Access-Control-Allow-Origin', requestOrigin);
+  } else {
+    // If the origin is not in the allowed list, you might choose to
+    // set no ACAO header, or set it to a default, or deny the request.
+    // For strict security, you should not set ACAO if the origin is not allowed.
+    // For dev convenience, you might set a specific dev origin or even wildcard.
+    // For now, let's keep it restrictive:
+    // response.headers.set('Access-Control-Allow-Origin', allowedOrigins[0]); // Or a default allowed origin
+  }
+
   response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  response.headers.set('Access-Control-Allow-Credentials', 'true'); // Important if you're using cookies/sessions
+  response.headers.set('Access-Control-Allow-Credentials', 'true');
   return response;
 }
 
