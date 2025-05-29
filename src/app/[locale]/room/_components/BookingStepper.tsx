@@ -100,14 +100,13 @@ const BookingStepper = ({ formData, setFormData, setDialog }: IBookingStepperPro
     const handleNextStepper = () => {
         try {
             if (stepper === 1) {
-                console.log('STEP 1');
                 const validatedFormData = schema.safeParse(formData)
                 if (validatedFormData.success) {
                     // SUCCESS
                     setStepper(prev => (prev >= 3) ? 1 : prev + 1)
                 } else {
                     // ERROR
-                    console.log(validatedFormData.error.format());
+                    console.error(validatedFormData.error.format());
                     setError(validatedFormData.error.flatten().fieldErrors)
                 }
             } else {

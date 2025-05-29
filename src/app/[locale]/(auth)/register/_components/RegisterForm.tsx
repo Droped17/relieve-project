@@ -47,7 +47,7 @@ const RegisterForm = () => {
             }
         },
         onError: (error) => {
-            console.log(error)
+            console.error(error)
         }
     });
 
@@ -66,7 +66,7 @@ const RegisterForm = () => {
             if (validatedFormData.success) {
                 await createUser({ variables: formData })
             } else {
-                console.log(validatedFormData.error.format());
+                console.error(validatedFormData.error.format());
                 setError(validatedFormData.error.flatten().fieldErrors)
             }
 

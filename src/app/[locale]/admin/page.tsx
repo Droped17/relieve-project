@@ -4,8 +4,6 @@ import AuthGuard from "@/src/components/AuthGuard"
 import { MyChart } from "@/src/components/organisms/Chart"
 import { gql, useQuery } from "@apollo/client"
 
-/* [TODO]: Fix render Admin when loading */
-
 const PENDING_TRANSACTION = gql`
     query Transaction($status: String!) {
         findTransactionByStatus(status: $status) {
@@ -36,9 +34,6 @@ const AdminPage = () => {
             status: "PENDING"
         }
     })
-
-    console.log(data);
-
 
     return (
         <AuthGuard requiredRole="ADMIN">

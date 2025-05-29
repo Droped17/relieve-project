@@ -45,11 +45,11 @@ const LoginForm = () => {
                 })
             }
             else {
-                console.log(validatedFormData.error.format());
+                console.error(validatedFormData.error.format());
                 setError(validatedFormData.error.flatten().fieldErrors)
             }
         } catch (error) {
-            console.log('error', error)
+            console.error('error', error)
         }
     }
 

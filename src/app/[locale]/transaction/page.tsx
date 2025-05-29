@@ -57,8 +57,7 @@ const TransactionPage = () => {
     const [imageUrl, setImageUrl] = useState<string | null>(null);
 
     const [findTransactionBy, { data, loading }] = useLazyQuery(FIND_TRANSACTION_BY, {
-        onCompleted: (data) => {
-            console.log(data);
+        onCompleted: () => {
         },
         onError: (error) => {
             console.error(error)
@@ -96,7 +95,6 @@ const TransactionPage = () => {
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault()
         try {
-            console.log(formData);
             findTransactionBy({
                 variables: {
                     id: formData.bookingNumber

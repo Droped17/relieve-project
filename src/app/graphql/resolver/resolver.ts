@@ -55,14 +55,7 @@ export const resolvers = {
       ])
 
       const occupiedRoomId = new Set(bookingOnDate.map(b => b.room.toString()))
-
-
       const checkInRoomCount = bookingOnDate.filter(b => dayjs(b.checkIn).isSame(targetDate, 'day')).length;
-
-      console.log(occupiedRoomId);
-      console.log(date);
-      console.log(checkInRoomCount);
-      console.log(totalRoom);
 
       return {
         date,
@@ -99,8 +92,6 @@ export const resolvers = {
 
       const allRooms = await Room.find(filter);
 
-      // console.log(allRooms);
-
       const { date, nights, numberOfPeople } = args;
 
       if (date && nights && numberOfPeople) {
@@ -118,11 +109,7 @@ export const resolvers = {
           ],
         }).select('room');
 
-        // console.log(bookings);
-
         const bookedRoomSet = new Set(bookings.map((b) => b.room.toString()));
-
-        // console.log(bookedRoomSet);
 
         return allRooms.map((room) => {
           let status: 'FULL' | 'EMPTY' | 'UNVAILABLE';
@@ -309,7 +296,6 @@ export const resolvers = {
       const newRoom = await Transaction.create({
         ...args,
       })
-      console.log(newRoom);
       return newRoom
     },
     /* USER, ADMIN */
@@ -358,7 +344,6 @@ export const resolvers = {
         })
 
         if (newTransaction) {
-          console.log(newTransaction);
           // FOR DEV
           await sendContactEmail({
             to: guest.email,
@@ -412,7 +397,6 @@ export const resolvers = {
       }
     },
     confirmTransaction: async (_: any, { id }: { id: string }) => {
-      console.log(id);
       const result = await Transaction.updateOne({
         _id: id
       },
@@ -422,13 +406,10 @@ export const resolvers = {
           }
         }
       )
-      console.log(result);
       return result.modifiedCount > 0;
     },
     /* USER, ADMIN */
     uploadImage: async (_: any, { imageUrl, transactionId }: { imageUrl: string; transactionId: string }) => {
-      console.log("Image uploaded to:", imageUrl);
-
       const result = await Transaction.updateOne(
         { _id: transactionId },             // filter
         {
@@ -437,8 +418,6 @@ export const resolvers = {
           }
         }
       );
-
-      console.log("Update result:", result);
       return result.modifiedCount > 0;
     },
   }

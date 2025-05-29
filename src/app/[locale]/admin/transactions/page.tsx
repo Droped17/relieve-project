@@ -46,8 +46,7 @@ const TransactionPage = () => {
     })
 
     const [confirmTransaction, { client: confirmTransactionClient, loading: confirmTransactionLoading }] = useMutation(CONFIRM_TRANSACTION, {
-        onCompleted: (data) => {
-            console.log(data);
+        onCompleted: () => {
             confirmTransactionClient.cache.evict({
                 id: 'ROOT_QUERY',
                 fieldName: 'findTransactionByStatus',
@@ -61,12 +60,8 @@ const TransactionPage = () => {
     if (loading) return <p>Loading..</p>
     if (confirmTransactionLoading) return <Loading />
 
-    console.log(data);
-
-    const handleConfirm = async (id: string) => {
+    const handleConfirm = async () => {
         try {
-            console.log(id);
-            console.log('Submit Button');
             await confirmTransaction({
                 variables: {
                     id: data?.findTransactionByStatus?.data[0]._id
@@ -123,7 +118,7 @@ const TransactionPage = () => {
 
                         <div className="flex justify-end gap-2">
                             <Button type="submit" title="Delete" className="p-4 bg-red-400 hover:bg-red-500" />
-                            {transaction.image && <Button type="submit" title="Confirm" className="p-4 bg-primary hover:bg-secondary" onClick={() => handleConfirm(transaction._id)} />}
+                            {transaction.image && <Button type="submit" title="Confirm" className="p-4 bg-primary hover:bg-secondary" onClick={handleConfirm} />}
                         </div>
 
                     </div>

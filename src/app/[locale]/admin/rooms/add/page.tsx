@@ -57,8 +57,7 @@ const AddRoom = () => {
     const params = useParams()
 
     const [createRoom] = useMutation(CREATE_ROOM, {
-        onCompleted: (data) => {
-            console.log(data);
+        onCompleted: () => {
             router.replace(`/${params.locale}/admin`)
         },
         onError: (error) => {
@@ -125,8 +124,6 @@ const AddRoom = () => {
             console.error(error)
         }
     }
-
-    console.log(formData);
 
     return (
         <div className="flex flex-col gap-4 max-w-[1280px] px-8">
