@@ -3,8 +3,6 @@
 import { ApolloServer } from '@apollo/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { startServerAndCreateNextHandler } from '@as-integrations/next';
-import { Ratelimit } from "@upstash/ratelimit";
-import { kv } from "@vercel/kv"
 import { typeDefs } from '@/src/app/graphql/queries/user';
 import { resolvers } from '@/src/app/graphql/resolver/resolver';
 import dbConnect from '@/src/lib/mongoose';
@@ -35,10 +33,6 @@ function setCorsHeaders(response: NextResponse, request: NextRequest) {
   ];
   const requestOrigin = request.headers.get('origin');
 
-  console.log('Request Origin:', requestOrigin);
-  console.log('Allowed Origins:', allowedOrigins);
-  console.log('Is Origin Allowed:', requestOrigin && allowedOrigins.includes(requestOrigin));
-
   if (requestOrigin && allowedOrigins.includes(requestOrigin)) {
     response.headers.set('Access-Control-Allow-Origin', requestOrigin);
     console.log('Access-Control-Allow-Origin set to:', requestOrigin);
@@ -52,33 +46,10 @@ function setCorsHeaders(response: NextResponse, request: NextRequest) {
   return response;
 }
 
-/* API LEVEL */
-const ratelimit = new Ratelimit({
-  redis: kv,
-  limiter: Ratelimit.slidingWindow(10, "10s"),
-  analytics: true
-})
-
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   // Connect to the database
   const result = await dbConnect();
   console.log(`CONNECT DB`, result);
-
-  // Get IP
-  const ip = req.headers.get("x-forwarded-for") || "127.0.0.1"
-
-  const { success, limit, reset, remaining } = await ratelimit.limit(`api_rate_limit_${ip}`)
-  if (!success) {
-    const ratelimitResponse = new Response("Too many request", {
-      status: 429,
-      headers: {
-        "X-RateLimit-Limit": limit.toString(),
-        "X-RateLimit-Remaining": remaining.toString(),
-        "X-RateLimit-Reset": reset.toString(),
-      }
-    })
-    return setCorsHeaders(ratelimitResponse as NextResponse<unknown>, req)
-  }
 
   // Call the Apollo handler once to process the request and get the response
   const response = await apolloHandler(req) as NextResponse<unknown>
@@ -92,22 +63,6 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   // Connect to the database
   const result = await dbConnect();
   console.log(`CONNECT DB`, result);
-
-  // Get IP
-  const ip = req.headers.get("x-forwarded-for") || "127.0.0.1"
-
-  const { success, limit, reset, remaining } = await ratelimit.limit(`api_rate_limit_${ip}`)
-  if (!success) {
-    const ratelimitResponse = new Response("Too many request", {
-      status: 429,
-      headers: {
-        "X-RateLimit-Limit": limit.toString(),
-        "X-RateLimit-Remaining": remaining.toString(),
-        "X-RateLimit-Reset": reset.toString(),
-      }
-    })
-    return setCorsHeaders(ratelimitResponse as NextResponse<unknown>, req)
-  }
 
   // Call the Apollo handler once to process the request and get the response
   const response = await apolloHandler(req) as NextResponse<unknown>
