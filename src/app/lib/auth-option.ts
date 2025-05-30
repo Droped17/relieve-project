@@ -17,22 +17,58 @@ export const authOptions: AuthOptions = {
                 password: { label: 'Password', type: 'password', placeholder: 'password' },
                 name: { label: 'Name', type: "text" }
             },
+            // async authorize(credentials) {
+            //     const db = (await clientPromise).db()
+            //     if (!credentials) return null
+            //     try {
+
+            //     } catch (error) {
+
+            //     }
+            //     const foundUser = await db.collection("users").findOne({ email: credentials.email })
+            //     if (foundUser && await bcrypt.compare(credentials.password, foundUser.password)) {
+            //         return {
+            //             id: foundUser._id.toString(),
+            //             firstName: foundUser.firstName,
+            //             lastName: foundUser.lastName,
+            //             email: foundUser.email,
+            //             role: foundUser.role,
+            //             phone: foundUser.phone
+            //         }
+            //     }
+            //     else {
+            //         throw new Error('Invalid Email or Password')
+            //     }
+            // },
             async authorize(credentials) {
-                const db = (await clientPromise).db()
-                if (!credentials) return null
-                const foundUser = await db.collection("users").findOne({ email: credentials.email })
-                if (foundUser && await bcrypt.compare(credentials.password, foundUser.password)) {
-                    return {
-                        id: foundUser._id.toString(),
-                        firstName: foundUser.firstName,
-                        lastName: foundUser.lastName,
-                        email: foundUser.email,
-                        role: foundUser.role,
-                        phone: foundUser.phone
-                    }
+                if (!credentials || !credentials.email || !credentials.password) {
+                    console.warn('NextAuth: Missing email or password in credentials.');
+                    throw new Error('Please enter both email and password.');
                 }
-                else {
-                    throw new Error('Invalid Email or Password')
+
+                try {
+                    const client = await clientPromise;
+                    const db = client.db(process.env.DATABASE_NAME);
+                    const usersCollection = db.collection("users");
+   
+                    const foundUser = await usersCollection.findOne({ email: credentials.email });
+               
+                    if (foundUser && foundUser.password && await bcrypt.compare(credentials.password, foundUser.password)) {
+                        return {
+                            id: foundUser._id.toString(),
+                            firstName: foundUser.firstName,
+                            lastName: foundUser.lastName,
+                            email: foundUser.email,
+                            role: foundUser.role,
+                            phone: foundUser.phone,
+                        };
+                    } else {
+                        console.warn('NextAuth: Invalid Email or Password (or password mismatch).');
+                        throw new Error('Invalid Email or Password');
+                    }
+                } catch (error) {
+                    console.error('NextAuth: Error during authorization:', error);
+                    throw new Error('An error occurred during login. Please try again.');
                 }
             },
         }),
