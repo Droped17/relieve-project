@@ -1,11 +1,7 @@
 import { MongoDBAdapter } from '@next-auth/mongodb-adapter';
 import CredentialProvider from 'next-auth/providers/credentials'
-// import dbConnect from '@/src/lib/mongoose'
-// import client from '@/src/app/lib/db'
 import * as bcrypt from 'bcrypt'
 import { AuthOptions, SessionStrategy } from 'next-auth'
-// import client from '@/src/app/lib/db';
-// import dbConnect from '@/src/lib/mongoose';
 import clientPromise from '@/src/app/lib/db';
 
 export const authOptions: AuthOptions = {
@@ -17,35 +13,11 @@ export const authOptions: AuthOptions = {
                 password: { label: 'Password', type: 'password', placeholder: 'password' },
                 name: { label: 'Name', type: "text" }
             },
-            // async authorize(credentials) {
-            //     const db = (await clientPromise).db()
-            //     if (!credentials) return null
-            //     try {
-
-            //     } catch (error) {
-
-            //     }
-            //     const foundUser = await db.collection("users").findOne({ email: credentials.email })
-            //     if (foundUser && await bcrypt.compare(credentials.password, foundUser.password)) {
-            //         return {
-            //             id: foundUser._id.toString(),
-            //             firstName: foundUser.firstName,
-            //             lastName: foundUser.lastName,
-            //             email: foundUser.email,
-            //             role: foundUser.role,
-            //             phone: foundUser.phone
-            //         }
-            //     }
-            //     else {
-            //         throw new Error('Invalid Email or Password')
-            //     }
-            // },
             async authorize(credentials) {
                 if (!credentials || !credentials.email || !credentials.password) {
                     console.warn('NextAuth: Missing email or password in credentials.');
                     throw new Error('Please enter both email and password.');
                 }
-
                 try {
                     const client = await clientPromise;
                     const db = client.db(process.env.DATABASE_NAME);

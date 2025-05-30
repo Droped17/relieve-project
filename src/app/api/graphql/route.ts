@@ -1,77 +1,20 @@
-// /* eslint-disable @typescript-eslint/no-unused-vars */
-
-// import { ApolloServer } from '@apollo/server';
-// import { startServerAndCreateNextHandler } from '@as-integrations/next';
-// import { typeDefs } from '@/src/app/graphql/queries/user';
-// import { resolvers } from '../../graphql/resolver/resolver';
-// import { NextRequest } from 'next/server';
-// import dbConnect from '@/src/lib/mongoose';
-
-// const server = new ApolloServer({
-//   typeDefs,
-//   resolvers,
-// });
-
-// // interface RouteHandlerContext {
-// //   params: {}; // Or { [key: string]: string | string[] }; if you might have dynamic params
-// // }
-
-// // const handler = startServerAndCreateNextHandler<NextRequest, RouteHandlerContext>(server, {
-// //   context: async (req, res) => {
-// //     // You can add your context logic here, e.g., authentication
-// //     // For now, we just ensure `params` is present.
-// //     return {
-// //       req,
-// //       res,
-// //       params: {}, // Provide an empty params object
-// //       // ... any other context properties you need
-// //     };
-// //   },
-// // });
-
-// export async function POST(req: NextRequest, {params}: {params: Promise<{id: string}>}) {
-//   await dbConnect()
-//   const handler = startServerAndCreateNextHandler(server, {
-//     context: async (req, res) => {
-//       // You can add context here, like authenticated user, etc.
-//       return { req, res };
-//     },
-//   });
-//   return handler(req);
-// }
-
-// // For GET requests (e.g., Apollo Playground)
-// export async function GET(req: NextRequest, {params}: {params: Promise<{id: string}>}) {
-//   await dbConnect()
-//   const handler = startServerAndCreateNextHandler(server, {
-//     context: async (req, res) => {
-//       return { req, res };
-//     },
-//   });
-//   return handler(req);
-// }
-
-
-
-// // export { handler as GET, handler as POST };
-
-
-/* ========================================================== */
-
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 import { ApolloServer } from '@apollo/server';
-import { startServerAndCreateNextHandler } from '@as-integrations/next';
-import { typeDefs } from '@/src/app/graphql/queries/user'; // Adjust path as needed
-import { resolvers } from '../../graphql/resolver/resolver'; // Adjust path as needed
 import { NextRequest, NextResponse } from 'next/server';
-import dbConnect from '@/src/lib/mongoose'; // Adjust path as needed
+import { startServerAndCreateNextHandler } from '@as-integrations/next';
+import { Ratelimit } from "@upstash/ratelimit";
+import { kv } from "@vercel/kv"
+import { typeDefs } from '@/src/app/graphql/queries/user';
+import { resolvers } from '@/src/app/graphql/resolver/resolver';
+import dbConnect from '@/src/lib/mongoose';
 
 // Initialize Apollo Server with your schema and resolvers
 const server = new ApolloServer({
   typeDefs,
   resolvers,
 });
+
 
 // Create a single handler for the Apollo Server integration with Next.js
 // This handler will be reused for GET and POST requests.
@@ -87,18 +30,18 @@ const apolloHandler = startServerAndCreateNextHandler(server, {
 function setCorsHeaders(response: NextResponse, request: NextRequest) {
   const allowedOrigins = [
     'https://relieve-project.vercel.app',
-    'https://relieve-project.vercel.app/', // Add with trailing slash
+    'https://relieve-project.vercel.app/',
     'http://localhost:3000', // For local testing
   ];
   const requestOrigin = request.headers.get('origin');
 
-   console.log('Request Origin:', requestOrigin);
-   console.log('Allowed Origins:', allowedOrigins);
-   console.log('Is Origin Allowed:', requestOrigin && allowedOrigins.includes(requestOrigin));
+  console.log('Request Origin:', requestOrigin);
+  console.log('Allowed Origins:', allowedOrigins);
+  console.log('Is Origin Allowed:', requestOrigin && allowedOrigins.includes(requestOrigin));
 
   if (requestOrigin && allowedOrigins.includes(requestOrigin)) {
     response.headers.set('Access-Control-Allow-Origin', requestOrigin);
-     console.log('Access-Control-Allow-Origin set to:', requestOrigin);
+    console.log('Access-Control-Allow-Origin set to:', requestOrigin);
   } else {
     console.warn('Origin NOT allowed or missing:', requestOrigin);
   }
@@ -109,10 +52,33 @@ function setCorsHeaders(response: NextResponse, request: NextRequest) {
   return response;
 }
 
+/* API LEVEL */
+const ratelimit = new Ratelimit({
+  redis: kv,
+  limiter: Ratelimit.slidingWindow(10, "10s"),
+  analytics: true
+})
+
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   // Connect to the database
   const result = await dbConnect();
-  console.log(`CONNECT DB`,result);
+  console.log(`CONNECT DB`, result);
+
+  // Get IP
+  const ip = req.headers.get("x-forwarded-for") || "127.0.0.1"
+
+  const { success, limit, reset, remaining } = await ratelimit.limit(`api_rate_limit_${ip}`)
+  if (!success) {
+    const ratelimitResponse = new Response("Too many request", {
+      status: 429,
+      headers: {
+        "X-RateLimit-Limit": limit.toString(),
+        "X-RateLimit-Remaining": remaining.toString(),
+        "X-RateLimit-Reset": reset.toString(),
+      }
+    })
+    return setCorsHeaders(ratelimitResponse as NextResponse<unknown>, req)
+  }
 
   // Call the Apollo handler once to process the request and get the response
   const response = await apolloHandler(req) as NextResponse<unknown>
@@ -125,7 +91,23 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   // Connect to the database
   const result = await dbConnect();
-  console.log(`CONNECT DB`,result);
+  console.log(`CONNECT DB`, result);
+
+  // Get IP
+  const ip = req.headers.get("x-forwarded-for") || "127.0.0.1"
+
+  const { success, limit, reset, remaining } = await ratelimit.limit(`api_rate_limit_${ip}`)
+  if (!success) {
+    const ratelimitResponse = new Response("Too many request", {
+      status: 429,
+      headers: {
+        "X-RateLimit-Limit": limit.toString(),
+        "X-RateLimit-Remaining": remaining.toString(),
+        "X-RateLimit-Reset": reset.toString(),
+      }
+    })
+    return setCorsHeaders(ratelimitResponse as NextResponse<unknown>, req)
+  }
 
   // Call the Apollo handler once to process the request and get the response
   const response = await apolloHandler(req) as NextResponse<unknown>
@@ -141,7 +123,7 @@ export async function OPTIONS(request: NextRequest) {
 
   // Set CORS headers for the preflight response
   // setCorsHeaders(response, request);
-  response = setCorsHeaders(response,request);
+  response = setCorsHeaders(response, request);
 
   // Cache preflight response for 24 hours (86400 seconds)
   response.headers.set('Access-Control-Max-Age', '86400');
