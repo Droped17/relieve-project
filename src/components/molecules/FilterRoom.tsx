@@ -19,7 +19,7 @@ const FilterRoom = () => {
   };
 
   return (
-    <div className="flex gap-4 small-mobile:flex-col tablet:flex-row justify-center items-center   p-4 rounded-2xl">
+    <div className="flex gap-4 small-mobile:flex-col tablet:flex-row justify-center items-center p-4 rounded-2xl">
       <label className="text-tertiary">{'วันที่'}</label>
       <DatePicker />
 

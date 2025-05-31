@@ -93,7 +93,6 @@ enum EBookingStatus {
 
 type Room {
   _id: ID!
-  publicId: String
   number: String!
   detail: [String!]!
   price: Float!

@@ -43,17 +43,12 @@ export const DatePicker = () => {
         <>
             <div className='relative z-10' ref={dropdownRef}>
                 <div onClick={() => setOpenDate(!openDate)} className="cursor-pointer rounded-md border border-gray-100 shadow-md py-2 px-5 hover:bg-gray-100 transition duration-300">{format(formData.date, 'dd-MM-yyyy') || 'Select Date'}</div>
-                {openDate && <div className='absolute mt-2 bg-white p-4 rounded-3xl shadow-xl border border-gray-200'>
+                {openDate && <div className='small-mobile:flex small-mobile:p-2 tablet:absolute mt-2 bg-white p-4 rounded-3xl shadow-xl border border-gray-200'>
                     <DayPicker
                         mode="single"
                         selected={selected}
                         onSelect={handleDateSelect}
                     />
-                    {selected && (
-                        <p className="mt-2">
-                            Selected date: <strong>{format(selected, 'dd-MM-yyyy')}</strong>
-                        </p>
-                    )}
                 </div>}
             </div>
         </>
