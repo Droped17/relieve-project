@@ -1,6 +1,4 @@
 {
-    "create": "create",
-    "read": "read",
-    "update": "update",
-    "delete": "delete"
+    "title": "Relieve",
+    "description": "Homepage"
 }

@@ -1,6 +1,4 @@
 {
-    "create": "สร้าง",
-    "read": "อ่าน",
-    "update": "แก้ไข",
-    "delete": "ลบ"
+    "title": "เลอร์ลีฟ",
+    "description": "หน้าหลัก"
 }
