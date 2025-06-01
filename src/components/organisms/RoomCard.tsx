@@ -2,15 +2,16 @@
 
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { RootState } from "@/src/store/store";
-// import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
+// import { useTranslations } from "next-intl";
 import dayjs from "dayjs";
+import { gql, ServerError, useQuery } from "@apollo/client";
+import { RootState } from "@/src/store/store";
 import { Room } from "@/src/types/room";
-import { gql, useQuery } from "@apollo/client";
 import SkeletonBox from "../atoms/SkeletonBox";
 import SkeletonText from "../atoms/SkeletonText";
 import RoomButton from "../molecules/RoomButton";
+import Dialog from "../molecules/Dialog";
 import HomePageRoomStatus from "@/src/app/[locale]/homepage/_components/HomePageRoomStatus";
 import "react-day-picker/style.css";
 
@@ -30,6 +31,7 @@ currentDate.format('YYYY-MM-DD')
 
 const RoomCard = () => {
     const [floor, setFloor] = useState(1);
+    const [dialog, setDialog] = useState<boolean>(true)
     const formData = useSelector((state: RootState) => state.booking);
 
     const router = useRouter()
@@ -65,14 +67,26 @@ const RoomCard = () => {
         setFloor(newFloor);
     };
 
-    if (loading) return <SkeletonBox height="168px" className="p-2 flex flex-col gap-4">
+    if (loading) return <SkeletonBox height="400px" className="p-2 flex flex-col gap-4">
         <SkeletonText className="bg-gray-200" />
         <SkeletonText className="bg-gray-200" />
         <SkeletonText className="bg-gray-200" />
         <SkeletonText className="bg-gray-200" />
     </SkeletonBox>;
-    if (error) return <p>Error: {error.message}</p>;
 
+    if (error) {
+        const networkError = error.networkError as ServerError;
+        const statusCode = networkError?.statusCode;
+
+        if (statusCode === 429) {
+            return <>
+                {dialog && <Dialog className="w-full" onClose={() => setDialog(false)}>
+                    Too Many Requests. Please slow down.
+                </Dialog>}
+            </>
+        }
+        return <p>{error.message}</p>;
+    }
 
     return (
         <>
@@ -114,6 +128,7 @@ const RoomCard = () => {
                 <p className="font-semibold text-lg">{currentDate.format('DD-MM-YYYY')}</p>
                 <div className="flex gap-2">
                     <button
+                        type="button"
                         onClick={() => handleFloorChange(1)}
                         className={`${floor === 1 ? 'bg-tertiary text-white' : ''
                             } p-2 border border-transparent hover:border-gray-400 cursor-pointer transition-all rounded-md`}
@@ -121,6 +136,7 @@ const RoomCard = () => {
                         Floor 1
                     </button>
                     <button
+                        type="button"
                         onClick={() => handleFloorChange(2)}
                         className={`${floor === 2 ? 'bg-tertiary text-white' : ''
                             } p-2 border border-transparent hover:border-gray-400 cursor-pointer transition-all duration-300 rounded-md`}
