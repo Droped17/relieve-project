@@ -9,6 +9,7 @@ import Button from "@/src/components/atoms/Button";
 import Input from "@/src/components/atoms/Input";
 import HeaderText from "@/src/components/atoms/HeaderText";
 import { CREATE_USER } from "@/src/app/graphql/mutations/user.mutation";
+import Loading from "@/src/app/[locale]/loading";
 
 
 interface IFormData {
@@ -33,7 +34,7 @@ const RegisterForm = () => {
     const param = useParams()
     const schema = RegisterSchema()
 
-    const [createUser] = useMutation(CREATE_USER, {
+    const [createUser, {loading}] = useMutation(CREATE_USER, {
         onCompleted: (data) => {
             // Auto Login with NextAuth
             if (data) {
@@ -82,6 +83,8 @@ const RegisterForm = () => {
             console.error(error)
         }
     }
+
+    if (loading) return <Loading/>
 
     return (
         /* [TODO: Refactor this input */

@@ -54,7 +54,6 @@ const LoginForm = () => {
     }
 
     return (
-        /* [TODO]: Responsive */
         /* [TODO]: localization */
         <form
             onSubmit={handleSubmit}
