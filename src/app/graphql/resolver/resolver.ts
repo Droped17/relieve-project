@@ -6,7 +6,7 @@ import { Types } from 'mongoose';
 import { Booking } from '@/src/models/Booking';
 import { Room } from '@/src/models/Room';
 import { ITransaction, Transaction } from '@/src/models/Transaction';
-import { IUser, User } from '@/src/models/User';
+import { User } from '@/src/models/User';
 import { sendEmail } from '../../lib/mailer';
 import fs from 'fs';
 import path from 'path';
@@ -242,13 +242,10 @@ export const resolvers = {
   },
   Mutation: {
     /* USER, ADMIN */
-    createUser: async (_: never, args: IUser) => {
-      // if (!context.isAdmin) {
-      //   throw new Error('Not Authorization');
-      // }
+    createUser: async (_: never, {input}: any) => {
       const newUser = await User.create({
-        ...args,
-        password: await bcrypt.hash(args.password, 10)
+        ...input,
+        password: await bcrypt.hash(input.password, 10)
       })
       return newUser
     },

@@ -201,7 +201,7 @@ type Query {
     createUser(input: CreateUserInput!): User!
     createRoom(input: CreateRoomInput!): Room!
     createBooking(input: CreateBookingInput!): Booking!
-    createTransaction(totalPrice: Int!): TransactionResponse!
+    createTransaction(totalPrice: Int!): Transaction!
     sendContactEmail(input: sendContactEmailInput!): EmailResponse!
     uploadImage(imageUrl: String!, transactionId: ID!): Boolean!
     confirmTransaction(id: ID): Boolean!

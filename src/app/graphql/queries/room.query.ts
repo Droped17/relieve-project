@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
 export const FIND_ROOMS_BY_ID = gql`
-  query FindRoomBy($id: ID) {
-    findRoomBy(id: $id) {
+  query FindRoomBy($input: FindRoomByInput!) {
+    findRoomBy(input: $input) {
       number
       detail
       price
