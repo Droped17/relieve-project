@@ -377,7 +377,7 @@ export const resolvers = {
       },
         {
           $set: {
-            status: "SUCCESS"
+            status: "PAID"
           }
         }
       )

@@ -20,13 +20,15 @@ const RoomPage = () => {
 
     const params = useParams()
     const { data, loading, error } = useQuery(FIND_ROOMS_BY_ID, {
-        variables: { id: params.id }
+        variables: { 
+            input: {
+                id: params.id
+            }
+         }
     })
 
     if (loading) return <Loading />
-    if (error) return <p>Error..</p>;
-
-    console.log(data);
+    if (error) return <p>{error.message}</p>;
 
     return (
         <div className="small-mobile:p-3 tablet:p-8 flex flex-col small-mobile:gap-4 tablet:gap-8 max-w-[1024px] mx-auto">

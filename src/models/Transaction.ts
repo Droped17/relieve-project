@@ -3,7 +3,7 @@ import mongoose, { Schema, Document, Types } from 'mongoose';
 enum ETransactionStatus {
     PENDING = "PENDING",
     PAID = "PAID",
-    NOT_PAID = "NOT_PAID"
+    NOT_PAID = "NOT_PAID",
 }
 
 export interface ITransaction extends Document {
