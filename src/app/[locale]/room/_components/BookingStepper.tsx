@@ -12,33 +12,10 @@ import { EmblaOptionsType } from "embla-carousel"
 import { useParams } from "next/navigation"
 import { useSelector } from "react-redux"
 import { RootState } from "@/src/store/store"
-import { gql, useMutation, useQuery } from "@apollo/client"
+import { useMutation, useQuery } from "@apollo/client"
 import Loading from "../../loading"
-
-const FIND_ROOMS_BY_ID = gql`
-  query FindRoomBy($id: ID) {
-    findRoomBy(id: $id) {
-      number
-      price
-      image
-      personPerRoom
-    }
-  }
-`;
-
-const CREATE_BOOKING = gql`
-mutation CreateBooking($input: CreateBookingInput!){
-    createBooking(input: $input) {
-        _id
-        checkIn
-        checkOut
-        request
-        room {
-            _id
-        }
-    }
-}
-`
+import { FIND_ROOMS_BY_ID } from "@/src/app/graphql/queries/room.query"
+import { CREATE_BOOKING } from "@/src/app/graphql/mutations/booking.mutation"
 
 interface IFormData {
     firstName: string

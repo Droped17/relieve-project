@@ -1,31 +1,9 @@
 "use client"
 
+import { useQuery } from "@apollo/client"
 import AuthGuard from "@/src/components/AuthGuard"
 import { MyChart } from "@/src/components/organisms/Chart"
-import { gql, useQuery } from "@apollo/client"
-
-const PENDING_TRANSACTION = gql`
-    query Transaction($status: String!) {
-        findTransactionByStatus(status: $status) {
-    message
-    status
-    data {
-        _id
-        image
-        status
-        totalPrice
-        booking {
-          checkIn
-          checkOut
-          room {
-            floor
-            number
-          }
-        }
-    }
-        }       
-    }
-`
+import { PENDING_TRANSACTION } from "@/src/app/graphql/queries/transaction.query"
 
 const AdminPage = () => {
 

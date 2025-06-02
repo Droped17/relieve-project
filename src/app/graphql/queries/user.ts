@@ -1,40 +1,35 @@
 import { gql } from 'graphql-tag';
 
 export const typeDefs = gql`
-  directive @auth(requires: Role = USER) on FIELD_DEFINITION
+directive @auth(requires: Role = ADMIN) on FIELD_DEFINITION
 
-  enum Role {
-    USER
-    ADMIN
-  }
+enum Role {
+  USER
+  ADMIN
+}
 
-  enum ERoomStatus {
-    EMPTY
-    FULL
-    NULL_VALUE
-  }
+enum ERoomStatus {
+  EMPTY
+  FULL    
+  NULL_VALUE
+}
 
-  enum EStatus {
-    SUCCESS
-    ERROR
-  }
+enum EStatus {
+  SUCCESS
+  ERROR
+}
   
-  enum ETransactionStatus {
-    PENDING
-    PAID
-    NOT_PAID 
+enum ETransactionStatus {
+  PENDING
+  PAID
+  NOT_PAID 
 }
 
-type TransactionResponse {
-  status: EStatus!
-  message: String!
-  data: Transaction
-}
-
-type TransactionsResponse {
-  status: EStatus!
-  message: String!
-  data: [Transaction!]
+enum EBookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
 }
 
 type Guest {
@@ -50,7 +45,6 @@ input GuestInput {
   email: String
   phone: String
 }
-
 
 input CreateBookingInput {
   roomId: ID!
@@ -70,26 +64,68 @@ input CreateRoomInput {
   image: [String!]!
 }
 
+input CreateUserInput {
+  firstName: String!
+  lastName: String!
+  email: String! 
+  password: String!
+  phone: String!
+}
+
+input FindRoomInput {
+  id: ID
+  floor: Int
+  status: ERoomStatus
+  date: String
+  nights: Int
+  numberOfPeople: Int
+}
+
+input sendContactEmailInput {
+  to: String!, 
+  subject: String!
+  message: String
+  username: String
+  actionUrl: String
+}
+
+
+type CreateUserResponse {
+  status: EStatus!
+  message: String!
+  data: [User!]
+}
+
 type CreateBookingResponse {
   bookingId: ID!
 }
 
-enum EBookingStatus {
-  PENDING
-  CONFIRMED
-  CANCELLED
-  COMPLETED
+type TransactionResponse {
+  status: EStatus!
+  message: String!
+  data: Transaction
 }
 
-  type User {
-    id: ID!
-    firstName: String!
-    lastName: String!
-    email: String!
-    password: String!
-    phone: String!  
-    role: String!
-  }
+type TransactionsResponse {
+  status: EStatus!
+  message: String!
+  data: [Transaction!]
+}
+
+type EmailResponse {
+  success: Boolean!
+  message: String!
+} 
+
+type User {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  email: String!
+  password: String!
+  phone: String!  
+  role: String!
+}
 
 type Room {
   _id: ID!
@@ -142,67 +178,33 @@ type RoomStats {
 }
 
 type Query {
-  myProfile: User
-  publicData: String
-  userData: String @auth
+  myProfile: User @auth(requires: ADMIN)
+  findTransactionByStatus(status: String!): TransactionsResponse! @auth(requires: ADMIN)
+  userData: String @auth(requires: ADMIN)
   adminData: String @auth(requires: ADMIN)
-  protectedData: String
-  me: [User!]!
-  users: [User!]!
+  roomStatByDate(date: String!): RoomStats! @auth(requires: ADMIN)
+  publicData: String
   transaction: [Transaction!]!
   rooms(
     date: String
     nights: Int
     numberOfPeople: Int
   ): [Room!]!
-  findRoomBy(
-    id: ID
-    floor: Int
-    status: ERoomStatus
-    date: String
-    nights: Int
-    numberOfPeople: Int
-  ): [Room!]!
+  findRoomBy(input: FindRoomInput!): [Room!]!
   findTransactionBy(id: ID): TransactionResponse!
-  findTransactionByStatus(status: String!): TransactionsResponse!
   booking: [Booking!]!
   allRooms(date: String!, nights: Int!, personPerRoom: Int!, floor: Int): [Room!]!
   availableRoom(date: String!, nights: Int!, personPerRoom: Int!, floor: Int): Int!
-  roomStatByDate(date: String!): RoomStats!
 }
 
-
   type Mutation {
-    createUser(firstName: String!, lastName: String!, email: String!, password: String!, phone: String!): User!
-  }
-
-  extend type Mutation {
+    createUser(input: CreateUserInput!): User!
     createRoom(input: CreateRoomInput!): Room!
-  }
-
-  type Mutation {
-    createTransaction(totalPrice: Int!): Transaction!
-  }
-
-  type EmailResponse {
-    success: Boolean!
-    message: String!
-  }
-
-  type Mutation {
-    sendContactEmail(to: String!, subject: String!, message: String!): EmailResponse!
-  }
-
-  type Mutation {
-   uploadImage(imageUrl: String!, transactionId: ID!): Boolean!
-  }
-
-extend type Mutation {
-  createBooking(input: CreateBookingInput!): Booking!
-}
-
-  type Mutation {
+    createBooking(input: CreateBookingInput!): Booking!
+    createTransaction(totalPrice: Int!): TransactionResponse!
+    sendContactEmail(input: sendContactEmailInput!): EmailResponse!
+    uploadImage(imageUrl: String!, transactionId: ID!): Boolean!
     confirmTransaction(id: ID): Boolean!
   }
-
+ 
 `;

@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import { useParams, useRouter } from "next/navigation";
 // import { useTranslations } from "next-intl";
 import dayjs from "dayjs";
-import { gql, ServerError, useQuery } from "@apollo/client";
+import { ServerError, useQuery } from "@apollo/client";
 import { RootState } from "@/src/store/store";
 import { Room } from "@/src/types/room";
 import SkeletonBox from "../atoms/SkeletonBox";
@@ -14,18 +14,8 @@ import RoomButton from "../molecules/RoomButton";
 import Dialog from "../molecules/Dialog";
 import HomePageRoomStatus from "@/src/app/[locale]/homepage/_components/HomePageRoomStatus";
 import "react-day-picker/style.css";
+import { GET_ALL_ROOMS } from "@/src/app/graphql/queries/room.query";
 
-const GET_ALL_ROOMS = gql`
-  query AllRooms($date: String!, $nights: Int!, $personPerRoom: Int!, $floor: Int) {
-    allRooms(date: $date, nights: $nights, personPerRoom: $personPerRoom, floor: $floor) {
-      _id
-      floor
-      number
-      status
-      isBooked
-    }
-  }
-`
 const currentDate = dayjs();
 currentDate.format('YYYY-MM-DD')
 

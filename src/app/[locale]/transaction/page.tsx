@@ -3,52 +3,24 @@
 
 import { FormEvent, useState } from "react"
 import { CldUploadWidget } from "next-cloudinary"
+import { useParams } from "next/navigation"
 import Image from "next/image"
+import dayjs from 'dayjs'
 import clsx from "clsx"
+import { useLazyQuery, useMutation } from "@apollo/client"
+import { FIND_TRANSACTION_BY } from "@/src/app/graphql/queries/transaction.query"
 import Button from "@/src/components/atoms/Button"
 import HeaderText from "@/src/components/atoms/HeaderText"
 import Input from "@/src/components/atoms/Input"
-import { gql, useLazyQuery, useMutation } from "@apollo/client"
-import { useParams } from "next/navigation"
 import TabButton from "@/src/components/atoms/TabButton"
-import dayjs from 'dayjs'
+import { UPLOAD_IMAGE } from "@/src/app/graphql/mutations/transaction.mutation"
 
-
-// [TODO]: Refactor Transaction Page
-// [TODO]: Call Mutation
 // [TODO]: Localization
 
 interface IFormData {
     bookingNumber: string
 }
 
-const FIND_TRANSACTION_BY = gql`
-    query FindTransactionBy($id: ID) {
-        findTransactionBy(id: $id) {
-            status
-            message
-            data {
-                _id
-                status
-                totalPrice
-                booking {
-                    _id
-                    checkIn
-                    checkOut
-                    nights
-                }
-                image
-            }
-        }
-    }
-
-`
-
-const UPLOAD_IMAGE = gql`
-  mutation UploadImage($imageUrl: String!, $transactionId: ID!) {
-    uploadImage(imageUrl: $imageUrl, transactionId: $transactionId)
-  }
-`;
 
 const TransactionPage = () => {
     const [formData, setFormData] = useState<IFormData>({

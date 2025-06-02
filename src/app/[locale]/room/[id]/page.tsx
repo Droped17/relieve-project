@@ -4,25 +4,14 @@ import { useState } from "react"
 import { useParams } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
-import { gql, useQuery } from "@apollo/client"
+import { useQuery } from "@apollo/client"
 import Dialog from "@/src/components/molecules/Dialog"
 import PageTitle from "@/src/components/molecules/PageTitle"
 import Loading from "../../loading"
 import RoomDetails from "../_components/RoomDetail"
+import { FIND_ROOMS_BY_ID } from "@/src/app/graphql/queries/room.query"
 
-// [TODO]: Call Mutation
 // [TODO]: Localization
-
-const FIND_ROOMS_BY_ID = gql`
-  query FindRoomBy($id: ID) {
-    findRoomBy(id: $id) {
-      number
-      detail
-      price
-      image
-    }
-  }
-`;
 
 const RoomPage = () => {
 
@@ -36,6 +25,8 @@ const RoomPage = () => {
 
     if (loading) return <Loading />
     if (error) return <p>Error..</p>;
+
+    console.log(data);
 
     return (
         <div className="small-mobile:p-3 tablet:p-8 flex flex-col small-mobile:gap-4 tablet:gap-8 max-w-[1024px] mx-auto">

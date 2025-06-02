@@ -6,6 +6,7 @@ import { startServerAndCreateNextHandler } from '@as-integrations/next';
 import { typeDefs } from '@/src/app/graphql/queries/user';
 import { resolvers } from '@/src/app/graphql/resolver/resolver';
 import dbConnect from '@/src/lib/mongoose';
+import { createContext } from '../../graphql/context';
 
 // Initialize Apollo Server with your schema and resolvers
 const server = new ApolloServer({
@@ -17,10 +18,11 @@ const server = new ApolloServer({
 // Create a single handler for the Apollo Server integration with Next.js
 // This handler will be reused for GET and POST requests.
 const apolloHandler = startServerAndCreateNextHandler(server, {
-  context: async (req, res) => {
+  context: async (req: NextRequest, res) => {
     // You can add context here, like authenticated user, etc.
     // The 'req' and 'res' objects are NextRequest and NextResponse respectively.
-    return { req, res };
+    const authContext = await createContext({req})
+    return { req, res, ...authContext };
   },
 });
 
@@ -35,7 +37,7 @@ function setCorsHeaders(response: NextResponse, request: NextRequest) {
 
   if (requestOrigin && allowedOrigins.includes(requestOrigin)) {
     response.headers.set('Access-Control-Allow-Origin', requestOrigin);
-    console.log('Access-Control-Allow-Origin set to:', requestOrigin);
+    // console.log('Access-Control-Allow-Origin set to:', requestOrigin);
   } else {
     console.warn('Origin NOT allowed or missing:', requestOrigin);
   }
@@ -49,7 +51,7 @@ function setCorsHeaders(response: NextResponse, request: NextRequest) {
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   // Connect to the database
   const result = await dbConnect();
-  console.log(`CONNECT DB`, result);
+  // console.log(`CONNECT DB`, result);
 
   // Call the Apollo handler once to process the request and get the response
   const response = await apolloHandler(req) as NextResponse<unknown>

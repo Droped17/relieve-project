@@ -1,41 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
-import Button from "@/src/components/atoms/Button"
-import { gql, useMutation, useQuery } from "@apollo/client"
+import Image from "next/image"
 import clsx from "clsx"
 import dayjs from "dayjs"
-import Image from "next/image"
+import { useMutation, useQuery } from "@apollo/client"
+import Button from "@/src/components/atoms/Button"
+import { CONFIRM_TRANSACTION, PENDING_TRANSACTION } from "@/src/app/graphql/queries/transaction.query"
 import Loading from "../../loading"
-
-const PENDING_TRANSACTION = gql`
-    query Transaction($status: String!) {
-        findTransactionByStatus(status: $status) {
-    message
-    status
-    data {
-        _id
-        image
-        status
-        totalPrice
-        booking {
-          checkIn
-          checkOut
-          room {
-            floor
-            number
-          }
-        }
-    }
-        }       
-    }
-`
-
-const CONFIRM_TRANSACTION = gql`
-    mutation ConfirmTransaction($id: ID) {
-        confirmTransaction(id: $id)
-    }
-`
 
 const TransactionPage = () => {
 

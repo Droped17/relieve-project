@@ -27,15 +27,15 @@ if (process.env.NODE_ENV === 'development') {
   const globalWithMongo = global as typeof globalThis & { _mongoClient: MongoClient };
 
   if (!globalWithMongo._mongoClient) {
-    console.log('MongoDB: Initializing new client for development...');
+    // console.log('MongoDB: Initializing new client for development...');
     globalWithMongo._mongoClient = new MongoClient(uri, options);
   } else {
-    console.log('MongoDB: Reusing existing client for development (HMR).');
+    // console.log('MongoDB: Reusing existing client for development (HMR).');
   }
   client = globalWithMongo._mongoClient;
 } else {
   // In production, always create a new client.
-  console.log('MongoDB: Initializing new client for production...');
+  // console.log('MongoDB: Initializing new client for production...');
   client = new MongoClient(uri, options);
 }
 

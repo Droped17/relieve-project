@@ -1,13 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
-import Button from "@/src/components/atoms/Button"
-import Input from "@/src/components/atoms/Input"
-import { CldUploadWidget } from "next-cloudinary"
 import { ChangeEvent, FormEvent, useState } from "react"
 import Image from "next/image"
-import { gql, useMutation } from "@apollo/client"
+import { CldUploadWidget } from "next-cloudinary"
 import { useParams, useRouter } from "next/navigation"
+import { useMutation } from "@apollo/client"
+import Button from "@/src/components/atoms/Button"
+import Input from "@/src/components/atoms/Input"
+import { CREATE_ROOM } from "@/src/app/graphql/mutations/room.mutation"
 
 interface IFormData {
     number: string
@@ -16,7 +17,6 @@ interface IFormData {
     floor: number
     image: string[]
     personPerRoom: number
-
 }
 
 const facilities = [
@@ -28,19 +28,6 @@ const facilities = [
     "Study desk and chair",
 ]
 
-
-const CREATE_ROOM = gql`
-    mutation CreateRoom($input: CreateRoomInput!) {
-        createRoom(input: $input) {
-            _id
-            floor
-            detail
-            number
-            personPerRoom
-            price
-        }
-    }
-`
 
 const AddRoom = () => {
     const [formData, setFormData] = useState<IFormData>({

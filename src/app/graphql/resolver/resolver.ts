@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import * as bcrypt from 'bcrypt'
 import dayjs from 'dayjs';
@@ -12,35 +11,35 @@ import { sendEmail } from '../../lib/mailer';
 import fs from 'fs';
 import path from 'path';
 import { sendContactEmail } from '../../utils/sendContactEmail';
-// import { GraphQLContext } from '../context';
+import { GraphQLContext } from '../context';
 import { CommonResponse, EStatus } from '../commonResponse';
+import { ObjectId } from 'mongodb';
 
 
 /* For use DD-MM-YYYY format */
 dayjs.extend(customParseFormat);
 
-// const requireAuth = (user) => {
-//   if (!user) throw new Error("Not Authenticated");
-// };
-
 // [TODO]: Remove transaction in 1 hr if status !== PAID 
 
 export const resolvers = {
   Query: {
-    /* MARK: PRIVATE */
-    // myProfile: (_, args) => {
-    //   // if (!context.isAuthenticated) {
-    //   //   throw new Error('Authentication required');
-    //   // }
-    //   // return {
-    //   //   id: context.user?.id,
-    //   //   name: context.user?.name,
-    //   //   email: context.user?.email,
-    //   // };
-    // },
+    myProfile: (_: any, context: GraphQLContext) => {
+      if (!context.isAuthenticated && !context.isAdmin()) {
+        throw new Error('Not Authorization');
+      }
+      return {
+        id: context.user?.id,
+        name: context.user?.name,
+        email: context.user?.email,
+      };
+    },
 
     /* MARK: ROOM */
-    roomStatByDate: async (_: any, { date }: any) => {
+    // ADMIN
+    roomStatByDate: async (_: any, { date }: any, context: GraphQLContext) => {
+      if (!context.isAuthenticated && !context.isAdmin()) {
+        throw new Error('Not Authorization');
+      }
       const targetDate = dayjs(date, 'YYYY-MM-DD', true)
       if (!targetDate.isValid()) {
         throw new Error("Invalid date format.")
@@ -64,35 +63,19 @@ export const resolvers = {
       }
 
     },
-    /* MARK: BOOKING */
-    /* MARK: TRANSACTION */
-
-    /* MARK: PUBLIC */
-    // users: async (_, __, context) => {
-    //   requireAuth(context.user);
-    //   return await User.find();
-    // },
     findRoomBy: async (
-      _: unknown,
-      args: {
-        id?: string;
-        floor?: number;
-        status?: string;
-        date?: string;
-        nights?: number;
-        numberOfPeople?: number;
-        context?: any
-      }
+      _: unknown, {input}: any
     ) => {
+      const {id,floor,status,date,nights,numberOfPeople} = input
       const filter: any = {};
 
-      if (args.id) filter._id = new Types.ObjectId(args.id);
-      if (args.floor !== undefined) filter.floor = args.floor;
-      if (args.status !== undefined) filter.status = args.status;
+      if (id) filter._id = new ObjectId(id);
+      if (floor !== undefined) filter.floor = floor;
+      if (status !== undefined) filter.status = status;
+
+      console.log(filter._id);
 
       const allRooms = await Room.find(filter);
-
-      const { date, nights, numberOfPeople } = args;
 
       if (date && nights && numberOfPeople) {
         const startDate = new Date(date);
@@ -133,6 +116,7 @@ export const resolvers = {
         ...room.toObject(),
       }));
     },
+
     findTransactionBy: async (
       _: any,
       args: { id?: string; bookingId?: string }
@@ -226,11 +210,6 @@ export const resolvers = {
       // populate User and Room
       return await Booking.find().populate('user').populate('room')
     },
-    /* ADMIN */
-    rooms: async () => {
-      return await Room.find()
-    },
-    /* ADMIN */
     transaction: async () => {
       return await Transaction.find().populate('user').populate('booking')
     },
@@ -358,13 +337,8 @@ export const resolvers = {
     },
     /* USER */
     // MARK: MAILER
-    sendContactEmail: async (_: any, args: {
-      to: string;
-      subject: string;
-      message: string;
-      username: string;
-      actionUrl: string;
-    }) => {
+    sendContactEmail: async (_: any, {input}: any) => {
+      const {to, subject, username, actionUrl} = input
       try {
         const getEmailTemplate = (templateName: string, variables: Record<string, string>) => {
           const filePath = path.join(process.cwd(), '/src/app/emailTemplates', `${templateName}.html`);
@@ -380,13 +354,13 @@ export const resolvers = {
         }
 
         const html = getEmailTemplate('booking', {
-          username: args.username,
-          actionUrl: args.actionUrl
+          username,
+          actionUrl
         });
 
         await sendEmail({
-          to: args.to,
-          subject: args.subject,
+          to,
+          subject,
           html
         });
 
@@ -396,7 +370,11 @@ export const resolvers = {
         return { success: false, message: 'Failed to send email' };
       }
     },
-    confirmTransaction: async (_: any, { id }: { id: string }) => {
+    /* ADMIN */
+    confirmTransaction: async (_: any, { id }: { id: string }, context: GraphQLContext) => {
+      if (!context.isAuthenticated && !context.isAdmin()) {
+        throw new Error('Not Authorization');
+      }
       const result = await Transaction.updateOne({
         _id: id
       },
