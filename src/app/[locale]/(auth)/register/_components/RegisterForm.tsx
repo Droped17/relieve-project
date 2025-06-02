@@ -64,7 +64,11 @@ const RegisterForm = () => {
         try {
             const validatedFormData = schema.safeParse(formData)
             if (validatedFormData.success) {
-                await createUser({ variables: formData })
+                await createUser({ variables: {
+                    input: {
+                        formData
+                    }
+                } })
             } else {
                 console.error(validatedFormData.error.format());
                 setError(validatedFormData.error.flatten().fieldErrors)
