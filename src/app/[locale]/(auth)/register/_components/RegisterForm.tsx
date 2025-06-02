@@ -66,7 +66,11 @@ const RegisterForm = () => {
             if (validatedFormData.success) {
                 await createUser({ variables: {
                     input: {
-                        formData
+                        firstName: formData.firstName,
+                        lastName: formData.lastName,
+                        email: formData.email,
+                        password: formData.password,
+                        phone: formData.phone
                     }
                 } })
             } else {
