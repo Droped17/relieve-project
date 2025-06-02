@@ -21,6 +21,11 @@ const protectedRoutes = [
   '/dashboard',
 ];
 
+const authenRoute = [
+  '/login',
+  '/register'
+]
+
 const isProtectedRoute = (pathname: string) => {
   const segments = pathname.split('/');
   let pathToCheck = pathname;
@@ -41,6 +46,9 @@ const isProtectedRoute = (pathname: string) => {
 export default async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   console.log(`Middleware running for: ${pathname}`);
+  
+  const locale = pathname.split('/')[1];
+  const isValidLocale = routing.locales.includes(locale as Locales);
 
   if (isProtectedRoute(pathname)) {
     console.log(`Protected route detected: ${pathname}`);
@@ -55,9 +63,6 @@ export default async function middleware(request: NextRequest) {
 
       if (!token) {
         console.log('No auth token - redirecting to login');
-        const locale = pathname.split('/')[1];
-        // Cast `locale` to `Locales` after checking if it's a valid locale
-        const isValidLocale = routing.locales.includes(locale as Locales);
 
         const callbackUrl = request.nextUrl.clone();
 
@@ -97,6 +102,20 @@ export default async function middleware(request: NextRequest) {
       // For production, consider more robust error handling.
       const url = new URL('/auth/signin', request.url); // Example: redirect to signin on unexpected error
       return NextResponse.redirect(url);
+    }
+  }
+
+  if (authenRoute.some(route => pathname.includes(route))) {
+    const locale = pathname.split('/')[1];
+    const isValidLocale = routing.locales.includes(locale as Locales);
+    const token = await getToken({
+      req: request,
+      secret: process.env.NEXTAUTH_SECRET
+    });
+
+    if (token) {
+      const redirectPath = isValidLocale ? `/${locale}` : `/`;
+      return NextResponse.redirect(new URL(redirectPath, request.url));
     }
   }
 

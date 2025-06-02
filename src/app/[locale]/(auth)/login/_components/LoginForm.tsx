@@ -2,7 +2,7 @@
 
 import { FormEvent, useState } from "react"
 import { signIn } from "next-auth/react"
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import { LoginSchema } from "../loginSchema"
 import Button from "@/src/components/atoms/Button"
 import Divider from "@/src/components/atoms/Divider"
@@ -20,10 +20,11 @@ const LoginForm = () => {
         password: ''
     });
     const [error, setError] = useState<Record<string, string[]>>({});
-
+    const [loginError,setLoginError] = useState<string>("");
+    
     const param = useParams()
+    const router = useRouter()
     const schema = LoginSchema()
-
 
     const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData((prev) => ({
@@ -37,12 +38,17 @@ const LoginForm = () => {
         try {
             const validatedFormData = schema.safeParse(formData)
             if (validatedFormData.success) {
-                await signIn('credentials', {
-                    redirect: true,
+                const result = await signIn('credentials', {
+                    redirect: false,
                     callbackUrl: `/${param.locale}/homepage`,
                     email: formData.email,
                     password: formData.password,
                 })
+                if (result?.error) {
+                    setLoginError(result.error)
+                } else {
+                    router.replace(`/${param.locale}/homepage`)
+                }
             }
             else {
                 console.error(validatedFormData.error.format());
@@ -61,8 +67,8 @@ const LoginForm = () => {
         >
             <div className="flex flex-col gap-4">
                 <HeaderText title="Login" className="text-center text-2xl font-semibold" />
-                <Input id="email" type="email" name="email" value={formData.email} onChange={handleOnChange} label="Email Address" error={error.email} />
-                <Input id="password" type="password" name="password" value={formData.password} onChange={handleOnChange} label="Password" error={error.password} />
+                <Input id="email" type="email" name="email" value={formData.email} onChange={handleOnChange} label="Email Address" error={error.email || loginError} />
+                <Input id="password" type="password" name="password" value={formData.password} onChange={handleOnChange} label="Password" error={error.password || loginError} />
                 <Button title="Sign In" type="submit" className="bg-primary hover:bg-secondary"/>
                 <Divider />
         {/* [TODO]: Re-Design Google Button */}
