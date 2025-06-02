@@ -47,7 +47,10 @@ const BookingStepper = ({ formData, setFormData, setDialog }: IBookingStepperPro
 
     const { data, loading } = useQuery(FIND_ROOMS_BY_ID, {
         variables: {
-            id: params.id
+            input: {
+                 id: params.id
+            }
+            
         }
     })
     const [createBooking, { loading: creating }] = useMutation(CREATE_BOOKING, {
