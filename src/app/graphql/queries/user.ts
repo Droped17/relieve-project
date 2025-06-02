@@ -72,7 +72,7 @@ input CreateUserInput {
   phone: String!
 }
 
-input FindRoomInput {
+input FindRoomByInput {
   id: ID
   floor: Int
   status: ERoomStatus
@@ -190,7 +190,7 @@ type Query {
     nights: Int
     numberOfPeople: Int
   ): [Room!]!
-  findRoomBy(input: FindRoomInput!): [Room!]!
+  findRoomBy(input: FindRoomByInput!): [Room!]!
   findTransactionBy(id: ID): TransactionResponse!
   booking: [Booking!]!
   allRooms(date: String!, nights: Int!, personPerRoom: Int!, floor: Int): [Room!]!
