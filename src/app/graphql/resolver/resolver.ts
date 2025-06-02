@@ -369,7 +369,7 @@ export const resolvers = {
     },
     /* ADMIN */
     confirmTransaction: async (_: any, { id }: { id: string }, context: GraphQLContext) => {
-      if (!context.isAuthenticated && !context.isAdmin()) {
+      if (!context.isAdmin()) {
         throw new Error('Not Authorization');
       }
       const result = await Transaction.updateOne({
