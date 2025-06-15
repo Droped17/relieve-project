@@ -49,8 +49,8 @@ const BookingSchema: Schema = new Schema({
         default: EBookingStatus.PENDING,
         required: true
     },
-    checkedInAt: { type: Date },
-    checkedOutAt: { type: Date },
+    checkedInAt: { type: Date, default: null},
+    checkedOutAt: { type: Date, default: null },
 
     /* Reference Model */
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },

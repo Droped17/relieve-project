@@ -50,3 +50,29 @@ export const CONFIRM_TRANSACTION = gql`
         confirmTransaction(id: $id)
     }
 `
+
+export const IS_CHECKED_IN = gql`
+    query isCheckedIn($date: String!) {
+        isCheckedIn(date: $date) {
+            status
+            message
+            data {
+                pendingCheckIn
+                totalCheckIn
+            }
+        }
+    }
+`
+
+export const INCOME = gql`
+query IncomePerMonth {
+  incomePerMonth {
+    status
+    message
+    data {
+      month
+      totalIncome
+    }
+  }
+}
+`

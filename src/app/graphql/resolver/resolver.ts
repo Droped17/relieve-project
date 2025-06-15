@@ -64,9 +64,9 @@ export const resolvers = {
 
     },
     findRoomBy: async (
-      _: unknown, {input}: any
+      _: unknown, { input }: any
     ) => {
-      const {id,floor,status,date,nights,numberOfPeople} = input
+      const { id, floor, status, date, nights, numberOfPeople } = input
       const filter: any = {};
 
       if (id) filter._id = new ObjectId(id);
@@ -116,7 +116,39 @@ export const resolvers = {
         ...room.toObject(),
       }));
     },
+    countEmptyRooms: async (_: any, __: any, context: GraphQLContext) => {
+      if (!context.isAuthenticated && !context.isAdmin()) {
+        throw new Error('Not Authorized');
+      }
+      // Get All Rooms
+      const allRooms = await Room.countDocuments()
+      // Get Bookings
+      const bookingNumber = await Booking.countDocuments()
+      // Caculate empty rooms
+      const emptyRoom = allRooms - bookingNumber
 
+      return emptyRoom;
+    },
+    findRoomByStatus: async (_: unknown, { input }: any, context: GraphQLContext) => {
+      if (!context.isAuthenticated && !context.isAdmin()) {
+        throw new Error('Not Authorization');
+      }
+      try {
+        const { id, status } = input
+
+        const filter: any = {}
+        if (id) filter._id = id
+        if (status) filter.status = status
+
+        const rooms = await Room.find(filter)
+        console.log(rooms);
+
+        return rooms
+
+      } catch (error) {
+        console.error(error)
+      }
+    },
     findTransactionBy: async (
       _: any,
       args: { id?: string; bookingId?: string }
@@ -239,10 +271,127 @@ export const resolvers = {
           room.personPerRoom < personPerRoom,
       }));
     },
+    isCheckedIn: async (_: any, { date }: any, context: GraphQLContext) => {
+      if (!context.isAuthenticated && !context.isAdmin()) {
+        throw new Error('Not Authorized');
+      }
+      const checkIn = dayjs(date, 'YYYY-MM-DD', true);
+
+      if (!checkIn.isValid()) {
+        throw new Error("Invalid date format. Use DD-MM-YYYY.");
+      }
+
+      const checkInDate = await Transaction.find({
+        checkIn: checkIn.toDate()
+      })
+
+      /* Total Checkin */
+      const totalCheckIn = await Transaction.countDocuments({
+        checkIn: checkIn.toDate()
+      })
+
+      /* Pending Checkin */
+      const result = [];
+      for (const pendingCheckIn of checkInDate) {
+        result.push(pendingCheckIn.checkedInAt)
+      }
+
+      const pendingCheckIn = result.filter((item) => item !== null)
+
+      return {
+        status: EStatus.SUCCESS,
+        message: "Get Checked in success",
+        data: {
+          totalCheckIn,
+          pendingCheckIn: pendingCheckIn.length
+        }
+      }
+    },
+    totalCustomer: async (_: any, __: any, context: GraphQLContext) => {
+      if (!context.isAuthenticated && !context.isAdmin()) {
+        throw new Error('Not Authorized');
+      }
+      /* Get User */
+      const totalUsers = await User.countDocuments()
+      /* Get Total Room */
+      const totalRooms = await Room.countDocuments()
+      /* Get Total Income */
+      const totalIncome = await Transaction.aggregate([
+        {
+          $group: {
+            _id: null,
+            totalPrice: { $sum: "$totalPrice" }
+          }
+        }
+      ])
+
+      return {
+        status: EStatus.SUCCESS,
+        message: "Get Total Customer",
+        data: {
+          totalUsers,
+          totalRooms,
+          totalIncome: totalIncome[0].totalPrice
+        }
+      }
+    },
+    incomePerMonth: async (_: any, __: any, context: GraphQLContext) => {
+      if (!context.isAuthenticated && !context.isAdmin()) {
+        throw new Error('Not Authorized');
+      }
+
+      const currentYear = dayjs().year();
+
+      const incomeByMonth = await Transaction.aggregate([
+        {
+          $match: {
+            checkIn: {
+              $gte: new Date(`${currentYear}-01-01T00:00:00Z`),
+              $lte: new Date(`${currentYear}-12-31T23:59:59Z`)
+            }
+          }
+        },
+        {
+          $group: {
+            _id: { $month: "$checkIn" },
+            totalIncome: { $sum: "$totalPrice" }
+          }
+        },
+        {
+          $project: {
+            _id: 0,
+            month: "$_id",
+            totalIncome: 1
+          }
+        },
+        {
+          $sort: { month: 1 }
+        }
+      ]);
+
+      const monthNames = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+      ];
+
+      const result = Array.from({ length: 12 }, (_, i) => {
+        const found = incomeByMonth.find(m => m.month === i + 1);
+        return {
+            month: monthNames[i],
+            totalIncome: found ? found.totalIncome : 0
+        };
+      });
+
+      return {
+        status: EStatus.SUCCESS,
+        message: "Get Income Per Month",
+        data: result
+      };
+    },
   },
   Mutation: {
     /* USER, ADMIN */
-    createUser: async (_: never, {input}: any) => {
+    createUser: async (_: never, { input }: any) => {
       const newUser = await User.create({
         ...input,
         password: await bcrypt.hash(input.password, 10)
@@ -317,6 +466,8 @@ export const resolvers = {
         const newTransaction = await Transaction.create({
           booking: booking._id,
           totalPrice: room.price * nights,
+          checkIn: parsedCheckIn.toDate(),
+          checkOut: parsedCheckOut.toDate(),
         })
 
         if (newTransaction) {
@@ -334,8 +485,8 @@ export const resolvers = {
     },
     /* USER */
     // MARK: MAILER
-    sendContactEmail: async (_: any, {input}: any) => {
-      const {to, subject, username, actionUrl} = input
+    sendContactEmail: async (_: any, { input }: any) => {
+      const { to, subject, username, actionUrl } = input
       try {
         const getEmailTemplate = (templateName: string, variables: Record<string, string>) => {
           const filePath = path.join(process.cwd(), '/src/app/emailTemplates', `${templateName}.html`);

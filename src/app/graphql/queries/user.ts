@@ -81,6 +81,11 @@ input FindRoomByInput {
   numberOfPeople: Int
 }
 
+input FindRoomByStatusInput {
+  id: ID
+  status: ERoomStatus
+}
+
 input sendContactEmailInput {
   to: String!, 
   subject: String!
@@ -115,7 +120,41 @@ type TransactionsResponse {
 type EmailResponse {
   success: Boolean!
   message: String!
-} 
+}
+
+type CheckedInData {
+  totalCheckIn: Int!
+  pendingCheckIn: Int!
+}
+  
+type CheckedInResponse {
+  status: EStatus!
+  message: String!
+  data: CheckedInData!
+}
+
+type TotalUserData {
+  totalUsers: Int!
+  totalRooms: Int!
+  totalIncome: Int!
+}
+
+type TotalCustomerResponse {
+  status: EStatus!
+  message: String!
+  data: TotalUserData!
+}
+
+type IncomePerMonthData {
+  month: String!
+  totalIncome: Int!
+}
+
+type IncomePerMonthResponse {
+  status: EStatus!
+  message: String!
+  data: [IncomePerMonthData!]!  
+}
 
 type User {
   id: ID!
@@ -164,6 +203,10 @@ type Transaction {
   request: String
   image: String
   status: ETransactionStatus
+  checkIn: String!
+  checkOut: String!
+  checkedInAt: String
+  checkedOutAt: String
   createdAt: String!
   updatedAt: String!
   user: [User!]
@@ -183,7 +226,6 @@ type Query {
   userData: String @auth(requires: ADMIN)
   adminData: String @auth(requires: ADMIN)
   roomStatByDate(date: String!): RoomStats! @auth(requires: ADMIN)
-  publicData: String
   transaction: [Transaction!]!
   rooms(
     date: String
@@ -191,6 +233,11 @@ type Query {
     numberOfPeople: Int
   ): [Room!]!
   findRoomBy(input: FindRoomByInput!): [Room!]!
+  findRoomByStatus(input: FindRoomByStatusInput!): [Room!]!
+  countEmptyRooms: Int
+  isCheckedIn(date: String!): CheckedInResponse!
+  totalCustomer: TotalCustomerResponse!
+  incomePerMonth: IncomePerMonthResponse!
   findTransactionBy(id: ID): TransactionResponse!
   booking: [Booking!]!
   allRooms(date: String!, nights: Int!, personPerRoom: Int!, floor: Int): [Room!]!

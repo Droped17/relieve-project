@@ -1,5 +1,7 @@
 "use client";
 
+import { INCOME } from "@/src/app/graphql/queries/transaction.query";
+import { useQuery } from "@apollo/client";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -16,12 +18,20 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
 /* [TODO]: Fetch real data */
 export const MyChart = () => {
-  const data = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+
+  const {data, loading, error} = useQuery(INCOME)
+
+  if (loading) return <p>Loading..</p>
+  if (error) return <p>{error.message}</p>
+
+  console.log(`DETAILS => `,data);
+
+  const incomeData = {
+    labels: data.incomePerMonth.data.map((item: { month: string; }) => item.month),
     datasets: [
       {
         label: "Income",
-        data: [100, 200, 150, 300, 250, 500, 120, 90, 250, 300, 210, 380],
+        data: data.incomePerMonth.data.map((item: { totalIncome: string; }) => item.totalIncome),
         backgroundColor: "rgba(75,192,192,0.6)",
       },
     ],
@@ -42,6 +52,6 @@ export const MyChart = () => {
 
   return (
   <div className="w-full">
-    <Bar data={data} options={options} />;
+    <Bar data={incomeData} options={options} />;
   </div>)
 };

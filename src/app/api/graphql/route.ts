@@ -32,6 +32,7 @@ function setCorsHeaders(response: NextResponse, request: NextRequest) {
     'https://relieve-project.vercel.app',
     'https://relieve-project.vercel.app/',
     'http://localhost:3000', // For local testing
+    'http://localhost:3000/', // For local testing
   ];
   const requestOrigin = request.headers.get('origin');
 

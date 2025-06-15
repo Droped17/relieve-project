@@ -23,3 +23,23 @@ export const GET_ALL_ROOMS = gql`
   }
 `
 
+export const COUNT_EMPTY_ROOMS = gql`
+  query CountRoom {
+    countEmptyRooms
+  }
+`
+
+export const YEAR_DETAIL = gql`
+  query TotalCustomer {
+    totalCustomer {
+      status
+      message
+      data {
+        totalUsers
+        totalRooms
+        totalIncome
+      }
+    }
+  }
+`
+

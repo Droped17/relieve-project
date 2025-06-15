@@ -9,6 +9,10 @@ enum ETransactionStatus {
 export interface ITransaction extends Document {
     totalPrice: number;
     image?: string
+    checkIn: string;
+    checkOut: string;
+    checkedInAt?: Date;
+    checkedOutAt?: Date;
     status: ETransactionStatus;
     createdAt: Date;
     updatedAt: Date;
@@ -22,6 +26,10 @@ export interface ITransaction extends Document {
 const TransactionSchema: Schema = new Schema({
     totalPrice: { type: Number, required: true },
     image: { type: String },
+    checkIn: { type: Date, required: true },
+    checkOut: { type: Date, required: true },
+    checkedInAt: { type: Date, default: null},
+    checkedOutAt: { type: Date, default: null },
     status: { type: String, enum: Object.values(ETransactionStatus), default: ETransactionStatus.PENDING, required: true },
     user: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     booking: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Booking' }],
