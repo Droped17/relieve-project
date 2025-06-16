@@ -6,7 +6,7 @@ import clsx from "clsx"
 import dayjs from "dayjs"
 import { useMutation, useQuery } from "@apollo/client"
 import Button from "@/src/components/atoms/Button"
-import { CONFIRM_TRANSACTION, PENDING_TRANSACTION } from "@/src/app/graphql/queries/transaction.query"
+import { CONFIRM_TRANSACTION, DELETE_TRANSACTION, PENDING_TRANSACTION } from "@/src/app/graphql/queries/transaction.query"
 import Loading from "../../loading"
 
 const TransactionPage = () => {
@@ -29,12 +29,36 @@ const TransactionPage = () => {
         }
     })
 
-    if (loading) return <p>Loading..</p>
+    const [deleteTransaction, {client: deleteTransactionClient, loading: deleteTransactionLoading}] = useMutation(DELETE_TRANSACTION, {
+        onCompleted: () => {
+            deleteTransactionClient.cache.evict({
+                id: 'ROOT_QUERY',
+                fieldName: 'findTransactionByStatus',
+            })
+        },
+        onError: (err) => {
+            console.error(err)
+        }
+    })
+
+    if (loading || confirmTransactionLoading || deleteTransactionLoading) return <p>Loading..</p>
     if (confirmTransactionLoading) return <Loading />
 
     const handleConfirm = async (id: string) => {
         try {
             await confirmTransaction({
+                variables: {
+                    id
+                }
+            })
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    const handleDelete = async(id: string) => {
+        try {
+            await deleteTransaction({
                 variables: {
                     id
                 }
@@ -89,7 +113,7 @@ const TransactionPage = () => {
                         </div>
 
                         <div className="flex justify-end gap-2">
-                            <Button type="submit" title="Delete" className="p-4 bg-red-400 hover:bg-red-500" />
+                            <Button type="submit" title="Delete" className="p-4 bg-red-400 hover:bg-red-500" onClick={() => handleDelete(transaction._id)}/>
                             {transaction.image && <Button type="submit" title="Confirm" className="p-4 bg-primary hover:bg-secondary" onClick={() => handleConfirm(transaction._id)} />}
                         </div>
 

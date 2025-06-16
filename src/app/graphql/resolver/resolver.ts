@@ -423,6 +423,28 @@ export const resolvers = {
       })
       return newRoom
     },
+    deleteTransaction: async (_:any, {id}: {id: string}, context: GraphQLContext) => {
+      if (!context.isAdmin()) {
+        throw new Error('Not Authorization');
+      }
+
+      const result = await Transaction.deleteOne({
+        _id: id
+      })
+
+      if (result) {
+        return {
+          status: EStatus.SUCCESS,
+          message: "Delete Transaction Success"
+        }
+      } else {
+        return {
+          status: EStatus.ERROR,
+          message: "Error to delete Transaction"
+        }
+      }
+
+    },
     /* USER, ADMIN */
     /* [TODO]: Fix request input */
     createBooking: async (_: any, { input }: any) => {

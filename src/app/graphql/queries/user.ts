@@ -156,6 +156,11 @@ type IncomePerMonthResponse {
   data: [IncomePerMonthData!]!  
 }
 
+type DeleteTransactionResponse {
+  status: EStatus!
+  message: String!
+}
+
 type User {
   id: ID!
   firstName: String!
@@ -252,6 +257,7 @@ type Query {
     sendContactEmail(input: sendContactEmailInput!): EmailResponse!
     uploadImage(imageUrl: String!, transactionId: ID!): Boolean!
     confirmTransaction(id: ID): Boolean!
+    deleteTransaction(id: ID): DeleteTransactionResponse!
   }
  
 `;

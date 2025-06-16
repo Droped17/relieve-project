@@ -16,15 +16,12 @@ import { Bar } from "react-chartjs-2";
 // Register the required components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-/* [TODO]: Fetch real data */
 export const MyChart = () => {
 
   const {data, loading, error} = useQuery(INCOME)
 
   if (loading) return <p>Loading..</p>
   if (error) return <p>{error.message}</p>
-
-  console.log(`DETAILS => `,data);
 
   const incomeData = {
     labels: data.incomePerMonth.data.map((item: { month: string; }) => item.month),

@@ -76,3 +76,11 @@ query IncomePerMonth {
   }
 }
 `
+export const DELETE_TRANSACTION = gql`
+    mutation DeleteTransaction($id: ID) {
+        deleteTransaction(id: $id) {
+           message
+           status 
+        }
+    }
+`
