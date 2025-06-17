@@ -72,9 +72,7 @@ export const resolvers = {
       if (id) filter._id = new ObjectId(id);
       if (floor !== undefined) filter.floor = floor;
       if (status !== undefined) filter.status = status;
-
-      console.log(filter._id);
-
+      
       const allRooms = await Room.find(filter);
 
       if (date && nights && numberOfPeople) {
@@ -141,7 +139,6 @@ export const resolvers = {
         if (status) filter.status = status
 
         const rooms = await Room.find(filter)
-        console.log(rooms);
 
         return rooms
 

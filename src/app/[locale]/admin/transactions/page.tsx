@@ -47,9 +47,7 @@ const TransactionPage = () => {
     const handleConfirm = async (id: string) => {
         try {
             await confirmTransaction({
-                variables: {
-                    id
-                }
+                variables: {id}
             })
         } catch (error) {
             console.error(error)
@@ -59,9 +57,7 @@ const TransactionPage = () => {
     const handleDelete = async(id: string) => {
         try {
             await deleteTransaction({
-                variables: {
-                    id
-                }
+                variables: {id}
             })
         } catch (error) {
             console.error(error)
